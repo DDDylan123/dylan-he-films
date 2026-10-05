@@ -9,7 +9,9 @@
     "yt": "ZKwydpctGVU",
     "bili": "BV1FSHp69EFQ",
     "descZh": "人类曾对宇宙说：你好。如果有一天，外星人终于回信了，地球上却一个人都不剩，谁来替人类回答？",
-    "descEn": "Humanity once said hello to the universe. If a reply finally arrives after everyone on Earth is gone, who will answer for us?"
+    "descEn": "Humanity once said hello to the universe. If a reply finally arrives after everyone on Earth is gone, who will answer for us?",
+    "publishedAt": "2026-10-05",
+    "dateSource": "bilibili"
   },
   {
     "slug": "the-gap",
@@ -21,7 +23,9 @@
     "yt": "KAgRfYksMPM",
     "bili": "BV191aW6rEDQ",
     "descZh": "从太阳到钟表，从手机上的红点到 AI，关于时间与注意力的一次思考。",
-    "descEn": "From the sun to clocks, from notifications to AI: a reflection on time and attention."
+    "descEn": "From the sun to clocks, from notifications to AI: a reflection on time and attention.",
+    "publishedAt": "2026-09-29",
+    "dateSource": "bilibili"
   },
   {
     "slug": "see-you-tomorrow",
@@ -33,7 +37,9 @@
     "yt": "2GY4CSDFOOE",
     "bili": "BV1FSbV6EE5D",
     "descZh": "故事从熟悉的海边日常展开。随着全息幻境关闭，温暖的重逢显露出孤独的底色。主人出舱维修后未归，留下的记忆仍不断播放。边牧不理解死亡与虚实，只记得主人离开的方向，最终走向舱外寻找主人。\n\n我们借此回应命题中的追问：“如果孤独是永恒的底色，幻境中能否得到真正的慰藉？”幻境中的快乐确实存在，却无法替代被等待的人。\n\n影片以二维手绘动画质感呈现海岸与宇宙，通过动作、环境和音乐，让这一追问落在一只狗最朴素的牵挂上。",
-    "descEn": "The story begins with familiar seaside moments. As the holographic illusion fades, a warm reunion gives way to the loneliness beneath it. The dog’s owner left the spacecraft to make repairs and never returned, but their memories together continue to play. The border collie understands neither death nor the boundary between illusion and reality. It remembers only the direction its owner took—and eventually ventures outside to find them.\n\nThrough this story, we explore the question posed by the brief: “If loneliness is the enduring backdrop to existence, can an illusion offer true solace?” The joy within the illusion is real, yet it cannot replace the one we are waiting for.\n\nRendered in the style of hand-drawn 2D animation, the film brings together the coast and the cosmos. Through movement, atmosphere, and music, it grounds this question in a dog’s simple longing for its owner."
+    "descEn": "The story begins with familiar seaside moments. As the holographic illusion fades, a warm reunion gives way to the loneliness beneath it. The dog’s owner left the spacecraft to make repairs and never returned, but their memories together continue to play. The border collie understands neither death nor the boundary between illusion and reality. It remembers only the direction its owner took—and eventually ventures outside to find them.\n\nThrough this story, we explore the question posed by the brief: “If loneliness is the enduring backdrop to existence, can an illusion offer true solace?” The joy within the illusion is real, yet it cannot replace the one we are waiting for.\n\nRendered in the style of hand-drawn 2D animation, the film brings together the coast and the cosmos. Through movement, atmosphere, and music, it grounds this question in a dog’s simple longing for its owner.",
+    "publishedAt": "2026-09-08",
+    "dateSource": "bilibili"
   },
   {
     "slug": "transfer-complete",
@@ -45,7 +51,9 @@
     "yt": "KPTNsmF0XfU",
     "bili": "BV1n6846REGM",
     "descZh": "积极拥抱 AI、教会它完成自己的工作之后，人将何去何从？一部关于 AI 时代职场焦虑的动画短片。",
-    "descEn": "After embracing AI and teaching it to do our work, where do we go next? An animated satire about working life in the age of AI."
+    "descEn": "After embracing AI and teaching it to do our work, where do we go next? An animated satire about working life in the age of AI.",
+    "publishedAt": "2026-08-23",
+    "dateSource": "bilibili"
   },
   {
     "slug": "taking-wing",
@@ -57,6 +65,8 @@
     "yt": "IEyBYQJ3uZA",
     "bili": "BV1NpTW6cE94",
     "descZh": "一只年轻的天山雪鸡在一次次失败后，学会读懂山间气流，找到属于自己的飞翔方式。Dylan He 的首部 AI 动画短片。",
-    "descEn": "After countless failed attempts to fly, a young Tianshan snowcock learns to read the mountain currents and discovers its own way to glide. Dylan He’s debut AI animated short."
+    "descEn": "After countless failed attempts to fly, a young Tianshan snowcock learns to read the mountain currents and discovers its own way to glide. Dylan He’s debut AI animated short.",
+    "publishedAt": "2026-07-03",
+    "dateSource": "bilibili"
   }
 ]
