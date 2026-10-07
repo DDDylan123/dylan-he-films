@@ -91,3 +91,7 @@ body::before{animation:none}
 .social .channels{margin-top:0}
 .social-label{font-family:Arial,"PingFang SC",sans-serif;font-size:12px;letter-spacing:2px;color:#9fafc6}
 .channels a{color:#aab6c7}
+
+/* hero poster is clickable */
+.feature-link{display:contents}
+.feature-link img{cursor:pointer}
