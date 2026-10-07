@@ -15,3 +15,24 @@ body{background:#111b2b}header{padding:32px 6%;}.brand{font-family:Arial,sans-se
 .channels{flex-wrap:wrap}.channels a{overflow-wrap:anywhere}footer{flex-wrap:wrap;gap:16px}footer a{overflow-wrap:anywhere}
 
 .personal-avatar{display:block;width:160px;height:160px;object-fit:contain;margin-top:28px;border:1px solid #536077}.about-identity h2{margin-top:7px}@media(max-width:650px){.personal-avatar{width:120px;height:120px;margin-top:20px}.about-identity{margin-bottom:12px}}
+
+/* 2026-10 fixes: play button off the title, tighter mobile hero, About link on mobile */
+.player-launch{align-items:flex-end;justify-content:flex-start;padding:28px;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.45))}
+.player-launch span{display:inline-flex;align-items:center;gap:10px;padding:11px 20px 11px 16px;font-size:14px}
+.player-launch span::before{content:"";width:0;height:0;border-left:10px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent}
+@media(max-width:650px){
+.nav-about{display:inline}
+nav{gap:16px}
+.intro{top:96px}
+.intro h1{font-size:64px}
+.feature{height:590px}
+.feature img{top:262px;height:220px}
+.feature-info{bottom:30px}
+.films{padding-top:10px}
+.player-launch{padding:14px}
+.player-launch span{font-size:12px;padding:8px 14px 8px 12px}
+}
+.contact-mail{display:inline-flex;flex-direction:column;gap:8px;margin-top:38px;font-family:Georgia,"Songti SC",serif;font-size:20px;letter-spacing:.5px;color:#dce6f3;border-bottom:1px solid #53647c;padding-bottom:6px;transition:color .2s,border-color .2s}
+.contact-mail span{font-family:Arial,"PingFang SC",sans-serif;font-size:12px;letter-spacing:2px;color:#9fafc6}
+.contact-mail:hover{color:#fff;border-color:#cbd7ec}
+@media(max-width:650px){.contact-mail{font-size:18px;margin-top:30px}}
