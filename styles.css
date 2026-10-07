@@ -136,3 +136,10 @@ body::before{animation:none}
 }
 @media(min-width:651px){.hero-bg img{left:18%;right:auto;width:100%}}
 @media(min-width:651px) and (max-width:1200px){.hero-bg img{left:11%}}
+/* text-free poster backdrop */
+.hero-bg img{opacity:.62}
+@media(max-width:650px){.hero-bg img{top:40px;left:-25%;width:150%;opacity:.7}}
+@media(min-width:651px){.hero-bg img{opacity:.74}}
+@media(max-width:650px){.hero-bg img{top:24px;
+  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,rgba(0,0,0,.4) 75%,transparent 100%);
+  mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,rgba(0,0,0,.4) 75%,transparent 100%)}}
