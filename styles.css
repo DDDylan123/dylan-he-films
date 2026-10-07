@@ -36,3 +36,47 @@ nav{gap:16px}
 .contact-mail span{font-family:Arial,"PingFang SC",sans-serif;font-size:12px;letter-spacing:2px;color:#9fafc6}
 .contact-mail{border-bottom:0;margin-bottom:0}
 @media(max-width:650px){.contact-mail{font-size:18px;margin-top:30px}}
+
+/* ===== 2026-10 cinematic polish ===== */
+@view-transition{navigation:auto}
+::view-transition-group(*){animation-duration:.6s;animation-timing-function:cubic-bezier(.22,.7,.18,1)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+
+/* film grain */
+body::before{content:"";position:fixed;inset:-50%;z-index:50;pointer-events:none;opacity:.07;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+animation:grain .9s steps(5) infinite;will-change:transform}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-4%)}60%{transform:translate(-4%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+
+/* slow push-in on the hero poster */
+.feature img{animation:pushin 26s ease-in-out infinite alternate;transform-origin:60% 55%}
+@keyframes pushin{from{transform:scale(1)}to{transform:scale(1.07)}}
+
+/* covers: blurred placeholder, then image fades in */
+.film .image{background-size:cover;background-position:center;overflow:hidden}
+.film .image img{display:block}
+
+/* cards fade up as they scroll into view */
+.js .film{opacity:0;transform:translateY(28px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.js .film.in{opacity:1;transform:none}
+.js .film:nth-child(2n).in{transition-delay:.12s}
+
+/* per-film color on detail pages */
+.film-page{--film:#a395d4}
+.film-page .detail-main{position:relative}
+.film-page .detail-main::before{content:"";position:absolute;z-index:-1;left:50%;top:-120px;width:min(1400px,140vw);height:900px;transform:translateX(-50%);
+background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--film) 22%,transparent),transparent 62%);pointer-events:none}
+.film-page .detail-kicker{color:var(--film)}
+.film-page .player-launch span{border-color:color-mix(in srgb,var(--film) 70%,white)}
+.film-page .player-launch span::before{border-left-color:var(--film)}
+.film-page .view-controls a{border-bottom-color:var(--film)}
+.film-page .film-next a{transition:color .3s}
+.film-page .film-next a:hover{color:var(--film)}
+.film-page .synopsis{border-bottom-color:color-mix(in srgb,var(--film) 30%,#354156)}
+
+@media(prefers-reduced-motion:reduce){
+body::before{animation:none}
+.feature img{animation:none}
+.js .film{opacity:1;transform:none;transition:none}
+@view-transition{navigation:none}
+}
