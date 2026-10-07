@@ -34,7 +34,7 @@ nav{gap:16px}
 }
 .contact-mail{display:inline-flex;flex-direction:column;gap:8px;margin-top:38px;font-family:Georgia,"Songti SC",serif;font-size:20px;letter-spacing:.5px;color:#dce6f3;border-bottom:1px solid #53647c;padding-bottom:6px;transition:color .2s,border-color .2s}
 .contact-mail span{font-family:Arial,"PingFang SC",sans-serif;font-size:12px;letter-spacing:2px;color:#9fafc6}
-.contact-mail{border-bottom:0;margin-bottom:0}
+.contact-mail:hover{color:#fff;border-color:#cbd7ec}
 @media(max-width:650px){.contact-mail{font-size:18px;margin-top:30px}}
 
 /* ===== 2026-10 cinematic polish ===== */
