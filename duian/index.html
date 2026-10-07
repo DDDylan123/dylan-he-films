@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>对岸 THE OTHER SHORE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+/* Layout: one 2.39:1 film frame centred on black; everything (subs, choices, HUD) lives inside the frame like a print. */
+:root{
+  --night:#07080a; --frame:#000; --paper:#efe6d6; --dim:#9c9387;
+  --flame:#e9a54f; --ember:#b8562b; --line:rgba(239,230,214,.22);
+  --serif:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --latin:"Cormorant Garamond","Times New Roman",serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--night);color:var(--paper);font-family:var(--serif);margin:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;padding-inline:0}
+#wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+#frame{position:relative;width:min(100vw,calc(100dvh * 2.39));aspect-ratio:2.39/1;max-width:100%;max-height:100%;
+  background:var(--frame);overflow:hidden;container-type:inline-size;cursor:pointer}
+.layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#still{opacity:0;transition:opacity .9s ease;transform-origin:50% 50%}
+#still.on{opacity:1}
+#still.kb0{animation:kb0 var(--kb,8s) linear forwards}
+#still.kb1{animation:kb1 var(--kb,8s) linear forwards}
+@keyframes kb0{from{transform:scale(1.02) translate(0,0)}to{transform:scale(1.10) translate(-1.2%,-.8%)}}
+@keyframes kb1{from{transform:scale(1.10) translate(1%,.6%)}to{transform:scale(1.03) translate(0,0)}}
+#vid{opacity:0;transition:opacity .5s ease;background:#000}
+#vid.on{opacity:1}
+#ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2cqw;opacity:0;transition:opacity .8s;
+  background:radial-gradient(ellipse at 50% 60%,#1a1612 0%,#08080a 70%);text-align:center;padding-inline:8cqw}
+#ph.on{opacity:1}
+#ph .tag{font-size:1.1cqw;letter-spacing:.4em;color:var(--flame);border:1px solid var(--flame);padding:.3cqw .9cqw}
+#ph .desc{font-size:2.1cqw;color:var(--dim);line-height:1.6}
+#grain{pointer-events:none;mix-blend-mode:overlay;opacity:.35}
+#vignette{pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+#flash{pointer-events:none;background:radial-gradient(circle at 50% 70%,rgba(233,165,79,.55),transparent 60%);opacity:0;transition:opacity .6s}
+#flash.on{opacity:1;transition:opacity .05s}
+
+#year{position:absolute;left:2.4cqw;top:1.8cqw;font-family:var(--latin);font-style:italic;font-size:1.7cqw;letter-spacing:.12em;color:var(--paper);opacity:.75;font-variant-numeric:tabular-nums}
+#box{position:absolute;right:2.4cqw;top:1.8cqw;display:flex;align-items:flex-end;gap:.32cqw;height:2.2cqw}
+#box i{display:block;width:.28cqw;height:2cqw;background:linear-gradient(to bottom,var(--ember) 0 22%,#d9c3a0 22%);border-radius:.14cqw .14cqw 0 0;transition:opacity .6s,transform .6s}
+#box i.burnt{opacity:.15;transform:translateY(.5cqw)}
+#need{position:absolute;right:2.4cqw;top:4.6cqw;font-size:1cqw;color:var(--flame);letter-spacing:.08em;opacity:.85}
+
+#subs{position:absolute;left:0;right:0;bottom:3.2cqw;text-align:center;padding-inline:10cqw;pointer-events:none;
+  text-shadow:0 0 .4cqw rgba(0,0,0,.9),0 .1cqw .2cqw #000}
+#subs .zh{font-size:2.15cqw;line-height:1.55;letter-spacing:.06em;color:#f3e7c9;text-wrap:balance}
+#subs .en{font-family:var(--latin);font-size:1.55cqw;font-style:italic;color:#d7ccb8;margin-top:.3cqw}
+#subs{opacity:0;transition:opacity .5s}
+#subs.on{opacity:1}
+
+/* choice */
+#choice{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2cqw;padding-bottom:5cqw;
+  background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.15) 65%,transparent);opacity:0;pointer-events:none;transition:opacity .8s;cursor:default}
+#choice.on{opacity:1;pointer-events:auto}
+#choice .q{font-size:2.4cqw;letter-spacing:.12em}
+#choice .qen{font-family:var(--latin);font-style:italic;font-size:1.5cqw;color:var(--dim);margin-top:-1.4cqw}
+#opts{display:flex;gap:3cqw;flex-wrap:wrap;justify-content:center}
+.opt{position:relative;background:none;border:0;color:var(--paper);font-family:var(--serif);cursor:pointer;padding:1cqw 1.6cqw 1cqw 3.4cqw;text-align:left;
+  border-bottom:1px solid var(--line);transition:border-color .3s,color .3s}
+.opt::before{content:"";position:absolute;left:.6cqw;top:50%;width:2cqw;height:.3cqw;transform:translateY(-50%);
+  background:linear-gradient(to right,#d9c3a0 78%,var(--ember) 78%);border-radius:0 .15cqw .15cqw 0}
+.opt b{display:block;font-weight:600;font-size:2.05cqw;letter-spacing:.1em}
+.opt span{display:block;font-family:var(--latin);font-style:italic;font-size:1.35cqw;color:var(--dim)}
+.opt:hover,.opt:focus-visible{border-color:var(--flame);color:#fff;outline:none}
+.opt:hover::before,.opt:focus-visible::before{background:linear-gradient(to right,#d9c3a0 70%,var(--flame) 70%);box-shadow:1.3cqw 0 1cqw rgba(233,165,79,.55)}
+
+/* cards: title & ending */
+.card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4cqw;
+  background:rgba(4,4,6,.9);opacity:0;pointer-events:none;transition:opacity 1s;cursor:default;text-align:center}
+.card.on{opacity:1;pointer-events:auto}
+.title{font-weight:900;font-size:8cqw;letter-spacing:.5em;margin-right:-.5em;line-height:1}
+.subtitle{font-family:var(--latin);font-size:1.8cqw;letter-spacing:.6em;color:var(--dim);margin-right:-.6em}
+.credit{font-size:1.1cqw;letter-spacing:.3em;color:var(--dim)}
+.btnrow{display:flex;gap:2cqw;flex-wrap:wrap;justify-content:center;margin-top:1cqw}
+.btn{background:none;border:1px solid var(--line);color:var(--paper);font-family:var(--serif);font-size:1.5cqw;letter-spacing:.25em;
+  padding:.8cqw 2.4cqw;cursor:pointer;transition:border-color .3s,background .3s}
+.btn:hover,.btn:focus-visible{border-color:var(--flame);background:rgba(233,165,79,.08);outline:none}
+.gallery{display:flex;gap:1.6cqw;margin-top:1cqw}
+.slot{width:12cqw;border-top:1px solid var(--line);padding-top:.7cqw;font-size:1.25cqw;color:#4d4842;letter-spacing:.1em}
+.slot.got{color:var(--paper);border-color:var(--flame)}
+.slot small{display:block;font-family:var(--latin);font-style:italic;font-size:1cqw;color:var(--dim)}
+.endno{font-family:var(--latin);font-style:italic;font-size:1.6cqw;color:var(--flame);letter-spacing:.2em}
+.endname{font-weight:900;font-size:6cqw;letter-spacing:.3em;margin-right:-.3em}
+.endline{font-size:1.7cqw;color:var(--paper);letter-spacing:.08em}
+.endmeta{font-size:1.2cqw;color:var(--dim);letter-spacing:.12em;font-variant-numeric:tabular-nums}
+label.notes{font-size:1.1cqw;color:var(--dim);letter-spacing:.1em;display:flex;gap:.6cqw;align-items:center;cursor:pointer}
+#hint{position:absolute;bottom:1cqw;right:2.4cqw;font-size:.95cqw;color:var(--dim);opacity:.6;letter-spacing:.1em}
+#pauseBtn{position:absolute;left:2.4cqw;bottom:1.2cqw;background:none;border:1px solid var(--line);color:var(--paper);
+  font-family:var(--serif);font-size:1.1cqw;letter-spacing:.2em;padding:.35cqw 1cqw;cursor:pointer;opacity:.7;transition:opacity .3s,border-color .3s;display:flex;gap:.5cqw;align-items:center}
+#pauseBtn:hover,#pauseBtn:focus-visible{opacity:1;border-color:var(--flame);outline:none}
+#pauseBtn svg{width:1cqw;height:1cqw}
+#frame.paused #still,#frame.paused #grain{animation-play-state:paused}
+#pausecard .ptitle{font-weight:600;font-size:3.2cqw;letter-spacing:.5em;margin-right:-.5em}
+#pausecard .where{font-size:1.2cqw;color:var(--dim);letter-spacing:.15em}
+#pausecard .btnrow{flex-direction:column;align-items:stretch;gap:1cqw;min-width:22cqw}
+#pausecard .keys{font-size:1cqw;color:var(--dim);letter-spacing:.1em}
+#loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:1.2cqw;letter-spacing:.4em;color:var(--dim);opacity:0;transition:opacity .4s;pointer-events:none}
+#loading.on{opacity:1;animation:breathe 1.6s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){#still.kb0,#still.kb1{animation:none}}
+</style>
+</head>
+<body>
+
+<div id="wrap"><div id="frame" aria-live="polite">
+  <img id="still" class="layer" alt="">
+  <video id="vid" class="layer" playsinline preload="auto"></video>
+  <div id="ph" class="layer"><div class="tag">待补静帧</div><div class="desc"></div></div>
+  <canvas id="grain" class="layer"></canvas>
+  <div id="vignette" class="layer"></div>
+  <div id="flash" class="layer"></div>
+  <div id="year"></div>
+  <div id="box" aria-label="火柴"></div>
+  <div id="need"></div>
+  <div id="subs"><div class="zh"></div><div class="en"></div></div>
+  <div id="loading">加载中</div>
+  <div id="hint">点击画面继续 · 空格 / P 暂停</div>
+  <button id="pauseBtn" hidden aria-label="暂停"><svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1" y="1" width="3" height="8" fill="currentColor"/><rect x="6" y="1" width="3" height="8" fill="currentColor"/></svg>暂停</button>
+
+  <div id="choice"><div class="q"></div><div class="qen"></div><div id="opts"></div></div>
+
+  <div id="titlecard" class="card on">
+    <div class="title">对岸</div>
+    <div class="subtitle">THE OTHER SHORE</div>
+    <div class="credit">一部互动影像 · 出品人 Dylan He</div>
+    <div class="btnrow"><button class="btn" id="startBtn">划一根火柴，开始</button></div>
+    <div class="gallery" id="gal1"></div>
+    <label class="notes"><input type="checkbox" id="notesChk" checked> 显示制作备注（缺的素材和待配台词）</label>
+  </div>
+
+  <div id="pausecard" class="card" role="dialog" aria-label="暂停">
+    <div class="ptitle">暂停</div>
+    <div class="where"></div>
+    <div class="btnrow">
+      <button class="btn" id="resumeBtn">继续</button>
+      <button class="btn" id="pBackBtn">回到上一个选择</button>
+      <button class="btn" id="pTitleBtn">回到标题</button>
+    </div>
+    <label class="notes"><input type="checkbox" id="pNotesChk"> 显示制作备注</label>
+    <div class="keys">继续：空格 / P / Esc　·　跳过这一格：点击画面 / →</div>
+  </div>
+
+  <div id="endcard" class="card">
+    <div class="endno"></div>
+    <div class="endname"></div>
+    <div class="endline"></div>
+    <div class="endmeta"></div>
+    <div class="gallery" id="gal2"></div>
+    <div class="btnrow">
+      <button class="btn" id="backBtn">回到上一个选择</button>
+      <button class="btn" id="againBtn">从头再来</button>
+    </div>
+  </div>
+</div></div>
+
+<script>
+const STORY = {"start": "prologue", "nodes": {"prologue": {"year": "2016", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/00.mp4", "sub": "二〇一六年。", "en": "2016."}, {"t": "vid", "src": "m/01.mp4", "sub": "一九九一年三月，夜里向九点钟。浦东个灯，一盏一盏，数得清。", "en": "March 1991, nine at night. You could still count the lights of Pudong."}], "next": "c1"}, "c1": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/02.webp", "sub": "末班轮渡前，一个浦西女人走过来。", "en": "Before the last ferry, a woman from Puxi walked over.", "dur": 4.5}, {"t": "img", "src": "m/03.webp", "sub": "「有火伐？」", "en": "\"Got a light?\"", "dur": 4.5, "need": "新台词待配音"}], "choice": {"q": "她在等你的火。", "qen": "She is waiting for a light.", "opts": [{"l": "划一根自来火", "en": "Strike a match", "to": "n1a", "set": "met"}, {"l": "讲：呒没", "en": "\"No, I don't.\"", "to": "n1b"}]}}, "n1a": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/04.webp", "sub": "我借拨伊一根自来火。", "en": "I gave her a match.", "dur": 4.5, "need": "新台词待配音"}, {"t": "img", "src": "m/05.webp", "sub": "火光里，我第一次看清伊个面孔。", "en": "In the light, I saw her face for the first time.", "dur": 4.5, "need": "新台词待配音"}, {"t": "img", "src": "m/06.webp", "sub": "伊上了船。", "en": "She got on the boat.", "dur": 4.5}, {"t": "vid", "src": "m/07.mp4", "sub": "从此，对岸有了一个人。", "en": "From then on, there was someone on the other shore.", "need": "新台词待配音"}], "next": "c2"}, "n1b": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "她转身走开，向别人借火（背影）", "sub": "我讲，呒没。", "en": "I said no.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"t": "vid", "src": "m/08.mp4", "sub": "对岸，还是对岸。", "en": "The other shore was just the other shore.", "need": "新台词待配音"}], "next": "c2"}, "c2": {"year": "1992", "music": "m/46.mp3", "shots": [{"t": "vid", "src": "m/09.mp4", "sub": "一九九二年，动迁个消息来了。", "en": "1992. Word came: the old houses would be torn down.", "need": "新台词待配音"}, {"t": "vid", "src": "m/10.mp4", "sub": "「量到哪里，算到哪里。」", "en": "\"Whatever we measure is what you get.\""}, {"t": "img", "src": "m/11.webp", "sub": "隔壁人家，连夜在屋顶上加楼。老金问我：「侬加伐？」", "en": "The neighbours were building extra floors overnight. Lao Jin asked: \"Are you adding one?\"", "dur": 4.5, "need": "新台词待配音"}], "choice": {"q": "多一层，多一套房。", "qen": "One more floor, one more flat.", "opts": [{"l": "加，连夜加楼", "en": "Build, tonight", "to": "n2a"}, {"l": "勿加，跟老金一样", "en": "Don't, like Lao Jin", "to": "n2b"}]}}, "n2a": {"year": "1992–1994", "music": "m/46.mp3", "shots": [{"t": "vid", "src": "m/12.mp4", "sub": "两年里向，我加了三层。", "en": "In two years, I added three floors."}, {"t": "vid", "src": "m/13.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/14.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/15.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/16.mp4", "sub": "老屋拆脱，分到四套新房子。", "en": "The old house came down. I got four new flats."}], "next": "c3"}, "c3": {"year": "1994", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/17.webp", "sub": "四把钥匙。", "en": "Four keys.", "dur": 3.5}, {"t": "img", "src": "m/18.webp", "sub": "哪能还是浦东。", "en": "Still Pudong, after all that.", "dur": 4.5}, {"t": "img", "src": "m/19.webp", "sub": "「对岸有啥好？」", "en": "\"What's so good about the other side?\"", "dur": 4.5, "vo": "m/20.mp3"}], "choice": {"q": "四套房子，在浦东。", "qen": "Four flats, all in Pudong.", "opts": [{"l": "统统卖脱，过江", "en": "Sell them all, cross the river", "to": "n3a"}, {"l": "留在浦东", "en": "Stay in Pudong", "to": "e3"}]}}, "n3a": {"year": "1995", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/21.mp4", "sub": "我一日也没住过，统统卖脱，去买了浦西。", "en": "I never spent a night there. Sold them all and bought in Puxi."}, {"t": "vid", "src": "m/22.mp4", "sub": "", "en": ""}, {"t": "img", "src": "m/23.webp", "sub": "", "en": "", "dur": 4.5}, {"if": "met", "then": {"t": "img", "src": "m/24.webp", "sub": "我走了四年，走到伊对面。", "en": "It took me four years to get across from her.", "dur": 4.5}, "else": {"t": "img", "src": "m/24.webp", "sub": "对面窗里，是一户浦西人家。", "en": "Across the lane, a Puxi family.", "dur": 4.5, "need": "新台词待配音"}}], "next": "c4"}, "c4": {"year": "1995", "music": "m/47.mp3", "shots": [{"t": "img", "src": "m/25.webp", "sub": "卖房子拨我个人，请新邻居吃饭。", "en": "The man who sold me the flat invited his new neighbour to dinner.", "dur": 4.5, "need": "新台词待配音"}, {"if": "met", "then": {"t": "img", "src": "m/26.webp", "sub": "火光换成了吊灯。是伊。", "en": "The match had become a chandelier. It was her.", "dur": 4.5, "need": "新台词待配音"}, "else": {"t": "img", "src": "m/26.webp", "sub": "伊是伊屋里个女主人。", "en": "She was the lady of the house.", "dur": 4.5, "need": "新台词待配音"}}, {"t": "img", "src": "m/27.webp", "sub": "伊拿出一根香烟。打火机先点着了。", "en": "She took out a cigarette. Her husband's lighter was quicker.", "dur": 4}, {"t": "img", "src": "m/28.webp", "sub": "「侬老底子是阿里人？」「……浦东。」「浦东啊？乡下头呀。」", "en": "\"Where are you from, originally?\" \"...Pudong.\" \"Pudong? The countryside.\"", "dur": 4.5, "vo": "m/29.mp3", "need": "她的这句要用薇薇的声音重配"}, {"t": "img", "src": "m/30.webp", "sub": "", "en": "", "dur": 3.5}], "choice": {"q": "一桌子人，都在笑。", "qen": "The whole table is smiling.", "opts": [{"l": "笑笑，坐下去", "en": "Smile, sit back down", "to": "e1"}, {"l": "起身，走出去", "en": "Stand up and leave", "to": "e2"}]}}, "n2b": {"year": "1994", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/31.mp4", "sub": "我跟老金一样，一层也没加。", "en": "Like Lao Jin, I didn't add a single floor.", "need": "新台词待配音"}, {"t": "img", "src": "m/32.webp", "sub": "一九九四年，搬进新村。一套，新个。", "en": "1994. We moved into the new estate. One flat. Brand new.", "dur": 4.5, "need": "史实修正：画面要改成新建新村"}, {"t": "vid", "src": "m/33.mp4", "sub": "隔壁就是老金。", "en": "Lao Jin lived next door.", "need": "新台词待配音"}], "next": "c5"}, "c5": {"year": "1996", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "有人上门出高价收房（门口，新村楼道）", "sub": "一九九六年，浦东涨了。有人敲门，要收我个房子。", "en": "1996. Pudong was rising. A man knocked and offered to buy my flat.", "dur": 4.5, "need": "待补静帧＋新台词"}], "choice": {"q": "这笔钱，够买浦西一间亭子间。", "qen": "Enough for one small room in Puxi.", "opts": [{"l": "卖掉，买间亭子间", "en": "Sell, buy a room in Puxi", "to": "n5a"}, {"l": "不卖", "en": "Keep it", "to": "e4"}]}}, "n5a": {"year": "1996", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "浦西弄堂里的亭子间", "sub": "钞票只够一间亭子间。卖拨我个人，请我吃饭。", "en": "The money bought one small room. The seller invited me to dinner.", "dur": 4.5, "need": "待补静帧＋新台词"}], "next": "c4"}, "e1": {"year": "1999–2016", "music": "m/45.mp3", "ending": 1, "shots": [{"t": "img", "src": "m/34.webp", "sub": "伊走过我身边，没回头。", "en": "She walked past me and didn't look back.", "dur": 4.5, "need": "新台词待配音"}, {"t": "vid", "src": "m/35.mp4", "sub": "「阿爸，对面是啥地方？」「浦东。」", "en": ""}, {"t": "vid", "src": "m/36.mp4", "sub": "一九九九年，浦东个灯，我数不清了。自来火，还剩三根。", "en": "1999. I could no longer count the lights of Pudong. Three matches left."}, {"t": "vid", "src": "m/37.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/38.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/39.mp4", "sub": "浦西个灯，我看了一世人生。呒没一盏，是为我亮个。", "en": "I watched the lights of Puxi all my life. Not one of them was lit for me."}, {"t": "vid", "src": "m/40.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/41.mp4", "sub": "", "en": ""}]}, "e2": {"year": "1995", "music": "m/45.mp3", "ending": 2, "shots": [{"t": "ph", "desc": "他走出饭店，外滩夜风", "sub": "我放下筷子。", "en": "I put down my chopsticks.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"t": "img", "src": "m/42.webp", "sub": "", "en": "", "dur": 4.5}, {"t": "ph", "desc": "火柴盒落进黄浦江", "sub": "从此，我勿再看对岸。", "en": "After that, I stopped looking across the river.", "dur": 4.5, "need": "待补静帧＋新台词"}]}, "e3": {"year": "2016", "music": "m/45.mp3", "ending": 3, "shots": [{"t": "vid", "src": "m/43.mp4", "sub": "我留了下来。", "en": "I stayed.", "need": "新台词待配音"}, {"t": "vid", "src": "m/37.mp4", "sub": "浦东起来了。", "en": "Pudong took off.", "need": "新台词待配音"}, {"t": "ph", "desc": "2016，老阿乔在浦东高楼窗前，望浦西", "sub": "四套房子，我收了一世人生个房租。", "en": "Four flats. A lifetime of rent.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"t": "ph", "desc": "同一扇窗，望出去是浦西的灯", "sub": "对岸，我一趟也没去过。", "en": "I never once crossed over.", "dur": 4.5, "need": "待补静帧＋新台词"}]}, "e4": {"year": "2016", "music": "m/45.mp3", "ending": 4, "shots": [{"t": "img", "src": "m/44.webp", "sub": "二十年。新村住旧了。", "en": "Twenty years. The new estate grew old.", "dur": 4.5, "need": "新台词待配音"}, {"t": "vid", "src": "m/40.mp4", "sub": "", "en": ""}, {"t": "ph", "desc": "同一扇厨房窗里，老金和老年阿乔", "sub": "那扇亮着个窗，是我自家个。", "en": "That lit window was my own.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"if": "met", "then": {"t": "ph", "desc": "他朝浦西看一眼，拉上窗帘", "sub": "", "en": "", "dur": 3.5, "need": "待补静帧"}}]}}, "endings": {"1": {"name": "对岸", "en": "The Other Shore", "line": "他得到了对岸，错过了唯一一盏为他亮的灯。"}, "2": {"name": "掼脱", "en": "Let Go", "line": "尊严保住了，两岸都不再是他的家。"}, "3": {"name": "赢家", "en": "The Winner", "line": "钱赢了，对岸他一辈子没过去。"}, "4": {"name": "老金的窗", "en": "Lao Jin's Window", "line": "少拿了三套房，那扇窗是他自己的。"}}, "sfx": {}, "matches": 12};
+const $ = s => document.querySelector(s);
+const still=$('#still'), vid=$('#vid'), ph=$('#ph'), subs=$('#subs'), choice=$('#choice');
+const music = new Audio(); music.loop = true; music.volume = 0;
+const vo = new Audio();
+let state, queue, qi, timer, history = [], notes = true, busy = false, kbFlip = 0, paused = false, deadline = 0, remain = 0, curDur = 0;
+function arm(ms){clearTimeout(timer); deadline=performance.now()+ms; timer=setTimeout(next,ms);}
+
+/* --- matches HUD --- */
+function drawBox(){
+  const b=$('#box'); b.innerHTML='';
+  for(let i=0;i<STORY.matches;i++){const m=document.createElement('i'); if(i>=state.left) m.className='burnt'; b.appendChild(m);}
+}
+/* --- strike sound, synthesized --- */
+let actx;
+function strike(){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const n = actx.sampleRate*0.5, buf = actx.createBuffer(1,n,actx.sampleRate), d = buf.getChannelData(0);
+    for(let i=0;i<n;i++){const t=i/actx.sampleRate; d[i]=(Math.random()*2-1)*(t<0.06?1:Math.exp(-(t-0.06)*9))*(t<0.06?0.9:0.35);}
+    const src=actx.createBufferSource(); src.buffer=buf;
+    const f=actx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2600; f.Q.value=0.7;
+    src.connect(f); f.connect(actx.destination); src.start();
+  }catch(e){}
+  const fl=$('#flash'); fl.classList.add('on'); setTimeout(()=>fl.classList.remove('on'),120);
+}
+/* --- music with crossfade --- */
+function fade(a,to,ms,done){const from=a.volume,t0=performance.now();
+  (function step(t){const k=Math.min(1,(t-t0)/ms); a.volume=from+(to-from)*k; if(k<1) requestAnimationFrame(step); else done&&done();})(t0);}
+function setMusic(src){
+  if(!src){fade(music,0,1200);return;}
+  if(music.dataset.src===src){ if(music.paused) music.play().catch(()=>{}); fade(music,.45,800); return;}
+  fade(music,0,700,()=>{music.src=src; music.dataset.src=src; music.currentTime=0; music.play().catch(()=>{}); fade(music,.45,1500);});
+}
+/* --- endings memory --- */
+function getGot(){try{return JSON.parse(localStorage.getItem('duian_endings')||'[]')}catch(e){return []}}
+function addGot(n){const g=new Set(getGot()); g.add(n); try{localStorage.setItem('duian_endings',JSON.stringify([...g]))}catch(e){} sessionGot.add(n);}
+const sessionGot=new Set();
+function gallery(el){
+  const got=new Set([...getGot(),...sessionGot]); el.innerHTML='';
+  for(const k of [1,2,3,4]){const e=STORY.endings[k],d=document.createElement('div');
+    d.className='slot'+(got.has(k)?' got':''); d.innerHTML=got.has(k)?`${e.name}<small>${e.en}</small>`:`结局${'一二三四'[k-1]}<small>未解锁</small>`; el.appendChild(d);}
+}
+/* --- preloading: next two shots, and the first shot of each choice --- */
+const cache=new Map();
+function warm(s){ if(!s||!s.src||cache.has(s.src)) return;
+  if(s.t==='img'){const i=new Image(); i.src=s.src; cache.set(s.src,i);}
+  else if(s.t==='vid'){const v=document.createElement('video'); v.preload='auto'; v.muted=true; v.src=s.src; cache.set(s.src,v);}
+  if(s.vo && !cache.has(s.vo)){const a=new Audio(); a.preload='auto'; a.src=s.vo; cache.set(s.vo,a);} }
+function warmNode(id){ const n=STORY.nodes[id]; if(n) resolve(n.shots).slice(0,2).forEach(warm); }
+function warmAhead(){ for(let k=1;k<=2;k++) warm(queue[qi+k]);
+  if(qi+2>=queue.length){const n=STORY.nodes[state.node]; if(n.choice) n.choice.opts.forEach(o=>warmNode(o.to)); else if(n.next) warmNode(n.next);} }
+let loadT; function loading(on){clearTimeout(loadT); if(on) loadT=setTimeout(()=>$('#loading').classList.add('on'),350); else $('#loading').classList.remove('on');}
+/* --- playback --- */
+function resolve(shots){
+  const out=[]; for(const s of shots){ if(s.if){const v=state.flags[s.if]?s.then:s.else; if(v) out.push(v);} else out.push(s);} return out;
+}
+function enter(id){
+  state.node=id; const n=STORY.nodes[id];
+  $('#year').textContent=n.year||''; setMusic(n.music);
+  queue=resolve(n.shots); qi=-1; next();
+}
+function clearShot(){clearTimeout(timer); deadline=0; vo.pause(); subs.classList.remove('on');}
+function showSub(s){
+  subs.querySelector('.zh').textContent=s.sub||''; subs.querySelector('.en').textContent=s.en||'';
+  if(s.sub) subs.classList.add('on');
+  $('#need').textContent=(notes&&s.need)?'● '+s.need:'';
+}
+function next(){
+  clearShot();
+  qi++;
+  if(qi>=queue.length) return afterNode();
+  const s=queue[qi];
+  showSub(s);
+  if(s.t==='vid'){
+    still.classList.remove('on'); ph.classList.remove('on');
+    vid.src=s.src; vid.currentTime=0; vid.muted=false; vid.classList.add('on'); loading(true);
+    vid.onplaying=()=>{loading(false); if(!paused) arm(30000);};
+    vid.onwaiting=()=>{loading(true); clearTimeout(timer); deadline=0;};
+    vid.play().catch(()=>{vid.muted=true; vid.play().catch(()=>{});});
+    vid.onended=()=>next();
+  } else {
+    vid.pause(); vid.classList.remove('on');
+    let dur=(s.dur||4.5)*1000; curDur=dur;
+    if(s.t==='img'){
+      ph.classList.remove('on');
+      still.classList.remove('on','kb0','kb1'); void still.offsetWidth;
+      still.style.setProperty('--kb',(dur/1000+3)+'s');
+      const cls=(kbFlip++%2)?'kb1':'kb0', my=qi;
+      still.onload=()=>{ if(my!==qi) return; loading(false); still.classList.add('on',cls); if(!paused) arm(curDur); };
+      loading(true); still.src=s.src; if(still.complete && still.naturalWidth) still.onload();
+    } else {
+      still.classList.remove('on');
+      ph.querySelector('.desc').textContent=s.desc; ph.querySelector('.tag').textContent=s.need||'待补静帧'; ph.classList.add('on');
+    }
+    if(s.vo){vo.src=s.vo; vo.currentTime=0; vo.play().catch(()=>{});
+      vo.onloadedmetadata=()=>{const nd=vo.duration*1000+900; if(nd>curDur){const add=nd-curDur; curDur=nd; if(deadline){ if(paused) remain+=add; else arm(deadline-performance.now()+add);} }};}
+    if(s.t!=='img') arm(curDur);
+  }
+  warmAhead();
+}
+function afterNode(){
+  const n=STORY.nodes[state.node];
+  if(n.choice) return showChoice(n.choice);
+  if(n.next) return enter(n.next);
+  if(n.ending) return showEnding(n.ending);
+}
+function showChoice(c){
+  clearShot(); busy=true;
+  history.push(JSON.parse(JSON.stringify(state)));
+  choice.querySelector('.q').textContent=c.q; choice.querySelector('.qen').textContent=c.qen||'';
+  const o=$('#opts'); o.innerHTML='';
+  c.opts.forEach(op=>{const b=document.createElement('button'); b.className='opt';
+    b.innerHTML=`<b>${op.l}</b><span>${op.en||''}</span>`;
+    b.onclick=e=>{e.stopPropagation(); strike(); state.left=Math.max(0,state.left-1); if(op.set) state.flags[op.set]=true; drawBox();
+      choice.classList.remove('on'); busy=false; setTimeout(()=>enter(op.to),500);};
+    o.appendChild(b);});
+  choice.classList.add('on'); setTimeout(()=>o.querySelector('button')?.focus({preventScroll:true}),400);
+}
+function showEnding(k){
+  clearShot(); busy=true; addGot(k); setMusic(STORY.nodes[state.node].music);
+  const e=STORY.endings[k];
+  $('#endcard .endno').textContent='结局'+'一二三四'[k-1]+' · ENDING '+k;
+  $('#endcard .endname').textContent=e.name;
+  $('#endcard .endline').textContent=e.line;
+  $('#endcard .endmeta').textContent=`火柴还剩 ${state.left} 根　·　已解锁 ${new Set([...getGot(),...sessionGot]).size} / 4 个结局`;
+  gallery($('#gal2')); $('#backBtn').hidden=!history.length;
+  $('#pauseBtn').hidden=true;
+  $('#endcard').classList.add('on');
+}
+function start(){
+  state={node:null,left:STORY.matches,flags:{}}; history=[];
+  drawBox(); $('#titlecard').classList.remove('on'); $('#endcard').classList.remove('on'); busy=false;
+  $('#pauseBtn').hidden=false;
+  enter(STORY.start);
+}
+$('#startBtn').onclick=e=>{e.stopPropagation(); notes=$('#notesChk').checked; strike(); start();};
+$('#againBtn').onclick=e=>{e.stopPropagation(); start();};
+function inPlay(){return state && state.node && !$('#titlecard').classList.contains('on') && !$('#endcard').classList.contains('on');}
+function pause(){
+  if(paused || !inPlay()) return;
+  paused=true; $('#frame').classList.add('paused');
+  if(deadline){remain=Math.max(0,deadline-performance.now()); clearTimeout(timer);} else remain=-1;
+  vid.pause(); vo.pause(); music.pause();
+  const n=STORY.nodes[state.node]; $('#pausecard .where').textContent=(n.year||'')+'　·　火柴还剩 '+state.left+' 根';
+  $('#pNotesChk').checked=notes; $('#pBackBtn').hidden=!history.length;
+  $('#pausecard').classList.add('on'); setTimeout(()=>$('#resumeBtn').focus({preventScroll:true}),50);
+}
+function resume(){
+  if(!paused) return;
+  paused=false; $('#frame').classList.remove('paused'); $('#pausecard').classList.remove('on');
+  if(music.dataset.src) music.play().catch(()=>{});
+  if(vid.classList.contains('on') && !vid.ended) vid.play().catch(()=>{});
+  if(vo.src && vo.currentTime>0 && !vo.ended) vo.play().catch(()=>{});
+  if(remain>=0 && !busy){deadline=performance.now()+remain; timer=setTimeout(next,remain);}
+  else if(!busy && still.classList.contains('on') && queue[qi] && queue[qi].t==='img') arm(curDur);
+}
+function closePause(){paused=false; $('#frame').classList.remove('paused'); $('#pausecard').classList.remove('on'); clearShot(); vid.pause();}
+function goBack(){ const s=history.pop(); if(!s) return;
+  state=s; drawBox(); $('#endcard').classList.remove('on'); const n=STORY.nodes[s.node];
+  $('#year').textContent=n.year||''; setMusic(n.music); still.classList.remove('on'); vid.classList.remove('on');
+  // show last still of that node behind the choice
+  const last=resolve(n.shots).filter(x=>x.t==='img').pop(); if(last){still.src=last.src; still.classList.add('on');}
+  showChoice(n.choice);}
+$('#backBtn').onclick=e=>{e.stopPropagation(); $('#pauseBtn').hidden=false; goBack();};
+$('#pauseBtn').onclick=e=>{e.stopPropagation(); pause();};
+$('#resumeBtn').onclick=e=>{e.stopPropagation(); resume();};
+$('#pBackBtn').onclick=e=>{e.stopPropagation(); closePause(); goBack(); if(music.dataset.src) music.play().catch(()=>{});};
+$('#pTitleBtn').onclick=e=>{e.stopPropagation(); closePause(); state.node=null; busy=false; choice.classList.remove('on');
+  still.classList.remove('on'); ph.classList.remove('on'); vid.classList.remove('on'); $('#pauseBtn').hidden=true; setMusic(null);
+  gallery($('#gal1')); $('#titlecard').classList.add('on');};
+$('#pNotesChk').onchange=e=>{notes=e.target.checked; $('#notesChk').checked=notes; if(queue && queue[qi]) showSub(queue[qi]);};
+$('#pausecard').addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) pause(); });
+$('#frame').addEventListener('click',()=>{ if(!paused && !busy && state && state.node) next(); });
+document.addEventListener('keydown',e=>{
+  const k=e.key;
+  if(k===' '||k==='p'||k==='P'||k==='Escape'){ if(paused){e.preventDefault(); resume(); return;} if(inPlay()){e.preventDefault(); pause(); return;} }
+  if(k==='ArrowRight' && !paused && !busy && state && state.node){e.preventDefault(); next();}
+});
+gallery($('#gal1'));
+
+/* --- film grain --- */
+(function(){const c=$('#grain'),x=c.getContext('2d'); c.width=320; c.height=134;
+  const img=x.createImageData(c.width,c.height);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){draw();return;}
+  function draw(){const d=img.data; for(let i=0;i<d.length;i+=4){const v=Math.random()*255; d[i]=d[i+1]=d[i+2]=v; d[i+3]=60;} x.putImageData(img,0,0);}
+  let t=0;(function loop(){ if(++t%3===0) draw(); requestAnimationFrame(loop);})();
+})();
+</script>
+
+</body>
+</html>
