@@ -86,3 +86,8 @@ body::before{animation:none}
 .channels a{display:grid;place-items:center;width:44px;height:44px;margin:-10px;border:0;padding:0;color:#8d9bb0;transition:color .25s,transform .25s}
 .channels a:hover,.channels a:focus-visible{color:#fff;transform:translateY(-2px)}
 .channels svg{width:22px;height:22px;fill:currentColor}
+
+.social{display:flex;flex-direction:column;gap:14px;margin-top:40px}
+.social .channels{margin-top:0}
+.social-label{font-family:Arial,"PingFang SC",sans-serif;font-size:12px;letter-spacing:2px;color:#9fafc6}
+.channels a{color:#aab6c7}
