@@ -1,0 +1,61 @@
+仓库 duian/m 编号	状态	素材名	本地03清单里
+m/00.mp4	★在用	vid_VID_N1_老阿乔火柴_Kling3.mp4	本地★在用
+m/01.mp4	★在用	vid_VN2_火柴盒满.mp4	本地★在用
+m/02.webp	★在用	img_KF_P1_码头全景_她走来.webp	本地★在用
+m/03.webp	★在用	img_KF_P2_她举烟借火.webp	本地★在用
+m/04.webp	★在用	img_KF_W1_薇薇定妆_借火特写.webp	本地★在用
+m/05.webp	★在用	img_KF_P5_他在火光里看她.webp	本地★在用
+m/06.webp	★在用	img_KF_P6_她在轮渡雨窗后.webp	本地★在用
+m/07.mp4	★在用	vid_VID_S18_Kling3.mp4	本地★在用
+m/08.mp4	★在用	vid_VID_S09_Kling3.mp4	本地★在用
+m/09.mp4	★在用	vid_VID_S03_Kling3.mp4	本地★在用
+m/10.mp4	★在用	vid_VID_S05_口型_v2.mp4	本地★在用
+m/11.webp	★在用	img_KF_S09w_晾衣望对岸.webp	本地★在用
+m/12.mp4	★在用	vid_VID_S07_Kling3.mp4	本地★在用
+m/13.mp4	★在用	vid_VID_S08_Kling3.mp4	本地★在用
+m/14.mp4	★在用	vid_VID_S10_Kling3.mp4	本地★在用
+m/15.mp4	★在用	vid_VID_S11_Seedance2_0.mp4	本地★在用
+m/16.mp4	★在用	vid_VID_S14_Kling3.mp4	本地★在用
+m/17.webp	★在用	img_KF_N6_final.webp	本地★在用
+m/18.webp	★在用	img_KF_S09_final.webp	本地★在用
+m/19.webp	★在用	img_KF_S22_老金炒菜.webp	本地★在用
+m/20.mp3	✕已删	aud_VO_老金对白.mp3	本地★在用
+m/21.mp4	★在用	vid_VID_S15_Kling3_v3.mp4	本地★在用
+m/22.mp4	★在用	vid_VID_S15c_Kling3.mp4	本地★在用
+m/23.webp	★在用	img_KF_Q1_新房窗口望对面.webp	本地★在用
+m/24.webp	★在用	img_KF_Q2_对面窗里是她.webp	本地★在用
+m/25.webp	★在用	img_KF_B1_饭局全景.webp	本地★在用
+m/26.webp	★在用	img_KF_B2_她近景_吊灯光.webp	本地★在用
+m/27.webp	★在用	img_KF_B5_打火机先点.webp	本地★在用
+m/28.webp	★在用	img_KF_B7_耳语_阿乔视角.webp	本地★在用
+m/29.mp3	★在用	aud_阿姨_上海话_v4a.mp3	本地★在用
+m/30.webp	★在用	img_KF_B8_阿乔僵住的笑.webp	本地★在用
+m/31.mp4	★在用	vid_VID_S13_Kling3.mp4	本地★在用
+m/32.webp	★在用	img_KF_S14b_新村钥匙.webp	本地★在用
+m/33.mp4	★在用	vid_VID_S22_Kling3.mp4	本地★在用
+m/34.webp	✕已删	img_KF_V1_1999她回头一秒.webp	本地★在用
+m/35.mp4	✕已删	vid_VID_S24_口型_v2.mp4	本地★在用
+m/36.mp4	★在用	vid_VN3_火柴剩三根.mp4	本地★在用
+m/37.mp4	★在用	vid_VID_S28_Kling3.mp4	本地★在用
+m/38.mp4	★在用	vid_VID_S29_Seedance2_0_1080p.mp4	本地★在用
+m/39.mp4	★在用	vid_VID_S26_Kling3_v3.mp4	本地★在用
+m/40.mp4	★在用	vid_VN4_老金厨房2016.mp4	本地★在用
+m/41.mp4	★在用	vid_VN5_对岸远窗2016.mp4	本地★在用
+m/42.webp	★在用	img_KF_S23_外滩人群.webp	本地★在用
+m/43.mp4	★在用	vid_VID_S12_Seedance2_0.mp4	本地★在用
+m/44.webp	★在用	img_KF_N4b_2016老金厨房窗.webp	本地★在用
+m/45.mp3	★在用	aud_MUS_主题_大提琴华尔兹.mp3	本地★在用
+m/46.mp3	★在用	aud_MUSIC_对岸主题_v1.mp3	本地★在用
+m/47.mp3	★在用	aud_MUS_饭局现场_老上海爵士.mp3	本地★在用
+m/48.mp3	★在用	aud_PD_老金_吃仔饭再去_a.mp3	本地没有（本会话新加）
+m/49.mp3	★在用	aud_PD_老金_修修还好用格_a.mp3	本地没有（本会话新加）
+m/50.mp3	★在用	aud_PD_老金_夜里冷迭盒自来火拿去_b.mp3	本地没有（本会话新加）
+m/51.mp3	★在用	aud_PD_老金_依bebe有啥好_a.mp3	本地没有（本会话新加）
+m/52.webp	★在用	img_KF_V1v2_1999沈家擦肩_b.webp	本地没有（本会话新加）
+m/53.webp	★在用	img_KF_S24v2_1999沈家父女_b.webp	本地没有（本会话新加）
+m/54.mp3	★在用	aud_VO_S24口型版音轨_父女.mp3	本地没有（本会话新加）
+
+本地标★在用、但仓库从来没有的：
+aud_VO_动迁干部.mp3
+aud_VO_外滩爸爸_3_a-a4fy87j9dmrp_.mp3
+aud_VO_小女孩.mp3
