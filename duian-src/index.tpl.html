@@ -272,7 +272,8 @@ function next(){
       ph.classList.remove('on'); still.dataset.src=s.src;
       still.classList.remove('on','kb0','kb1'); void still.offsetWidth;
       still.style.setProperty('--kb',(dur/1000+3)+'s');
-      const cls=(kbFlip++%2)?'kb1':'kb0', my=qi;
+      /* fixed: the film's one locked-off shot, no slow push-in */
+      const cls=s.fixed?'still':((kbFlip++%2)?'kb1':'kb0'), my=qi;
       still.onload=()=>{ if(my!==qi) return; loading(false); still.classList.add('on',cls); if(!paused) arm(curDur); };
       loading(true); still.src=U(s.src); if(still.complete && still.naturalWidth) still.onload();
     } else {
