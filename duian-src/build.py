@@ -356,5 +356,5 @@ for nid in order:
 open(os.path.join(HERE, '配音清单.txt'), 'w', encoding='utf-8').write(
     '# 由 build.py 生成，勿手改。段落\t角色\t原话\t普通话字幕\n' + '\n'.join(rows) + '\n')
 
-unused = sorted(v for k, v in media_map.items() if k not in used)
+unused = sorted(v for k, v in media_map.items() if k not in used and os.path.exists(os.path.join(OUT, v)))
 print(len(used), 'media files in use;', len(rows), 'lines still need voice;', 'unused in duian/m:', ' '.join(unused) or '-')
