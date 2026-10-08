@@ -23,7 +23,7 @@ body{background:var(--night);color:var(--paper);font-family:var(--serif);margin:
 #wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
 #frame{position:relative;width:min(100vw,calc(100dvh * 2.39));aspect-ratio:2.39/1;max-width:100%;max-height:100%;
   background:var(--frame);overflow:hidden;container-type:inline-size;cursor:pointer}
-.layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.layer{box-sizing:border-box;position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #still{opacity:0;transition:opacity .9s ease;transform-origin:50% 50%}
 #still.on{opacity:1}
 #still.kb0{animation:kb0 var(--kb,8s) linear forwards}
@@ -37,13 +37,18 @@ body{background:var(--night);color:var(--paper);font-family:var(--serif);margin:
 #ph.on{opacity:1}
 #ph .tag{font-size:1.1cqw;letter-spacing:.4em;color:var(--flame);border:1px solid var(--flame);padding:.3cqw .9cqw}
 #ph .desc{font-size:2.1cqw;color:var(--dim);line-height:1.6}
+#cardtxt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6cqw;background:#000;opacity:0;transition:opacity 1s;text-align:center;padding-inline:14cqw}
+#cardtxt.on{opacity:1}
+#cardtxt .zh{font-size:2.3cqw;line-height:1.9;letter-spacing:.14em;white-space:pre-line;text-wrap:balance}
+#cardtxt .en{font-family:var(--latin);font-style:italic;font-size:1.5cqw;line-height:1.5;color:var(--dim);white-space:pre-line}
 #grain{pointer-events:none;mix-blend-mode:overlay;opacity:.35}
 #vignette{pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
 #flash{pointer-events:none;background:radial-gradient(circle at 50% 70%,rgba(233,165,79,.55),transparent 60%);opacity:0;transition:opacity .6s}
 #flash.on{opacity:1;transition:opacity .05s}
 
 #year{position:absolute;left:2.4cqw;top:1.8cqw;font-family:var(--latin);font-style:italic;font-size:1.7cqw;letter-spacing:.12em;color:var(--paper);opacity:.75;font-variant-numeric:tabular-nums}
-#box{position:absolute;right:2.4cqw;top:1.8cqw;display:flex;align-items:flex-end;gap:.32cqw;height:2.2cqw}
+#box.off{opacity:0}
+#box{transition:opacity .8s;position:absolute;right:2.4cqw;top:1.8cqw;display:flex;align-items:flex-end;gap:.32cqw;height:2.2cqw}
 #box i{display:block;width:.28cqw;height:2cqw;background:linear-gradient(to bottom,var(--ember) 0 22%,#d9c3a0 22%);border-radius:.14cqw .14cqw 0 0;transition:opacity .6s,transform .6s}
 #box i.burnt{opacity:.15;transform:translateY(.5cqw)}
 #need{position:absolute;right:2.4cqw;top:4.6cqw;font-size:1cqw;color:var(--flame);letter-spacing:.08em;opacity:.85}
@@ -51,6 +56,7 @@ body{background:var(--night);color:var(--paper);font-family:var(--serif);margin:
 #subs{position:absolute;left:0;right:0;bottom:3.2cqw;text-align:center;padding-inline:10cqw;pointer-events:none;
   text-shadow:0 0 .4cqw rgba(0,0,0,.9),0 .1cqw .2cqw #000}
 #subs .zh{font-size:2.15cqw;line-height:1.55;letter-spacing:.06em;color:#f3e7c9;text-wrap:balance}
+#subs .mid{font-size:1.75cqw;line-height:1.5;letter-spacing:.06em;color:#e4d8bf;margin-top:.2cqw}
 #subs .en{font-family:var(--latin);font-size:1.55cqw;font-style:italic;color:#d7ccb8;margin-top:.3cqw}
 #subs{opacity:0;transition:opacity .5s}
 #subs.on{opacity:1}
@@ -89,6 +95,10 @@ body{background:var(--night);color:var(--paper);font-family:var(--serif);margin:
 .endno{font-family:var(--latin);font-style:italic;font-size:1.6cqw;color:var(--flame);letter-spacing:.2em}
 .endname{font-weight:900;font-size:6cqw;letter-spacing:.3em;margin-right:-.3em}
 .endline{font-size:1.7cqw;color:var(--paper);letter-spacing:.08em}
+#lampBtn{position:relative;background:none;border:0;color:var(--dim);font-family:var(--serif);font-size:1.15cqw;letter-spacing:.3em;cursor:pointer;padding:.6cqw 1cqw .6cqw 3.4cqw}
+#lampBtn::before{content:"";position:absolute;left:.6cqw;top:50%;width:2cqw;height:.3cqw;transform:translateY(-50%);background:linear-gradient(to right,#d9c3a0 78%,var(--ember) 78%);border-radius:0 .15cqw .15cqw 0}
+#lampBtn:hover,#lampBtn:focus-visible{color:var(--paper);outline:none}
+#lampBtn:hover::before,#lampBtn:focus-visible::before{background:linear-gradient(to right,#d9c3a0 70%,var(--flame) 70%);box-shadow:1.3cqw 0 1cqw rgba(233,165,79,.55)}
 .endmeta{font-size:1.2cqw;color:var(--dim);letter-spacing:.12em;font-variant-numeric:tabular-nums}
 label.notes{font-size:1.1cqw;color:var(--dim);letter-spacing:.1em;display:flex;gap:.6cqw;align-items:center;cursor:pointer}
 #hint{position:absolute;bottom:1cqw;right:2.4cqw;font-size:.95cqw;color:var(--dim);opacity:.6;letter-spacing:.1em}
@@ -113,13 +123,14 @@ label.notes{font-size:1.1cqw;color:var(--dim);letter-spacing:.1em;display:flex;g
   <img id="still" class="layer" alt="">
   <video id="vid" class="layer" playsinline preload="auto"></video>
   <div id="ph" class="layer"><div class="tag">待补静帧</div><div class="desc"></div></div>
+  <div id="cardtxt" class="layer"><div class="zh"></div><div class="en"></div></div>
   <canvas id="grain" class="layer"></canvas>
   <div id="vignette" class="layer"></div>
   <div id="flash" class="layer"></div>
   <div id="year"></div>
   <div id="box" aria-label="火柴"></div>
   <div id="need"></div>
-  <div id="subs"><div class="zh"></div><div class="en"></div></div>
+  <div id="subs"><div class="zh"></div><div class="mid"></div><div class="en"></div></div>
   <div id="loading">加载中</div>
   <div id="hint">点击画面继续 · 空格 / P 暂停</div>
   <button id="pauseBtn" hidden aria-label="暂停"><svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1" y="1" width="3" height="8" fill="currentColor"/><rect x="6" y="1" width="3" height="8" fill="currentColor"/></svg>暂停</button>
@@ -132,6 +143,7 @@ label.notes{font-size:1.1cqw;color:var(--dim);letter-spacing:.1em;display:flex;g
     <div class="credit">一部互动影像 · 出品人 Dylan He</div>
     <div class="btnrow"><button class="btn" id="startBtn">划一根火柴，开始</button></div>
     <div class="gallery" id="gal1"></div>
+    <button id="lampBtn" hidden>一根没用过的火柴</button>
     <label class="notes"><input type="checkbox" id="notesChk" checked> 显示制作备注（缺的素材和待配台词）</label>
   </div>
 
@@ -161,13 +173,13 @@ label.notes{font-size:1.1cqw;color:var(--dim);letter-spacing:.1em;display:flex;g
 </div></div>
 
 <script>
-const STORY = {"start": "prologue", "nodes": {"prologue": {"year": "2016", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/00.mp4", "sub": "二〇一六年。", "en": "2016."}, {"t": "vid", "src": "m/01.mp4", "sub": "一九九一年三月，夜里向九点钟。浦东个灯，一盏一盏，数得清。", "en": "March 1991, nine at night. You could still count the lights of Pudong."}], "next": "c1"}, "c1": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/02.webp", "sub": "末班轮渡前，一个浦西女人走过来。", "en": "Before the last ferry, a woman from Puxi walked over.", "dur": 4.5}, {"t": "img", "src": "m/03.webp", "sub": "「有火伐？」", "en": "\"Got a light?\"", "dur": 4.5, "need": "新台词待配音"}], "choice": {"q": "她在等你的火。", "qen": "She is waiting for a light.", "opts": [{"l": "划一根自来火", "en": "Strike a match", "to": "n1a", "set": "met"}, {"l": "讲：呒没", "en": "\"No, I don't.\"", "to": "n1b"}]}}, "n1a": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/04.webp", "sub": "我借拨伊一根自来火。", "en": "I gave her a match.", "dur": 4.5, "need": "新台词待配音"}, {"t": "img", "src": "m/05.webp", "sub": "火光里，我第一趟看清爽伊个面孔。", "en": "In the light, I saw her face for the first time.", "dur": 4.5, "need": "新台词待配音"}, {"t": "img", "src": "m/06.webp", "sub": "伊上了船。", "en": "She got on the boat.", "dur": 4.5}, {"t": "vid", "src": "m/07.mp4", "sub": "从此以后，对岸有了一个人。", "en": "From then on, there was someone on the other shore.", "need": "新台词待配音"}], "next": "c2"}, "n1b": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "她转身走开，向别人借火（背影）", "sub": "我讲，呒没。", "en": "I said no.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"t": "vid", "src": "m/08.mp4", "sub": "对岸，还是对岸。", "en": "The other shore was just the other shore.", "need": "新台词待配音"}], "next": "c2"}, "c2": {"year": "1992", "music": "m/46.mp3", "shots": [{"t": "vid", "src": "m/09.mp4", "sub": "一九九二年，动迁个消息来了。", "en": "1992. Word came: the old houses would be torn down.", "need": "新台词待配音"}, {"t": "vid", "src": "m/10.mp4", "sub": "「量到哪里，算到哪里。」", "en": "\"Whatever we measure is what you get.\""}, {"t": "img", "src": "m/11.webp", "sub": "隔壁人家，连夜辣屋顶上加楼。老金问我：「侬加伐？」", "en": "The neighbours were building extra floors overnight. Lao Jin asked: \"Are you adding one?\"", "dur": 4.5, "need": "新台词待配音"}], "choice": {"q": "多一层，多一套房。", "qen": "One more floor, one more flat.", "opts": [{"l": "加，连夜加楼", "en": "Build, tonight", "to": "n2a"}, {"l": "勿加，跟老金一样", "en": "Don't, like Lao Jin", "to": "n2b"}]}}, "n2a": {"year": "1992–1994", "music": "m/46.mp3", "shots": [{"t": "vid", "src": "m/12.mp4", "sub": "两年里向，我加了三层。", "en": "In two years, I added three floors."}, {"t": "vid", "src": "m/13.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/14.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/15.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/16.mp4", "sub": "老屋拆脱，分到四套新房子。", "en": "The old house came down. I got four new flats."}], "next": "c3"}, "c3": {"year": "1994", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/17.webp", "sub": "四把钥匙。", "en": "Four keys.", "dur": 3.5}, {"t": "img", "src": "m/18.webp", "sub": "哪能还是浦东。", "en": "Still Pudong, after all that.", "dur": 4.5}, {"t": "img", "src": "m/19.webp", "sub": "「对岸有啥好？」", "en": "\"What's so good about the other side?\"", "dur": 4.5, "vo": "m/20.mp3"}], "choice": {"q": "四套房子，在浦东。", "qen": "Four flats, all in Pudong.", "opts": [{"l": "统统卖脱，过江", "en": "Sell them all, cross the river", "to": "n3a"}, {"l": "留在浦东", "en": "Stay in Pudong", "to": "e3"}]}}, "n3a": {"year": "1995", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/21.mp4", "sub": "我一日也没住过，统统卖脱，去买了浦西。", "en": "I never spent a night there. Sold them all and bought in Puxi."}, {"t": "vid", "src": "m/22.mp4", "sub": "", "en": ""}, {"t": "img", "src": "m/23.webp", "sub": "", "en": "", "dur": 4.5}, {"if": "met", "then": {"t": "img", "src": "m/24.webp", "sub": "我花了四年，走到伊对面。", "en": "It took me four years to get across from her.", "dur": 4.5, "need": "新台词待配音"}, "else": {"t": "img", "src": "m/24.webp", "sub": "对面窗里，是一户浦西人家。", "en": "Across the lane, a Puxi family.", "dur": 4.5, "need": "新台词待配音"}}], "next": "c4"}, "c4": {"year": "1995", "music": "m/47.mp3", "shots": [{"t": "img", "src": "m/25.webp", "sub": "卖房子拨我个男人，请新邻居吃饭。", "en": "The man who sold me the flat invited his new neighbour to dinner.", "dur": 4.5, "need": "新台词待配音"}, {"if": "met", "then": {"t": "img", "src": "m/26.webp", "sub": "火柴换成了吊灯。是伊。", "en": "The match had become a chandelier. It was her.", "dur": 4.5, "need": "新台词待配音"}, "else": {"t": "img", "src": "m/26.webp", "sub": "伊是迭户人家个女主人。", "en": "She was the lady of the house.", "dur": 4.5, "need": "新台词待配音"}}, {"t": "img", "src": "m/27.webp", "sub": "伊拿出一根香烟。伊男人个打火机，先点着了。", "en": "She took out a cigarette. Her husband's lighter was quicker.", "dur": 4}, {"t": "img", "src": "m/28.webp", "sub": "「侬老底子是阿里人？」「……浦东。」「浦东啊？乡下头呀。」", "en": "\"Where are you from, originally?\" \"...Pudong.\" \"Pudong? The countryside.\"", "dur": 4.5, "vo": "m/29.mp3", "need": "三句对白用AI市区话重配（丈夫、阿乔、薇薇）"}, {"t": "img", "src": "m/30.webp", "sub": "", "en": "", "dur": 3.5}], "choice": {"q": "一桌子人，都在笑。", "qen": "The whole table is smiling.", "opts": [{"l": "笑笑，坐下去", "en": "Smile, sit back down", "to": "e1"}, {"l": "起身，走出去", "en": "Stand up and leave", "to": "e2"}]}}, "n2b": {"year": "1994", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/31.mp4", "sub": "我跟老金一样，一层也没加。", "en": "Like Lao Jin, I didn't add a single floor.", "need": "新台词待配音"}, {"t": "img", "src": "m/32.webp", "sub": "一九九四年，搬进新村。一套，新个。", "en": "1994. We moved into the new estate. One flat. Brand new.", "dur": 4.5, "need": "史实修正：画面要改成新建新村"}, {"t": "vid", "src": "m/33.mp4", "sub": "隔壁就是老金。", "en": "Lao Jin lived next door.", "need": "新台词待配音"}], "next": "c5"}, "c5": {"year": "1996", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "有人上门出高价收房（门口，新村楼道）", "sub": "一九九六年，浦东涨了。有人敲门，要收我个房子。", "en": "1996. Pudong was rising. A man knocked and offered to buy my flat.", "dur": 4.5, "need": "待补静帧＋新台词"}], "choice": {"q": "这笔钱，够买浦西一间亭子间。", "qen": "Enough for one small room in Puxi.", "opts": [{"l": "卖掉，买间亭子间", "en": "Sell, buy a room in Puxi", "to": "n5a"}, {"l": "勿卖", "en": "Keep it", "to": "e4"}]}}, "n5a": {"year": "1996", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "浦西弄堂里的亭子间", "sub": "钞票只够一间亭子间。卖拨我个人，请我吃饭。", "en": "The money bought one small room. The seller invited me to dinner.", "dur": 4.5, "need": "待补静帧＋新台词"}], "next": "c4"}, "e1": {"year": "1999–2016", "music": "m/45.mp3", "ending": 1, "shots": [{"t": "img", "src": "m/34.webp", "sub": "伊走过我身边，没回头。", "en": "She walked past me and didn't look back.", "dur": 4.5, "need": "新台词待配音"}, {"t": "vid", "src": "m/35.mp4", "sub": "「阿爸，对面是啥地方？」「浦东。」", "en": ""}, {"t": "vid", "src": "m/36.mp4", "sub": "一九九九年，浦东个灯，我数不清了。自来火，还剩三根。", "en": "1999. I could no longer count the lights of Pudong. Three matches left."}, {"t": "vid", "src": "m/37.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/38.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/39.mp4", "sub": "浦西个灯，我看了一世人生。呒没一盏，是为我亮个。", "en": "I watched the lights of Puxi all my life. Not one of them was lit for me."}, {"t": "vid", "src": "m/40.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/41.mp4", "sub": "", "en": ""}]}, "e2": {"year": "1995", "music": "m/45.mp3", "ending": 2, "shots": [{"t": "ph", "desc": "他走出饭店，外滩夜风", "sub": "我放下筷子。", "en": "I put down my chopsticks.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"t": "img", "src": "m/42.webp", "sub": "", "en": "", "dur": 4.5}, {"t": "ph", "desc": "火柴盒落进黄浦江", "sub": "从此以后，我勿再看对岸。", "en": "After that, I stopped looking across the river.", "dur": 4.5, "need": "待补静帧＋新台词"}]}, "e3": {"year": "2016", "music": "m/45.mp3", "ending": 3, "shots": [{"t": "vid", "src": "m/43.mp4", "sub": "我留了下来。", "en": "I stayed.", "need": "新台词待配音"}, {"t": "vid", "src": "m/37.mp4", "sub": "浦东起来了。", "en": "Pudong took off.", "need": "新台词待配音"}, {"t": "ph", "desc": "2016，老阿乔在浦东高楼窗前，望浦西", "sub": "四套房子，我收了一世人生个房租。", "en": "Four flats. A lifetime of rent.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"t": "ph", "desc": "同一扇窗，望出去是浦西的灯", "sub": "对岸，我一趟也没去过。", "en": "I never once crossed over.", "dur": 4.5, "need": "待补静帧＋新台词"}]}, "e4": {"year": "2016", "music": "m/45.mp3", "ending": 4, "shots": [{"t": "img", "src": "m/44.webp", "sub": "二十年。新村住旧了。", "en": "Twenty years. The new estate grew old.", "dur": 4.5, "need": "新台词待配音"}, {"t": "vid", "src": "m/40.mp4", "sub": "", "en": ""}, {"t": "ph", "desc": "同一扇厨房窗里，老金和老年阿乔", "sub": "迭扇亮着个窗，是我自家个。", "en": "That lit window was my own.", "dur": 4.5, "need": "待补静帧＋新台词"}, {"if": "met", "then": {"t": "ph", "desc": "他朝浦西看一眼，拉上窗帘", "sub": "", "en": "", "dur": 3.5, "need": "待补静帧"}}]}}, "endings": {"1": {"name": "对岸", "en": "The Other Shore", "line": "他得到了对岸，错过了唯一一盏为他亮的灯。"}, "2": {"name": "掼脱", "en": "Let Go", "line": "尊严保住了，两岸都不再是他的家。"}, "3": {"name": "赢家", "en": "The Winner", "line": "钱赢了，对岸他一辈子没过去。"}, "4": {"name": "老金的窗", "en": "Lao Jin's Window", "line": "少拿了三套房，那扇窗是他自己的。"}}, "sfx": {}, "matches": 12};
+const STORY = {"start": "prologue", "nodes": {"prologue": {"year": "2016", "music": "m/45.mp3", "shots": [{"t": "card", "text": "一九九〇年，浦东开发。\n在那以前，上海人讲：宁要浦西一张床，不要浦东一间房。", "en": "1990: Pudong opens for development. Before that, Shanghai people said:\n“Better a bed in Puxi than a flat in Pudong.”", "dur": 6}, {"t": "vid", "src": "m/00.mp4", "sub": "江两边的灯，我数了二十五年。", "en": "The lights on both banks — I counted them for twenty-five years.", "who": "旁白", "line": "江两边个灯，我数了廿五年。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/01.mp4", "sub": "一九九一年三月，晚上九点。浦东的灯，一盏一盏，数得清。", "en": "March 1991, nine at night. The lights of Pudong — you could still count them, one by one.", "who": "旁白", "line": "一九九一年三月，夜里向九点钟。浦东个灯，一盏一盏，数得清。", "need": "待配音·旁白", "year": "1991"}], "next": "k1"}, "k1": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "灶间，两只碗，一只还冒着热气（1991，老平房）", "dur": 4.5, "sub": "吃了饭再走，外面风大得很。", "en": "Eat first, then go. The wind’s fierce out there.", "who": "老金", "line": "吃仔饭再去，外头 hong 大来邪。", "vo": "m/48.mp3", "need": "待补静帧"}, {"t": "ph", "desc": "灶间，两只碗，一只还冒着热气（1991，老平房）", "dur": 4.5, "sub": "老金是我师傅。我十六岁起跟着他过，跟他学修自行车。", "en": "Lao Jin was my master. From sixteen I lived with him and learned to fix bicycles.", "who": "旁白", "line": "老金是我师傅。我十六岁起跟伊过，跟伊学修脚踏车。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "灶间，两只碗，一只还冒着热气（1991，老平房）", "dur": 4.5, "sub": "我爸死的那年，我妈过江改嫁。走的时候说，过两个月来接我。", "en": "The year my father died, my mother crossed the river to remarry. She said she’d come for me in two months.", "who": "旁白", "line": "爷死脱那年，姆妈过江嫁人，临走讲，过两个号头来接我。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "灶间，两只碗，一只还冒着热气（1991，老平房）", "dur": 4.5, "sub": "我爸给我留了一间平房，就在老金隔壁。", "en": "My father left me a one-storey house, right next door to Lao Jin.", "who": "旁白", "line": "爷留拨我一间平房，就辣老金隔壁。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "灶间，两只碗，一只还冒着热气（1991，老平房）", "dur": 3.5, "sub": "我等到今天。", "en": "I’m still waiting.", "who": "旁白", "line": "我等到今朝。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "修车摊，老金把着阿乔的手补胎", "dur": 4.5, "sub": "修修还能用的。", "en": "Patch it up. It still works.", "who": "老金", "line": "修修还好用格。", "vo": "m/49.mp3", "need": "待补静帧"}, {"t": "ph", "desc": "灶头上，老金把一盒自来火塞进阿乔口袋", "dur": 4.5, "sub": "夜里冷，这盒火柴拿去。", "en": "It’s cold at night. Take these matches.", "who": "老金", "line": "夜里冷，迭盒自来火拿去。", "vo": "m/50.mp3", "need": "待补静帧", "box": true}, {"t": "ph", "desc": "灶头上，老金把一盒自来火塞进阿乔口袋", "dur": 4.5, "sub": "他不知道，我每天晚上跑到江边，是去数对岸的灯。", "en": "He didn’t know that every night I went down to the river to count the lights on the other side.", "who": "旁白", "line": "伊不晓得，我每夜跑到江边，是去数对岸个灯。", "need": "待补静帧；待配音·旁白"}], "next": "c1"}, "c1": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/02.webp", "dur": 4.5, "sub": "末班轮渡前，一个浦西女人走过来。", "en": "Before the last ferry, a woman from Puxi walked over.", "who": "旁白", "line": "末班轮渡前，一个浦西女人走过来。", "need": "待配音·旁白"}, {"t": "img", "src": "m/03.webp", "dur": 4.5, "sub": "有火吗？", "en": "“Got a light?”", "who": "薇薇", "line": "有火伐？", "need": "待配音·薇薇"}], "choice": {"q": "火一亮，你看得见她；她也看得见你。", "qen": "Strike a light and you will see her — and she will see you.", "opts": [{"l": "划一根自来火", "en": "Strike a match", "to": "n1a", "set": "met", "burn": 1}, {"l": "讲：呒没", "en": "“I don’t have one.”", "to": "n1b"}]}}, "n1a": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/04.webp", "dur": 4.5, "sub": "我借给她一根火柴。", "en": "I gave her a match.", "who": "旁白", "line": "我借拨伊一根自来火。", "need": "待配音·旁白"}, {"t": "img", "src": "m/05.webp", "dur": 4.5, "sub": "火光里，我第一次看清她的脸。", "en": "In the flare, I saw her face clearly for the first time.", "who": "旁白", "line": "火光里，我第一趟看清爽伊个面孔。", "need": "待配音·旁白"}, {"t": "img", "src": "m/06.webp", "dur": 4.5, "sub": "她上了船。", "en": "She got on the boat.", "who": "旁白", "line": "伊上了船。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/07.mp4", "sub": "从那以后，对岸有了一个人。", "en": "From then on, there was someone on the other shore.", "who": "旁白", "line": "从此以后，对岸有了一个人。", "need": "待配音·旁白"}], "next": "c2"}, "n1b": {"year": "1991", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "她转身走开，向别人借火（背影）", "dur": 4.5, "sub": "我说，没有。", "en": "“No,” I said.", "who": "旁白", "line": "我讲，呒没。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "她转身走开，向别人借火（背影）", "dur": 4.5, "sub": "火柴在我口袋里，一根也没少。", "en": "The matches stayed in my pocket. Not one missing.", "who": "旁白", "line": "自来火辣我袋袋里，一根也没少。", "need": "待补静帧；待配音·旁白"}, {"t": "vid", "src": "m/08.mp4", "sub": "对岸，还是对岸。", "en": "The other shore was still the other shore.", "who": "旁白", "line": "对岸，还是对岸。", "need": "待配音·旁白"}], "next": "c2"}, "c2": {"year": "1992", "music": "m/46.mp3", "shots": [{"t": "vid", "src": "m/09.mp4", "sub": "一九九二年，动迁的消息来了。江上已经有了桥，人心里的江，还没有。", "en": "1992. Word of the demolitions came. There was a bridge over the river now — but not over the one in people’s heads.", "who": "旁白", "line": "一九九二年，动迁个消息来了。江上头已经有了桥，人心里向个江，还没。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/10.mp4", "sub": "量到哪里，算到哪里。", "en": "“Whatever we measure is what you get.”", "who": "老张（公事，市区腔）"}, {"t": "img", "src": "m/11.webp", "dur": 4.5, "sub": "一夜之间，隔壁人家的屋顶上，长出了楼。", "en": "Overnight, extra floors sprouted on the neighbours’ roofs.", "who": "旁白", "line": "一夜之间，隔壁人家个屋顶上，长出了楼。", "need": "待配音·旁白"}, {"t": "ph", "desc": "门口，老张私下跟老金说话，阿乔在旁边（1992）", "dur": 4.5, "sub": "老金，你也加一层，不加吃亏的。", "en": "“Lao Jin, add a floor too. You lose out if you don’t.”", "who": "老张（私下，浦东话）", "line": "老金，侬也加一层，弗加吃亏格。", "need": "待补静帧；浦东话生成中（L7）；待配音·老张（私下，浦东话）"}, {"t": "ph", "desc": "门口，老张私下跟老金说话，阿乔在旁边（1992）", "dur": 4.5, "sub": "不是我们的，拿了夜里睡不着。", "en": "“It isn’t ours. Take it and you won’t sleep at night.”", "who": "老金", "line": "弗是吾伲格，拿仔夜里困弗着。", "need": "待补静帧；浦东话待生成（L5，写作“五泥”）；待配音·老金"}, {"t": "ph", "desc": "门口，老张私下跟老金说话，阿乔在旁边（1992）", "dur": 3.5, "sub": "你加吗？", "en": "“Are you adding one?”", "who": "老金（转向阿乔）", "line": "侬加伐？", "need": "待补静帧；浦东话待选（L6）；待配音·老金（转向阿乔）"}], "choice": {"q": "多一层，多一套房。也多一夜困弗着。", "qen": "One more floor, one more flat. And one more sleepless night.", "opts": [{"l": "加，连夜加楼", "en": "Build, tonight", "to": "n2a"}, {"l": "勿加，跟老金一样", "en": "Don’t, like Lao Jin", "to": "n2b"}]}}, "n2a": {"year": "1992–1994", "music": "m/46.mp3", "shots": [{"t": "vid", "src": "m/12.mp4", "sub": "加。", "en": "“Build.”", "who": "年轻阿乔（浦东话）", "line": "加。", "need": "浦东话待生成（L8）；待配音·年轻阿乔（浦东话）"}, {"t": "vid", "src": "m/13.mp4", "sub": "老板，三层要加钢筋，不然要塌的。", "en": "“Boss, three floors needs rebar, or it’ll come down.”", "who": "小陈（苏北口音普通话）", "line": "老板，三层要加钢筋，不然要塌的。", "need": "待配音·小陈（苏北口音普通话）"}, {"t": "vid", "src": "m/14.mp4", "sub": "两年里，我加了三层。楼是假的，钢筋是真的。", "en": "In two years I added three floors. The floors were fake. The rebar was real.", "who": "旁白", "line": "两年里向，我加了三层。楼是假个，钢筋是真个。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/15.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/16.mp4", "sub": "老房子拆了，分到四套新房子。", "en": "The old house came down. I got four new flats.", "who": "旁白", "line": "老屋拆脱，分到四套新房子。", "need": "待配音·旁白"}], "next": "c3"}, "n2b": {"year": "1994", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/31.mp4", "sub": "我跟老金一样，一层也没加。", "en": "Like Lao Jin, I didn’t add a single floor.", "who": "旁白", "line": "我跟老金一样，一层也没加。", "need": "待配音·旁白"}, {"t": "img", "src": "m/32.webp", "dur": 4.5, "sub": "一九九四年，搬进新村。一套，新的。", "en": "1994. We moved into the new estate. One flat. Brand new.", "who": "旁白", "line": "一九九四年，搬进新村。一套，新个。", "need": "史实修正：画面要改成新建的新村；待配音·旁白"}, {"t": "vid", "src": "m/33.mp4", "sub": "隔壁就是老金。我家没装灶，晚饭还是跟他一起吃。", "en": "Lao Jin was next door. I never put in a stove; I still ate dinner at his.", "who": "旁白", "line": "隔壁就是老金。我屋里没装灶，夜饭还是搭伊吃。", "need": "待配音·旁白"}], "next": "c5"}, "c3": {"year": "1994", "music": "m/45.mp3", "shots": [{"t": "img", "src": "m/17.webp", "dur": 4.5, "sub": "四把钥匙。每一把，都开一扇浦东的门。", "en": "Four keys. Every one of them opened a door in Pudong.", "who": "旁白", "line": "四把钥匙。每一把，都开一扇浦东个门。", "need": "待配音·旁白"}, {"t": "img", "src": "m/18.webp", "dur": 3.5, "sub": "怎么还是浦东。", "en": "And still — Pudong.", "who": "旁白", "line": "哪能还是浦东。", "need": "待配音·旁白"}, {"t": "img", "src": "m/19.webp", "dur": 4.5, "sub": "那边有什么好？", "en": "“What’s so good over there?”", "who": "老金", "line": "依 be be 有啥好？", "vo": "m/51.mp3"}], "choice": {"q": "四扇门，都在你身后。", "qen": "Four doors, all of them behind you.", "opts": [{"l": "统统卖脱，过江", "en": "Sell them all, cross the river", "to": "n3a"}, {"l": "留在浦东", "en": "Stay in Pudong", "to": "e3"}]}}, "n3a": {"year": "1995", "music": "m/45.mp3", "shots": [{"t": "vid", "src": "m/21.mp4", "sub": "我一天也没住过，晚上还是睡在老金家。全部卖掉，去买了浦西。", "en": "I never spent a night in them — I still slept at Lao Jin’s. I sold the lot and bought in Puxi.", "who": "旁白", "line": "我一日也没住过，夜里还是困辣老金屋里。统统卖脱，去买了浦西。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/22.mp4", "sub": "四套房子，换了弄堂里一间老公寓。", "en": "Four flats, for one old apartment down a Puxi lane.", "who": "旁白", "line": "四套房子，换一间弄堂里个老公寓。", "need": "待配音·旁白"}, {"t": "img", "src": "m/23.webp", "dur": 3.5, "sub": "", "en": ""}, {"if": "met", "then": {"t": "img", "src": "m/24.webp", "dur": 4.5, "sub": "我花了四年，走到她对面。", "en": "It took me four years to end up across from her.", "who": "旁白", "line": "我花了四年，走到伊对面。", "need": "待配音·旁白"}, "else": {"t": "img", "src": "m/24.webp", "dur": 4.5, "sub": "对面窗里，是一户浦西人家。窗帘是丝绒的。", "en": "In the window opposite, a Puxi family. Velvet curtains.", "who": "旁白", "line": "对面窗里，是一户浦西人家。窗帘是丝绒个。", "need": "待配音·旁白"}}], "next": "c4"}, "c4": {"year": "1995", "year_if": ["sold", "1996"], "music": "m/47.mp3", "shots": [{"t": "img", "src": "m/25.webp", "dur": 4.5, "sub": "卖房子给我的沈先生，请新邻居吃饭。", "en": "Mr Shen, who had sold me the flat, invited his new neighbour to dinner.", "who": "旁白", "line": "卖房子拨我个沈先生，请新邻居吃饭。", "need": "待配音·旁白"}, {"if": "met", "then": {"t": "img", "src": "m/26.webp", "dur": 4.5, "sub": "火柴换成了吊灯。是她。", "en": "The match had become a chandelier. It was her.", "who": "旁白", "line": "火柴换成了吊灯。是伊。", "need": "待配音·旁白"}, "else": {"t": "img", "src": "m/26.webp", "dur": 4.5, "sub": "她是沈家的女主人。", "en": "She was the lady of the Shen house.", "who": "旁白", "line": "伊是沈家个女主人。", "need": "待配音·旁白"}}, {"t": "img", "src": "m/27.webp", "dur": 4.5, "sub": "她拿出一根香烟。我的手，比我的脑子先动。", "en": "She took out a cigarette. My hand moved before my head did.", "who": "旁白", "line": "伊拿出一根香烟。我个手，比我个脑子先动。", "need": "待配音·旁白"}, {"t": "img", "src": "m/27.webp", "dur": 3.5, "sub": "沈先生的打火机，先点着了。", "en": "Mr Shen’s lighter got there first.", "who": "旁白", "line": "沈先生个打火机，先点着了。", "need": "待配音·旁白"}, {"t": "img", "src": "m/28.webp", "dur": 3.5, "sub": "你原来是哪里人？", "en": "“Where are you from, originally?”", "who": "沈家骏", "line": "侬老底子是阿里人？", "need": "待配音·沈家骏"}, {"t": "img", "src": "m/28.webp", "dur": 3, "sub": "……浦东。", "en": "“…Pudong.”", "who": "阿乔", "line": "……浦东。", "need": "待配音·阿乔"}, {"t": "img", "src": "m/28.webp", "dur": 4.5, "sub": "浦东啊？乡下呀。", "en": "“Pudong? That’s the countryside.”", "who": "薇薇（侧身对丈夫，轻声）", "line": "浦东啊？乡下头呀。", "vo": "m/29.mp3", "need": "现在是旧的阿姨声音，要用薇薇的声音重配"}, {"t": "img", "src": "m/30.webp", "dur": 3.5, "sub": "", "en": ""}], "choice": {"q": "一桌子人都在笑。你也可以笑。", "qen": "The whole table is laughing. You could laugh too.", "opts": [{"l": "笑笑，坐下去", "en": "Smile, sit back down", "to": "e1"}, {"l": "起身，走出去", "en": "Stand up and leave", "to": "e2"}]}}, "c5": {"year": "1996", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "周敏敲开新村的门，开口叫“乔师傅”（1996）", "dur": 4.5, "sub": "乔师傅，沈先生托我来的。这套房子，你开个价。", "en": "“Master Qiao — Mr Shen sent me. Name your price for the flat.”", "who": "周敏", "line": "乔师傅，沈先生托我来个。迭套房子，侬开个价。", "need": "待补静帧；待配音·周敏"}, {"t": "ph", "desc": "周敏敲开新村的门，开口叫“乔师傅”（1996）", "dur": 4.5, "sub": "一九九六年，浦东涨了。涨得还不够多，刚好够我动心。", "en": "1996. Pudong had gone up. Not by enough — just enough to tempt me.", "who": "旁白", "line": "一九九六年，浦东涨了。涨得还不够多，正好够我动心。", "need": "待补静帧；待配音·旁白"}], "choice": {"q": "这笔钱，够买浦西一间亭子间。不够买回一个灶间。", "qen": "Enough for a box room in Puxi. Not enough to buy back a kitchen.", "opts": [{"l": "卖掉，买间亭子间", "en": "Sell, buy a box room in Puxi", "to": "n5a", "set": "sold"}, {"l": "勿卖", "en": "Keep it", "to": "e4"}]}}, "n5a": {"year": "1996", "music": "m/45.mp3", "shots": [{"t": "ph", "desc": "浦西弄堂里朝北的亭子间（1996）", "dur": 4.5, "sub": "钱只够一间亭子间，朝北，冬天晒不到太阳。", "en": "The money bought a box room facing north. No sun in winter.", "who": "旁白", "line": "钞票只够一间亭子间，朝北，冬天晒不着太阳。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "浦西弄堂里朝北的亭子间（1996）", "dur": 4.5, "sub": "卖亭子间给我的，也是这位沈先生。他请我吃饭。", "en": "The man who sold it to me was that same Mr Shen. He invited me to dinner.", "who": "旁白", "line": "卖拨我亭子间个，也是迭位沈先生。伊请我吃饭。", "need": "待补静帧；待配音·旁白"}], "next": "c4"}, "e1": {"year": "1999", "music": "m/45.mp3", "ending": 1, "shots": [{"t": "img", "src": "m/23.webp", "dur": 4.5, "sub": "过江以后，我跟老金一年只吃一顿年夜饭。后来，年夜饭也没了。", "en": "After I crossed, Lao Jin and I ate together once a year, on New Year’s Eve. Then not even that.", "who": "旁白", "line": "过江以后，我搭老金，一年只吃一顿年夜饭。后来，年夜饭也没了。", "need": "待配音·旁白"}, {"if": "met", "then": {"t": "img", "src": "m/52.webp", "dur": 5.5, "sub": "一九九九年，外滩。她走过我身边，回头看了一眼。火一灭，她就转回去了。", "en": "1999, the Bund. She passed me and glanced back. When the flame died, she turned away.", "who": "旁白", "line": "一九九九年，外滩。伊走过我身边，回头看了一眼。火一熄，伊就转回去了。", "need": "待配音·旁白"}, "else": {"t": "img", "src": "m/52.webp", "dur": 5.5, "sub": "一九九九年，外滩。沈家一家人走过我身边。沈太太看了我一眼，没认出我。", "en": "1999, the Bund. The Shens walked past me. Mrs Shen looked at me and didn’t know me.", "who": "旁白", "line": "一九九九年，外滩。沈家一家门走过我身边。沈太太看了我一眼，没认出我。", "need": "待配音·旁白"}}, {"t": "img", "src": "m/53.webp", "dur": 4.5, "sub": "「爸爸，对面是什么地方？」「浦东。」", "en": "“Daddy, what’s over there?” “Pudong.”", "who": "沈囡囡 / 沈家骏", "line": "阿爸，对面是啥地方？ / 浦东。", "vo": "m/54.mp3", "need": "暂用旧 S24 口型版音轨，父亲要换成沈家骏的声音"}, {"t": "vid", "src": "m/36.mp4", "sub": "浦东的灯，我数不清了。火柴，还剩三根。", "en": "I could no longer count the lights of Pudong. Three matches left.", "who": "旁白", "line": "浦东个灯，我数不清了。自来火，还剩三根。", "need": "待配音·旁白", "left": 3}, {"t": "vid", "src": "m/37.mp4", "sub": "", "en": "", "year": "2016"}, {"t": "vid", "src": "m/38.mp4", "sub": "二〇一六年，我划了最后一根。", "en": "2016. I struck the last one.", "who": "旁白", "line": "二〇一六年，我划最后一根。", "need": "待配音·旁白", "left": 0, "sfx": "strike"}, {"t": "vid", "src": "m/39.mp4", "sub": "对岸的灯，我看了一辈子。没有一盏，是为我亮的。", "en": "I watched the lights on the other shore all my life. Not one of them was lit for me.", "who": "旁白", "line": "对岸个灯，我看了一世人生。呒没一盏，是为我亮个。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/40.mp4", "sub": "", "en": ""}, {"t": "vid", "src": "m/41.mp4", "sub": "……有一盏，在楼背后。我看了一辈子，一次也没看见。", "en": "…There was one, behind the towers. I looked all my life and never once saw it.", "who": "旁白", "line": "……有一盏，辣楼背后。我看了一世人生，一趟也没看见。", "need": "反打要是全片唯一一个不动的镜头，考虑换成静帧；待配音·旁白"}, {"t": "card", "text": "人望了一辈子对岸。对岸也在望，望个是另一个对岸。", "en": "We spend our lives looking at the other shore. The other shore is looking too — at another shore.", "dur": 5}]}, "e2": {"year": "1995", "year_if": ["sold", "1996"], "music": "m/45.mp3", "ending": 2, "shots": [{"t": "ph", "desc": "他走出饭店，外滩夜风", "dur": 4.5, "sub": "我放下筷子。没人留我。", "en": "I put down my chopsticks. No one asked me to stay.", "who": "旁白", "line": "我放下筷子。没人留我。", "need": "待补静帧；待配音·旁白"}, {"t": "img", "src": "m/42.webp", "dur": 4.5, "sub": "外滩的风，比浦东大。", "en": "The wind on the Bund was stronger than in Pudong.", "who": "旁白", "line": "外滩个风，比浦东大。", "need": "待配音·旁白"}, {"t": "ph", "desc": "火柴盒落进黄浦江", "dur": 4.5, "sub": "我把火柴盒扔进黄浦江。它漂了一会儿，没沉。", "en": "I threw the matchbox into the Huangpu. It floated a while. It didn’t sink.", "who": "旁白", "line": "我把自来火盒子掼进黄浦江。伊漂了一歇，没沉。", "need": "待补静帧；待配音·旁白", "box": false}, {"t": "ph", "desc": "火柴盒落进黄浦江", "dur": 4.5, "sub": "我扔掉的，是老金的火柴。", "en": "What I threw away were Lao Jin’s matches.", "who": "旁白", "line": "我掼脱个，是老金个自来火。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "外滩码头，末班轮渡（夜）", "dur": 4.5, "sub": "浦东的房子卖掉了，浦西的门进不去。", "en": "The Pudong flats were sold. The doors of Puxi wouldn’t open to me.", "who": "旁白", "line": "浦东个房子卖脱了，浦西个门开弗进。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "外滩码头，末班轮渡（夜）", "dur": 4.5, "sub": "末班轮渡在鸣笛。我站在码头上，没上船，也没走。", "en": "The last ferry sounded its horn. I stood on the pier. I didn’t board. I didn’t leave.", "who": "旁白", "line": "末班轮渡辣叫。我立辣码头上，没上船，也没走。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "外滩码头，末班轮渡（夜）", "dur": 4.5, "sub": "一条江，过得去，就回不来；回得来，就过不去。", "en": "A river: cross it and you can’t come back; come back and you can’t cross.", "who": "旁白", "line": "一条江，过得去，就回弗来；回得来，就过弗去。", "need": "待补静帧；待配音·旁白"}, {"t": "card", "text": "人一生最远个路，是半条江。", "en": "The longest road in a life is half a river.", "dur": 5}]}, "e3": {"year": "1994–2016", "music": "m/45.mp3", "ending": 3, "shots": [{"t": "vid", "src": "m/43.mp4", "sub": "我留了下来。", "en": "I stayed.", "who": "旁白", "line": "我留了下来。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/37.mp4", "sub": "浦东起来了。四套房子，我收了一辈子房租。", "en": "Pudong rose. Four flats — I collected rent on them all my life.", "who": "旁白", "line": "浦东起来了。四套房子，我收了一世人生个房租。", "need": "待配音·旁白"}, {"t": "img", "src": "m/44.webp", "dur": 4.5, "sub": "老金就住在隔两条马路的新村里。我一年去看他一次。", "en": "Lao Jin lived in the estate two streets away. I went to see him once a year.", "who": "旁白", "line": "老金就住辣隔开两条马路个新村里。我一年去看伊一趟。", "need": "待配音·旁白"}, {"t": "ph", "desc": "2016，老阿乔在浦东三十八楼窗前，望浦西", "dur": 4.5, "sub": "二〇一六年，我站在三十八楼，终于比对岸高了。", "en": "2016. Thirty-eight floors up, I was finally higher than the other shore.", "who": "旁白", "line": "二〇一六年，我立辣三十八楼，终于比对岸高了。", "need": "待补静帧；待配音·旁白", "year": "2016"}, {"t": "ph", "desc": "周敏领一位浦西老太太来看房", "dur": 5.5, "sub": "有一天，周敏领着一位浦西老太太来租我的房子。她的老房子动迁了，要搬到浦东来。", "en": "One day Zhou Min brought an old lady from Puxi to rent one of my flats. Her old house was being torn down; she was moving to Pudong.", "who": "旁白", "line": "有一日，周敏领一个浦西老太太来租我个房子。伊老屋动迁了，要搬到浦东来。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "2016，浦西老太太立在阿乔出租房的窗口（他的母亲）", "dur": 3.5, "sub": "浦东现在挺好的。", "en": "“Pudong’s quite nice now.”", "who": "老太太（市区话）", "line": "浦东现在蛮好。", "need": "待补静帧；待配音·老太太（市区话）"}, {"t": "ph", "desc": "2016，浦西老太太立在阿乔出租房的窗口（他的母亲）", "dur": 4.5, "sub": "我认得她。她不认得我。", "en": "I knew her. She didn’t know me.", "who": "旁白", "line": "我认得伊。伊不认得我。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "2016，浦西老太太立在阿乔出租房的窗口（他的母亲）", "dur": 4.5, "sub": "我收了她三个月押金。我没叫她妈。", "en": "I took three months’ deposit. I didn’t call her Mum.", "who": "旁白", "line": "我收了伊三个号头押金。我没叫伊姆妈。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "2016，浦西老太太立在阿乔出租房的窗口（他的母亲）", "dur": 4.5, "sub": "我一直以为，对岸是一个地方。", "en": "All along, I thought the other shore was a place.", "who": "旁白", "line": "我一直以为，对岸是一个地方。", "need": "待补静帧；待配音·旁白"}, {"t": "card", "text": "立得再高，也看不见自家身后。", "en": "However high you stand, you can’t see what’s behind you.", "dur": 5}]}, "e4": {"year": "2016", "music": "m/45.mp3", "ending": 4, "shots": [{"t": "img", "src": "m/44.webp", "dur": 4.5, "sub": "二十年。新村住旧了。", "en": "Twenty years. The new estate grew old.", "who": "旁白", "line": "二十年。新村住旧了。", "need": "待配音·旁白"}, {"t": "vid", "src": "m/40.mp4", "sub": "浦东的房子涨到天上，我的只涨了一点点。人家说我傻。", "en": "Pudong prices went sky-high. Mine went up a little. People called me a fool.", "who": "旁白", "line": "浦东个房子涨到天上，我个只涨了一点点。人家讲我戆。", "need": "待配音·旁白"}, {"t": "ph", "desc": "2016，老金和老年阿乔在灶间，老金修脚踏车", "dur": 4.5, "sub": "修修还能用的。", "en": "Patch it up. It still works.", "who": "老金（老了）", "line": "修修还好用格。", "vo": "m/49.mp3", "need": "待补静帧；暂用中年老金的声音，老年版待生成"}, {"t": "ph", "desc": "2016，老金和老年阿乔在灶间，老金修脚踏车", "dur": 4.5, "sub": "他说的是自行车。我知道，他说的是人。", "en": "He meant the bicycle. I knew he meant me.", "who": "旁白", "line": "伊讲个是脚踏车。我晓得，伊讲个是人。", "need": "待补静帧；待配音·旁白"}, {"if": "met", "then": {"t": "ph", "desc": "他朝浦西看一眼，拉上窗帘", "dur": 3.5, "sub": "", "en": "", "need": "待补静帧"}}, {"t": "ph", "desc": "灶间窗口，窗外是陆家嘴的背影", "dur": 4.5, "sub": "我一辈子没过江。对岸的灯是什么样子，我只看过。", "en": "I never crossed the river in my life. The lights over there — I only ever looked at them.", "who": "旁白", "line": "我一世人生没过江。对岸个灯是啥样子，我只看过。", "need": "待补静帧；待配音·旁白"}, {"t": "ph", "desc": "老金把空的自来火盒子放回灶头", "dur": 3.5, "sub": "", "en": "", "need": "待补静帧", "box": false}, {"t": "ph", "desc": "老金把空的自来火盒子放回灶头", "dur": 4.5, "sub": "二〇一六年冬天，老金走了。", "en": "In the winter of 2016, Lao Jin died.", "who": "旁白", "line": "二〇一六年冬天，老金走了。", "need": "待补静帧；待配音·旁白"}, {"t": "img", "src": "m/44.webp", "dur": 4.5, "sub": "灶间的灯，换我来开。不知道为谁开。", "en": "Now I keep the kitchen light on. I don’t know who for.", "who": "旁白", "line": "灶间个灯，换我来开。不晓得为啥人开。", "need": "待配音·旁白"}, {"t": "card", "text": "有人一辈子去对岸点灯，有人一辈子在身后守灯。", "en": "Some spend their lives lighting lamps on the other shore. Some spend theirs keeping one lit behind them.", "dur": 5}]}, "lamp": {"year": "1991–2016", "music": null, "ending": 5, "shots": [{"t": "card", "text": "", "en": "", "dur": 2, "sfx": "strike", "box": false}, {"t": "ph", "desc": "灶间的窗，1991→2016 同一机位，十几张静帧慢慢叠化；窗里的人从中年变老，窗一直亮着", "dur": 5.5, "sub": "一九九一年到二〇一六年，灶间个灯，夜夜开到天亮。", "en": "From 1991 to 2016, the kitchen light stayed on every night till dawn.", "need": "待补静帧（十几张，同一机位）", "mid": "一九九一年到二〇一六年，灶间的灯，每天晚上开到天亮。"}, {"t": "ph", "desc": "（同上，继续叠化）", "dur": 5, "sub": "电费单上，一个号头多七八角洋钿。", "en": "Seven or eight jiao more on the electricity bill, every month.", "need": "待补静帧", "mid": "电费单上，一个月多七八毛钱。"}, {"t": "ph", "desc": "（同上，继续叠化）", "dur": 4, "sub": "伊走了四条路。", "en": "He walked four roads.", "need": "待补静帧", "mid": "他走了四条路。"}, {"t": "ph", "desc": "（同上，窗还亮着）", "dur": 5, "sub": "四条路上，我一夜也没关。", "en": "On every one of them, I never turned it off. Not one night.", "need": "待补静帧", "mid": "四条路上，我一夜也没关。"}, {"t": "card", "text": "", "en": "", "dur": 2}]}}, "endings": {"1": {"name": "对岸", "en": "The Other Shore", "line": "他得到了对岸，对岸没有得到他。"}, "2": {"name": "掼脱", "en": "Let Go", "line": "他保住了自己，却把两岸都弄丢了。"}, "3": {"name": "赢家", "en": "The Winner", "line": "他赢了这个时代。对岸终于自己走到他面前，他却开不了口。"}, "4": {"name": "老金的窗", "en": "Lao Jin’s Window", "line": "他少拿了三套房，一辈子没过江，最后连守灯的人也失去了。"}, "5": {"name": "灯", "en": "The Lamp", "line": ""}}, "matches": 12};
 /* Media come from a CDN mirror when one is set (fast in mainland China); on any load error we fall back to the copy next to this page. */
-const BASE = "https://cdn.jsdelivr.net/gh/DDDylan123/dylan-he-films@ad545702ed2bac3c0ab36786960924e173a641a3/duian/";
+const BASE = "https://cdn.jsdelivr.net/gh/DDDylan123/dylan-he-films@7ea57e39675e588c9e6c91af56d5a2a54ac04e74/duian/";
 const U = p => BASE ? BASE + p : p;
 function fallback(el){ el.addEventListener('error',()=>{ const a=el.getAttribute('src')||''; if(BASE && a.startsWith(BASE)){ el.src=a.slice(BASE.length); if(el.play && !paused) el.play().catch(()=>{}); } }); }
 const $ = s => document.querySelector(s);
-const still=$('#still'), vid=$('#vid'), ph=$('#ph'), subs=$('#subs'), choice=$('#choice');
+const still=$('#still'), vid=$('#vid'), ph=$('#ph'), cardtxt=$('#cardtxt'), subs=$('#subs'), choice=$('#choice');
 const music = new Audio(); music.loop = true; music.volume = 0;
 const vo = new Audio();
 [music,vo].forEach(fallback);
@@ -176,7 +188,7 @@ function arm(ms){clearTimeout(timer); deadline=performance.now()+ms; timer=setTi
 
 /* --- matches HUD --- */
 function drawBox(){
-  const b=$('#box'); b.innerHTML='';
+  const b=$('#box'); b.innerHTML=''; b.classList.toggle('off',!state.box);
   for(let i=0;i<STORY.matches;i++){const m=document.createElement('i'); if(i>=state.left) m.className='burnt'; b.appendChild(m);}
 }
 /* --- strike sound, synthesized --- */
@@ -223,14 +235,15 @@ let loadT; function loading(on){clearTimeout(loadT); if(on) loadT=setTimeout(()=
 function resolve(shots){
   const out=[]; for(const s of shots){ if(s.if){const v=state.flags[s.if]?s.then:s.else; if(v) out.push(v);} else out.push(s);} return out;
 }
+function nodeYear(n){ return (n.year_if && state.flags[n.year_if[0]]) ? n.year_if[1] : (n.year||''); }
 function enter(id){
   state.node=id; const n=STORY.nodes[id];
-  $('#year').textContent=n.year||''; setMusic(n.music);
+  $('#year').textContent=nodeYear(n); setMusic(n.music);
   queue=resolve(n.shots); qi=-1; next();
 }
-function clearShot(){clearTimeout(timer); deadline=0; vo.pause(); subs.classList.remove('on');}
+function clearShot(){clearTimeout(timer); deadline=0; loading(false); vo.pause(); subs.classList.remove('on');}
 function showSub(s){
-  subs.querySelector('.zh').textContent=s.sub||''; subs.querySelector('.en').textContent=s.en||'';
+  subs.querySelector('.zh').textContent=s.sub||''; subs.querySelector('.mid').textContent=s.mid||''; subs.querySelector('.en').textContent=s.en||'';
   if(s.sub) subs.classList.add('on');
   $('#need').textContent=(notes&&s.need)?'● '+s.need:'';
 }
@@ -239,6 +252,16 @@ function next(){
   qi++;
   if(qi>=queue.length) return afterNode();
   const s=queue[qi];
+  /* per-shot story effects: year label, matchbox shown/hidden, matches set by the story, strike sound */
+  if(s.year) $('#year').textContent=s.year;
+  if(s.box!==undefined){state.box=s.box; drawBox();}
+  if(s.left!==undefined){state.left=s.left; drawBox();}
+  if(s.sfx==='strike') strike();
+  if(s.t==='card'){ showSub({}); $('#need').textContent=(notes&&s.need)?'● '+s.need:'';
+    vid.pause(); vid.classList.remove('on'); still.classList.remove('on'); ph.classList.remove('on');
+    cardtxt.querySelector('.zh').textContent=s.text||''; cardtxt.querySelector('.en').textContent=s.en||''; cardtxt.classList.add('on');
+    curDur=(s.dur||5)*1000; arm(curDur); warmAhead(); return; }
+  cardtxt.classList.remove('on');
   showSub(s);
   if(s.t==='vid'){
     still.classList.remove('on'); ph.classList.remove('on');
@@ -250,15 +273,18 @@ function next(){
   } else {
     vid.pause(); vid.classList.remove('on');
     let dur=(s.dur||4.5)*1000; curDur=dur;
-    if(s.t==='img'){
-      ph.classList.remove('on');
+    if(s.t==='img' && still.classList.contains('on') && still.dataset.src===s.src){
+      /* same picture as the previous shot: keep it (and its slow push-in) and only change the line */
+      arm(curDur);
+    } else if(s.t==='img'){
+      ph.classList.remove('on'); still.dataset.src=s.src;
       still.classList.remove('on','kb0','kb1'); void still.offsetWidth;
       still.style.setProperty('--kb',(dur/1000+3)+'s');
       const cls=(kbFlip++%2)?'kb1':'kb0', my=qi;
       still.onload=()=>{ if(my!==qi) return; loading(false); still.classList.add('on',cls); if(!paused) arm(curDur); };
       loading(true); still.src=U(s.src); if(still.complete && still.naturalWidth) still.onload();
     } else {
-      still.classList.remove('on');
+      still.classList.remove('on'); still.dataset.src='';
       ph.querySelector('.desc').textContent=s.desc; ph.querySelector('.tag').textContent=s.need||'待补静帧'; ph.classList.add('on');
     }
     if(s.vo){vo.src=U(s.vo); vo.currentTime=0; vo.play().catch(()=>{});
@@ -271,6 +297,7 @@ function afterNode(){
   const n=STORY.nodes[state.node];
   if(n.choice) return showChoice(n.choice);
   if(n.next) return enter(n.next);
+  if(n.ending===5) return finishLamp();
   if(n.ending) return showEnding(n.ending);
 }
 function showChoice(c){
@@ -280,30 +307,41 @@ function showChoice(c){
   const o=$('#opts'); o.innerHTML='';
   c.opts.forEach(op=>{const b=document.createElement('button'); b.className='opt';
     b.innerHTML=`<b>${op.l}</b><span>${op.en||''}</span>`;
-    b.onclick=e=>{e.stopPropagation(); strike(); state.left=Math.max(0,state.left-1); if(op.set) state.flags[op.set]=true; drawBox();
+    /* a match burns only when the choice really strikes one */
+    b.onclick=e=>{e.stopPropagation(); if(op.burn){strike(); state.left=Math.max(0,state.left-op.burn);} if(op.set) state.flags[op.set]=true; drawBox();
       choice.classList.remove('on'); busy=false; setTimeout(()=>enter(op.to),500);};
     o.appendChild(b);});
   choice.classList.add('on'); setTimeout(()=>o.querySelector('button')?.focus({preventScroll:true}),400);
 }
 function showEnding(k){
-  clearShot(); busy=true; addGot(k); setMusic(STORY.nodes[state.node].music);
+  clearShot(); busy=true; cardtxt.classList.remove('on'); addGot(k); setMusic(STORY.nodes[state.node].music);
   const e=STORY.endings[k];
   $('#endcard .endno').textContent='结局'+'一二三四'[k-1]+' · ENDING '+k;
   $('#endcard .endname').textContent=e.name;
   $('#endcard .endline').textContent=e.line;
-  $('#endcard .endmeta').textContent=`火柴还剩 ${state.left} 根　·　已解锁 ${new Set([...getGot(),...sessionGot]).size} / 4 个结局`;
+  const burnt=STORY.matches-state.left;
+  $('#endcard .endmeta').textContent=(burnt?`你划掉了 ${burnt} 根自来火。每一根，都是老金给的。`:'你一根自来火也没划。盒子还是老金给你时候的样子。')
+    +`　·　已解锁 ${gotCount()} / 4 个结局`;
   gallery($('#gal2')); $('#backBtn').hidden=!history.length;
   $('#pauseBtn').hidden=true;
   $('#endcard').classList.add('on');
 }
-function start(){
-  state={node:null,left:STORY.matches,flags:{}}; history=[];
+function gotCount(){ const g=new Set([...getGot(),...sessionGot]); return [1,2,3,4].filter(k=>g.has(k)).length; }
+/* hidden ending: after all four, an unused match appears on the title card */
+function lampCheck(){ $('#lampBtn').hidden=gotCount()<4; }
+function toTitle(){ clearShot(); loading(false); state.node=null; busy=false; choice.classList.remove('on'); cardtxt.classList.remove('on');
+  still.classList.remove('on'); ph.classList.remove('on'); vid.pause(); vid.classList.remove('on'); $('#pauseBtn').hidden=true;
+  $('#endcard').classList.remove('on'); gallery($('#gal1')); lampCheck(); $('#titlecard').classList.add('on'); }
+function finishLamp(){ addGot(5); state.left=STORY.matches; state.box=true; drawBox(); setMusic(STORY.nodes.prologue.music); toTitle(); }
+function start(id){
+  state={node:null,left:STORY.matches,flags:{},box:false}; history=[];
   drawBox(); $('#titlecard').classList.remove('on'); $('#endcard').classList.remove('on'); busy=false;
   $('#pauseBtn').hidden=false;
-  enter(STORY.start);
+  enter(id||STORY.start);
 }
 $('#startBtn').onclick=e=>{e.stopPropagation(); notes=$('#notesChk').checked; strike(); start();};
 $('#againBtn').onclick=e=>{e.stopPropagation(); start();};
+$('#lampBtn').onclick=e=>{e.stopPropagation(); notes=$('#notesChk').checked; start('lamp');};
 function inPlay(){return state && state.node && !$('#titlecard').classList.contains('on') && !$('#endcard').classList.contains('on');}
 function pause(){
   if(paused || !inPlay()) return;
@@ -326,17 +364,15 @@ function resume(){
 function closePause(){paused=false; $('#frame').classList.remove('paused'); $('#pausecard').classList.remove('on'); clearShot(); vid.pause();}
 function goBack(){ const s=history.pop(); if(!s) return;
   state=s; drawBox(); $('#endcard').classList.remove('on'); const n=STORY.nodes[s.node];
-  $('#year').textContent=n.year||''; setMusic(n.music); still.classList.remove('on'); vid.classList.remove('on');
+  $('#year').textContent=nodeYear(n); setMusic(n.music); still.classList.remove('on'); vid.classList.remove('on'); ph.classList.remove('on'); cardtxt.classList.remove('on');
   // show last still of that node behind the choice
-  const last=resolve(n.shots).filter(x=>x.t==='img').pop(); if(last){still.src=U(last.src); still.classList.add('on');}
+  const last=resolve(n.shots).filter(x=>x.t==='img').pop(); if(last){still.src=U(last.src); still.dataset.src=last.src; still.classList.add('on');}
   showChoice(n.choice);}
 $('#backBtn').onclick=e=>{e.stopPropagation(); $('#pauseBtn').hidden=false; goBack();};
 $('#pauseBtn').onclick=e=>{e.stopPropagation(); pause();};
 $('#resumeBtn').onclick=e=>{e.stopPropagation(); resume();};
 $('#pBackBtn').onclick=e=>{e.stopPropagation(); closePause(); goBack(); if(music.dataset.src) music.play().catch(()=>{});};
-$('#pTitleBtn').onclick=e=>{e.stopPropagation(); closePause(); state.node=null; busy=false; choice.classList.remove('on');
-  still.classList.remove('on'); ph.classList.remove('on'); vid.classList.remove('on'); $('#pauseBtn').hidden=true; setMusic(null);
-  gallery($('#gal1')); $('#titlecard').classList.add('on');};
+$('#pTitleBtn').onclick=e=>{e.stopPropagation(); closePause(); setMusic(null); toTitle();};
 $('#pNotesChk').onchange=e=>{notes=e.target.checked; $('#notesChk').checked=notes; if(queue && queue[qi]) showSub(queue[qi]);};
 $('#pausecard').addEventListener('click',e=>e.stopPropagation());
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) pause(); });
@@ -346,7 +382,7 @@ document.addEventListener('keydown',e=>{
   if(k===' '||k==='p'||k==='P'||k==='Escape'){ if(paused){e.preventDefault(); resume(); return;} if(inPlay()){e.preventDefault(); pause(); return;} }
   if(k==='ArrowRight' && !paused && !busy && state && state.node){e.preventDefault(); next();}
 });
-gallery($('#gal1'));
+gallery($('#gal1')); lampCheck();
 [still,vid].forEach(fallback);
 
 /* --- film grain --- */
