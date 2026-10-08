@@ -88,14 +88,23 @@ PD_MATCH = 'aud_PD_老金_夜里冷迭盒自来火拿去_b.mp3'
 PD_THERE = 'aud_PD_老金_依bebe有啥好_a.mp3'
 VO_S24 = 'aud_VO_S24口型版音轨_父女.mp3'
 
-K_TABLE = '灶间，两只碗，一只还冒着热气（1991，老平房）'
-K_DOOR = '门口，老张私下跟老金说话，阿乔在旁边（1992）'
-K_ZHOU = '周敏敲开新村的门，开口叫“乔师傅”（1996）'
-K_ROOM = '浦西弄堂里朝北的亭子间（1996）'
-K_PIER = '外滩码头，末班轮渡（夜）'
 K_LADY = '2016，浦西老太太立在阿乔出租房的窗口（他的母亲）'
-K_JIN = '2016，老金和老年阿乔在灶间，老金修脚踏车'
-K_STOVE = '老金把空的自来火盒子放回灶头'
+
+# 2026-10-08 Dylan 选定的 v2 静帧（LibTV 节点 V2_*，Seedream 5.0 Pro）
+I_TABLE = 'KF_V2_01_1991灶间两只碗_b'
+I_TYRE = 'KF_V2_02_1991修车摊补胎_b'
+I_MATCH = 'KF_V2_03_1991灶头塞火柴_a'
+I_BACK = 'KF_V2_04_1991她转身借火背影_a'
+I_DOOR = 'KF_V2_05_1992老张老金门口_a'
+I_NEWFLAT = 'KF_V2_06b_1994新村钥匙_新房_实景光_a'
+I_ZHOU = 'KF_V2_07b_1996周敏敲门_实景光_a'
+I_ROOM = 'KF_V2_08_1996浦西亭子间_b'
+I_WALKOUT = 'KF_V2_09b_1995走出饭店外滩夜风_b'
+I_BOX = 'KF_V2_10b_1995火柴盒落江_b'
+I_PIER = 'KF_V2_11b_1995码头末班轮渡_a'
+I_JIN = 'KF_V2_14_2016老金老阿乔灶间修车_a'
+I_CURTAIN = 'KF_V2_15_2016拉窗帘_b'
+I_STOVE = 'KF_V2_16_空火柴盒放回灶头_b'
 
 nodes = {
  'prologue': {'year': '2016', 'music': WALTZ, 'shots': [
@@ -109,20 +118,20 @@ nodes = {
    ], 'next': 'k1'},
 
  'k1': {'year': '1991', 'music': WALTZ, 'shots': [
-    ph(K_TABLE, '吃了饭再走，外面风大得很。', 'Eat first, then go. The wind’s fierce out there.',
+    img(I_TABLE, '吃了饭再走，外面风大得很。', 'Eat first, then go. The wind’s fierce out there.',
        who='老金', line='吃仔饭再去，外头 hong 大来邪。', vo=PD_EAT),
-    ph(K_TABLE, **V('老金是我师傅。我十六岁起跟伊过，跟伊学修脚踏车。', '老金是我师傅。我十六岁起跟着他过，跟他学修自行车。',
+    img(I_TABLE, **V('老金是我师傅。我十六岁起跟伊过，跟伊学修脚踏车。', '老金是我师傅。我十六岁起跟着他过，跟他学修自行车。',
        'Lao Jin was my master. From sixteen I lived with him and learned to fix bicycles.')),
-    ph(K_TABLE, **V('爷跟厂里支内，去了外地。姆妈不肯去，过江回了娘家。', '我爸跟着厂里支内，去了外地。我妈不肯去，过江回了娘家。',
+    img(I_TABLE, **V('爷跟厂里支内，去了外地。姆妈不肯去，过江回了娘家。', '我爸跟着厂里支内，去了外地。我妈不肯去，过江回了娘家。',
        'My father went inland with his factory. My mother wouldn’t go; she crossed the river, back to her family.')),
-    ph(K_TABLE, **V('临走讲，过两个号头来接我。屋里个平房留拨我，就辣老金隔壁。', '走的时候说，过两个月来接我。家里的平房留给了我，就在老金隔壁。',
+    img(I_TABLE, **V('临走讲，过两个号头来接我。屋里个平房留拨我，就辣老金隔壁。', '走的时候说，过两个月来接我。家里的平房留给了我，就在老金隔壁。',
        'She said she’d come for me in two months. They left me the house, right next door to Lao Jin.')),
-    ph(K_TABLE, **V('我等到今朝。', '我等到今天。', 'I’m still waiting.'), dur=3.5),
-    ph('修车摊，老金把着阿乔的手补胎', '修修还能用的。', 'Patch it up. It still works.',
+    img(I_TABLE, **V('我等到今朝。', '我等到今天。', 'I’m still waiting.'), dur=3.5),
+    img(I_TYRE, '修修还能用的。', 'Patch it up. It still works.',
        who='老金', line='修修还好用格。', vo=PD_FIX),
-    ph('灶头上，老金把一盒自来火塞进阿乔口袋', '夜里冷，这盒火柴拿去。', 'It’s cold at night. Take these matches.',
+    img(I_MATCH, '夜里冷，这盒火柴拿去。', 'It’s cold at night. Take these matches.',
        who='老金', line='夜里冷，迭盒自来火拿去。', vo=PD_MATCH, box=True),
-    ph('灶头上，老金把一盒自来火塞进阿乔口袋', **V('伊不晓得，我每夜跑到江边，是去数对岸个灯。', '他不知道，我每天晚上跑到江边，是去数对岸的灯。',
+    img(I_MATCH, **V('伊不晓得，我每夜跑到江边，是去数对岸个灯。', '他不知道，我每天晚上跑到江边，是去数对岸的灯。',
        'He didn’t know that every night I went down to the river to count the lights on the other side.')),
    ], 'next': 'c1'},
 
@@ -141,8 +150,8 @@ nodes = {
    ], 'next': 'c2'},
 
  'n1b': {'year': '1991', 'music': WALTZ, 'shots': [
-    ph('她转身走开，向别人借火（背影）', **V('我讲，呒没。', '我说，没有。', '“No,” I said.')),
-    ph('她转身走开，向别人借火（背影）', **V('自来火辣我袋袋里，一根也没少。', '火柴在我口袋里，一根也没少。', 'The matches stayed in my pocket. Not one missing.')),
+    img(I_BACK, **V('我讲，呒没。', '我说，没有。', '“No,” I said.')),
+    img(I_BACK, **V('自来火辣我袋袋里，一根也没少。', '火柴在我口袋里，一根也没少。', 'The matches stayed in my pocket. Not one missing.')),
     vid('VID_S09_Kling3', **V('对岸，还是对岸。', en='The other shore was still the other shore.')),
    ], 'next': 'c2'},
 
@@ -153,11 +162,11 @@ nodes = {
     vid('VID_S05_口型_v2', '量到哪里，算到哪里。', '“Whatever we measure is what you get.”', who='老张（公事，市区腔）'),
     img('KF_S09w_晾衣望对岸', **V('一夜之间，隔壁人家个屋顶上，长出了楼。', '一夜之间，隔壁人家的屋顶上，长出了楼。',
         'Overnight, extra floors sprouted on the neighbours’ roofs.')),
-    ph(K_DOOR, '老金，你也加一层，不加吃亏的。', '“Lao Jin, add a floor too. You lose out if you don’t.”',
-       who='老张（私下，浦东话）', line='老金，侬也加一层，弗加吃亏格。', need='待补静帧；浦东话生成中（L7）'),
-    ph(K_DOOR, '不是我们的，拿了夜里睡不着。', '“It isn’t ours. Take it and you won’t sleep at night.”',
-       who='老金', line='弗是吾伲格，拿仔夜里困弗着。', need='待补静帧；浦东话待生成（L5，写作“五泥”）'),
-    ph(K_DOOR, '你加吗？', '“Are you adding one?”', who='老金（转向阿乔）', line='侬加伐？', need='待补静帧；浦东话待选（L6）', dur=3.5),
+    img(I_DOOR, '老金，你也加一层，不加吃亏的。', '“Lao Jin, add a floor too. You lose out if you don’t.”',
+       who='老张（私下，浦东话）', line='老金，侬也加一层，弗加吃亏格。', need='浦东话生成中（L7）'),
+    img(I_DOOR, '不是我们的，拿了夜里睡不着。', '“It isn’t ours. Take it and you won’t sleep at night.”',
+       who='老金', line='弗是吾伲格，拿仔夜里困弗着。', need='浦东话待生成（L5，写作“五泥”）'),
+    img(I_DOOR, '你加吗？', '“Are you adding one?”', who='老金（转向阿乔）', line='侬加伐？', need='浦东话待选（L6）', dur=3.5),
    ], 'choice': {'q': '多一层，多一套房。也多一夜困弗着。', 'qen': 'One more floor, one more flat. And one more sleepless night.', 'opts': [
       {'l': '加，连夜加楼', 'en': 'Build, tonight', 'to': 'n2a'},
       {'l': '勿加，跟老金一样', 'en': 'Don’t, like Lao Jin', 'to': 'n2b'}]}},
@@ -174,8 +183,7 @@ nodes = {
 
  'n2b': {'year': '1994', 'music': WALTZ, 'shots': [
     vid('VID_S13_Kling3', **V('我跟老金一样，一层也没加。', en='Like Lao Jin, I didn’t add a single floor.')),
-    img('KF_S14b_新村钥匙', **V('一九九四年，搬进新村。一套，新个。', '一九九四年，搬进新村。一套，新的。', '1994. We moved into the new estate. One flat. Brand new.'),
-        need='史实修正：画面要改成新建的新村'),
+    img(I_NEWFLAT, **V('一九九四年，搬进新村。一套，新个。', '一九九四年，搬进新村。一套，新的。', '1994. We moved into the new estate. One flat. Brand new.')),
     vid('VID_S22_Kling3', **V('隔壁就是老金。我屋里没装灶，夜饭还是搭伊吃。', '隔壁就是老金。我家没装灶，晚饭还是跟他一起吃。',
         'Lao Jin was next door. I never put in a stove; I still ate dinner at his.')),
    ], 'next': 'c5'},
@@ -217,18 +225,18 @@ nodes = {
       {'l': '起身，走出去', 'en': 'Stand up and leave', 'to': 'e2'}]}},
 
  'c5': {'year': '1996', 'music': WALTZ, 'shots': [
-    ph(K_ZHOU, '乔师傅，沈先生托我来的。这套房子，你开个价。', '“Master Qiao — Mr Shen sent me. Name your price for the flat.”',
+    img(I_ZHOU, '乔师傅，沈先生托我来的。这套房子，你开个价。', '“Master Qiao — Mr Shen sent me. Name your price for the flat.”',
        who='周敏', line='乔师傅，沈先生托我来个。迭套房子，侬开个价。'),
-    ph(K_ZHOU, **V('一九九六年，浦东涨了。涨得还不够多，正好够我动心。', '一九九六年，浦东涨了。涨得还不够多，刚好够我动心。',
+    img(I_ZHOU, **V('一九九六年，浦东涨了。涨得还不够多，正好够我动心。', '一九九六年，浦东涨了。涨得还不够多，刚好够我动心。',
        '1996. Pudong had gone up. Not by enough — just enough to tempt me.')),
    ], 'choice': {'q': '这笔钱，够买浦西一间亭子间。不够买回一个灶间。', 'qen': 'Enough for a box room in Puxi. Not enough to buy back a kitchen.', 'opts': [
       {'l': '卖掉，买间亭子间', 'en': 'Sell, buy a box room in Puxi', 'to': 'n5a', 'set': 'sold'},
       {'l': '勿卖', 'en': 'Keep it', 'to': 'e4'}]}},
 
  'n5a': {'year': '1996', 'music': WALTZ, 'shots': [
-    ph(K_ROOM, **V('钞票只够一间亭子间，朝北，冬天晒不着太阳。', '钱只够一间亭子间，朝北，冬天晒不到太阳。',
+    img(I_ROOM, **V('钞票只够一间亭子间，朝北，冬天晒不着太阳。', '钱只够一间亭子间，朝北，冬天晒不到太阳。',
        'The money bought a box room facing north. No sun in winter.')),
-    ph(K_ROOM, **V('卖拨我亭子间个，也是迭位沈先生。伊请我吃饭。', '卖亭子间给我的，也是这位沈先生。他请我吃饭。',
+    img(I_ROOM, **V('卖拨我亭子间个，也是迭位沈先生。伊请我吃饭。', '卖亭子间给我的，也是这位沈先生。他请我吃饭。',
        'The man who sold it to me was that same Mr Shen. He invited me to dinner.')),
    ], 'next': 'c4'},
 
@@ -259,16 +267,16 @@ nodes = {
    ]},
 
  'e2': {'year': '1995', 'year_if': ['sold', '1996'], 'music': WALTZ, 'ending': 2, 'shots': [
-    ph('他走出饭店，外滩夜风', **V('我放下筷子。没人留我。', en='I put down my chopsticks. No one asked me to stay.')),
+    img(I_WALKOUT, **V('我放下筷子。没人留我。', en='I put down my chopsticks. No one asked me to stay.')),
     img('KF_S23_外滩人群', **V('外滩个风，比浦东大。', '外滩的风，比浦东大。', 'The wind on the Bund was stronger than in Pudong.')),
-    ph('火柴盒落进黄浦江', **V('我把自来火盒子掼进黄浦江。伊漂了一歇，没沉。', '我把火柴盒扔进黄浦江。它漂了一会儿，没沉。',
+    img(I_BOX, **V('我把自来火盒子掼进黄浦江。伊漂了一歇，没沉。', '我把火柴盒扔进黄浦江。它漂了一会儿，没沉。',
        'I threw the matchbox into the Huangpu. It floated a while. It didn’t sink.'), box=False),
-    ph('火柴盒落进黄浦江', **V('我掼脱个，是老金个自来火。', '我扔掉的，是老金的火柴。', 'What I threw away were Lao Jin’s matches.')),
-    ph(K_PIER, **V('浦东个房子卖脱了，浦西个门开弗进。', '浦东的房子卖掉了，浦西的门进不去。',
+    img(I_BOX, **V('我掼脱个，是老金个自来火。', '我扔掉的，是老金的火柴。', 'What I threw away were Lao Jin’s matches.')),
+    img(I_PIER, **V('浦东个房子卖脱了，浦西个门开弗进。', '浦东的房子卖掉了，浦西的门进不去。',
        'The Pudong flats were sold. The doors of Puxi wouldn’t open to me.')),
-    ph(K_PIER, **V('末班轮渡辣叫。我立辣码头上，没上船，也没走。', '末班轮渡在鸣笛。我站在码头上，没上船，也没走。',
+    img(I_PIER, **V('末班轮渡辣叫。我立辣码头上，没上船，也没走。', '末班轮渡在鸣笛。我站在码头上，没上船，也没走。',
        'The last ferry sounded its horn. I stood on the pier. I didn’t board. I didn’t leave.')),
-    ph(K_PIER, **V('一条江，过得去，就回弗来；回得来，就过弗去。', '一条江，过得去，就回不来；回得来，就过不去。',
+    img(I_PIER, **V('一条江，过得去，就回弗来；回得来，就过弗去。', '一条江，过得去，就回不来；回得来，就过不去。',
        'A river: cross it and you can’t come back; come back and you can’t cross.')),
     card('人一生最远个路，是半条江。', 'The longest road in a life is half a river.'),
    ]},
@@ -295,14 +303,14 @@ nodes = {
     img('KF_N4b_2016老金厨房窗', **V('二十年。新村住旧了。', en='Twenty years. The new estate grew old.')),
     vid('VN4_老金厨房2016', **V('浦东个房子涨到天上，我个只涨了一点点。人家讲我戆。', '浦东的房子涨到天上，我的只涨了一点点。人家说我傻。',
         'Pudong prices went sky-high. Mine went up a little. People called me a fool.')),
-    ph(K_JIN, '修修还能用的。', 'Patch it up. It still works.', who='老金（老了）', line='修修还好用格。', vo=PD_FIX,
-       need='待补静帧；暂用中年老金的声音，老年版待生成'),
-    ph(K_JIN, **V('伊讲个是脚踏车。我晓得，伊讲个是人。', '他说的是自行车。我知道，他说的是人。', 'He meant the bicycle. I knew he meant me.')),
-    met(ph('他朝浦西看一眼，拉上窗帘', dur=3.5)),
+    img(I_JIN, '修修还能用的。', 'Patch it up. It still works.', who='老金（老了）', line='修修还好用格。', vo=PD_FIX,
+       need='暂用中年老金的声音，老年版待生成'),
+    img(I_JIN, **V('伊讲个是脚踏车。我晓得，伊讲个是人。', '他说的是自行车。我知道，他说的是人。', 'He meant the bicycle. I knew he meant me.')),
+    met(img(I_CURTAIN, dur=3.5)),
     ph('灶间窗口，窗外是陆家嘴的背影', **V('我一世人生没过江。对岸个灯是啥样子，我只看过。', '我一辈子没过江。对岸的灯是什么样子，我只看过。',
        'I never crossed the river in my life. The lights over there — I only ever looked at them.')),
-    ph(K_STOVE, dur=3.5, box=False),
-    ph(K_STOVE, **V('二〇一六年冬天，老金走了。', en='In the winter of 2016, Lao Jin died.')),
+    img(I_STOVE, dur=3.5, box=False),
+    img(I_STOVE, **V('二〇一六年冬天，老金走了。', en='In the winter of 2016, Lao Jin died.')),
     img('KF_N4b_2016老金厨房窗', **V('灶间个灯，换我来开。不晓得为啥人开。', '灶间的灯，换我来开。不知道为谁开。',
         'Now I keep the kitchen light on. I don’t know who for.')),
     card('有人一辈子去对岸点灯，有人一辈子在身后守灯。', 'Some spend their lives lighting lamps on the other shore. Some spend theirs keeping one lit behind them.'),
@@ -311,14 +319,15 @@ nodes = {
  # 隐藏结局《灯》：四个结局都看过后，标题页多出一根火柴。全剧唯一一次老金自己开口（只出字幕：浦东话写法 + 普通话）。
  'lamp': {'year': '1991–2016', 'music': None, 'ending': 5, 'shots': [
     card('', dur=2, sfx='strike', box=False),
-    ph('灶间的窗，1991→2016 同一机位，十几张静帧慢慢叠化；窗里的人从中年变老，窗一直亮着',
-       '一九九一年到二〇一六年，灶间个灯，夜夜开到天亮。', 'From 1991 to 2016, the kitchen light stayed on every night till dawn.',
-       mid='一九九一年到二〇一六年，灶间的灯，每天晚上开到天亮。', dur=5.5, need='待补静帧（十几张，同一机位）'),
-    ph('（同上，继续叠化）', '电费单上，一个号头多七八角洋钿。', 'Seven or eight jiao more on the electricity bill, every month.',
-       mid='电费单上，一个月多七八毛钱。', dur=5),
-    ph('（同上，继续叠化）', '伊走了四条路。', 'He walked four roads.', mid='他走了四条路。', dur=4),
-    ph('（同上，窗还亮着）', '四条路上，我一夜也没关。', 'On every one of them, I never turned it off. Not one night.',
-       mid='四条路上，我一夜也没关。', dur=5),
+    # 同一扇窗：1994（S22）→ 1999 → 2005 → 2010 → 2016（N4b），一张叠一张
+    img('KF_S22_老金炒菜', '一九九一年到二〇一六年，灶间个灯，夜夜开到天亮。', 'From 1991 to 2016, the kitchen light stayed on every night till dawn.',
+        mid='一九九一年到二〇一六年，灶间的灯，每天晚上开到天亮。', dur=5.5),
+    img('KF_V2_18_灯_1999同一扇窗_b', '电费单上，一个号头多七八角洋钿。', 'Seven or eight jiao more on the electricity bill, every month.',
+        mid='电费单上，一个月多七八毛钱。', dur=5),
+    img('KF_V2_19_灯_2005同一扇窗_a', '伊走了四条路。', 'He walked four roads.', mid='他走了四条路。', dur=4),
+    img('KF_V2_20_灯_2010同一扇窗_b', '四条路上，我一夜也没关。', 'On every one of them, I never turned it off. Not one night.',
+        mid='四条路上，我一夜也没关。', dur=5),
+    img('KF_N4b_2016老金厨房窗', dur=4),
     card('', dur=2),
    ]},
 }
