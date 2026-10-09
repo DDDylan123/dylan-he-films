@@ -46,14 +46,20 @@
   /* 手机静音键会让网页没声：开声音后在原位置提示几秒 */
   #ringtip { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 3; background: rgba(61, 42, 45, .86); color: var(--paper); padding: 8px 14px; border-radius: 999px; font-size: 13px; letter-spacing: .5px; opacity: 0; pointer-events: none; transition: opacity .4s; }
   #ringtip.on { opacity: 1; }
+  /* 点击翻页：停住时在底部提示「轻点继续」 */
+  #next { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 2; color: var(--ink); font-size: 14px; letter-spacing: 2px; opacity: 0; pointer-events: none; transition: opacity .5s; white-space: nowrap; }
+  #next.on { opacity: .7; animation: nudge 1.6s ease-in-out infinite; }
+  @keyframes nudge { 50% { opacity: .35; } }
+  body.inv #next { color: var(--paper); }
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="cv" aria-label="Animation: a giant wave washes away sandcastles, explaining a Zeng Ming interview"></canvas></div>
 <div id="ringtip" role="status"></div>
+<div id="next" aria-hidden="true"></div>
 <button id="hint" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>Sound on</button>
 <div id="controls">
-  <a id="home" href="https://dylanhe.cn/en/#explainers">Dylan He home</a><button id="snd">Sound on</button><button id="play">Pause</button><button id="restart">Replay</button><button id="ratio">Rotate</button><button id="fs">Fullscreen</button>
+  <a id="home" href="https://dylanhe.cn/en/#explainers">Dylan He home</a><button id="snd">Sound on</button><button id="play">Pause</button><button id="mode"></button><button id="restart">Replay</button><button id="ratio">Rotate</button><button id="fs">Fullscreen</button>
   <span id="speeds"><button data-s="1">1×</button><button data-s="1.5">1.5×</button><button data-s="2">2×</button><button data-s="3">3×</button></span>
   <span id="acts"></span><span id="clock">0.0s</span>
 </div>
@@ -985,7 +991,7 @@ build(params.get("ar") === "h" || (!params.get("ar") && innerWidth > innerHeight
 window.__wave = { TOTAL, ACTS };
 const logoImg = new Image(); logoImg.onload = () => { LOGO = logoImg; }; logoImg.src = "logo.png";
 const actsEl = document.getElementById("acts");
-ACTS.forEach(([n, at], i) => { const b = document.createElement("button"); b.textContent = `${i}·${n}`; b.onclick = () => { offset = at; startAt = performance.now(); playing = true; document.getElementById("play").textContent = tr("暂停"); }; actsEl.appendChild(b); });
+ACTS.forEach(([n, at], i) => { const b = document.createElement("button"); b.textContent = `${i}·${n}`; b.onclick = () => go(at); actsEl.appendChild(b); });
 let playing = !params.has("t"), startAt = performance.now();
 let offset = params.has("t") ? parseFloat(params.get("t")) : params.has("act") ? (ACTS[+params.get("act")] || [0, 0])[1] : 0;
 let speed = [1, 1.5, 2, 3].includes(+params.get("speed")) ? +params.get("speed") : 1;
@@ -993,26 +999,56 @@ const now = () => playing ? offset + (performance.now() - startAt) / 1000 * spee
 function setSpeed(s) { offset = now(); startAt = performance.now(); speed = s; document.querySelectorAll("#speeds button").forEach(b => b.classList.toggle("on", +b.dataset.s === s)); }
 document.querySelectorAll("#speeds button").forEach(b => b.onclick = () => setSpeed(+b.dataset.s));
 setSpeed(speed);
+// 点击翻页（默认）：每段字幕完整出现后停住，轻点画面（或空格 / →）才继续；「自动播放」按钮切回按时间走。?mode=auto 默认自动
+let stepMode = !params.has("t") && params.get("mode") !== "auto", holdAt = null, holdSince = 0, pendingHold = null;
+const HOLDS = CAPS.map(c => c.to - 0.5);
+const nextHold = t => HOLDS.find(h => h > t + 0.01) ?? null;
+const isTouch = matchMedia("(hover: none)").matches;
+const nextEl = document.getElementById("next"), modeEl = document.getElementById("mode");
+nextEl.textContent = LANG === "en" ? (isTouch ? "Tap to continue ▸" : "Click or press space ▸") : (isTouch ? "轻点继续 ▸" : "点击或按空格继续 ▸");
+function setPlay(p) { playing = p; document.getElementById("play").textContent = tr(p ? "暂停" : "播放"); }
+function go(t) { offset = t; startAt = performance.now(); holdAt = null; setPlay(true); pendingHold = stepMode ? nextHold(t) : null; }
+function advance() {
+  const t = now();
+  if (t >= TOTAL) return;
+  if (holdAt !== null || !playing) return go(t);
+  // 正在播放时点：直接跳到下一段字幕
+  const c = CAPS.find(c => c.at > t + 0.05);
+  go(c ? c.at : t);
+}
+function setMode(step) {
+  stepMode = step; modeEl.textContent = LANG === "en" ? (step ? "Tap mode" : "Autoplay") : (step ? "点击翻页" : "自动播放");
+  modeEl.classList.toggle("on", step);
+  if (holdAt !== null && !step) go(now()); else pendingHold = step ? nextHold(now()) : null;
+}
+setMode(stepMode);
+modeEl.onclick = () => setMode(!stepMode);
 function frame() {
+  if (stepMode && playing && pendingHold !== null && now() >= pendingHold) { offset = pendingHold; holdAt = pendingHold; holdSince = performance.now(); setPlay(false); }
+  nextEl.classList.toggle("on", holdAt !== null && performance.now() - holdSince > 900);
+  document.body.classList.toggle("inv", holdAt !== null && CAPS.some(c => c.k === "counter" && holdAt >= c.at && holdAt < c.to));
   const t = now();
   render(Math.min(t, TOTAL));
   audioTick(t);
   if (t >= TOTAL && playing) { offset = TOTAL; playing = false; document.getElementById("play").textContent = tr("播放"); }
   requestAnimationFrame(frame);
 }
-document.getElementById("play").onclick = e => { if (playing) { offset = now(); playing = false; } else { if (offset >= TOTAL) offset = 0; startAt = performance.now(); playing = true; } e.target.textContent = tr(playing ? "暂停" : "播放"); };
+document.getElementById("play").onclick = () => { if (playing) { offset = now(); setPlay(false); } else go(offset >= TOTAL ? 0 : offset); };
 document.getElementById("snd").onclick = enableSound;
 document.getElementById("hint").onclick = enableSound;
 let uiTimer = 0;
-cv.addEventListener("click", () => {
+cv.addEventListener("click", e => {
+  if (stepMode && !(isTouch && e.clientY > innerHeight * 0.82)) { advance(); return; }
   document.body.classList.toggle("ui");
   clearTimeout(uiTimer); uiTimer = setTimeout(() => document.body.classList.remove("ui"), 4000);
 });
 document.getElementById("controls").addEventListener("click", () => { clearTimeout(uiTimer); uiTimer = setTimeout(() => document.body.classList.remove("ui"), 4000); });
-document.getElementById("restart").onclick = () => { offset = 0; startAt = performance.now(); playing = true; document.getElementById("play").textContent = tr("暂停"); };
+document.getElementById("restart").onclick = () => go(0);
 document.getElementById("ratio").onclick = () => { const t = now(); build(R === "v" ? "h" : "v"); buildSound(); offset = t; startAt = performance.now(); lastFt = null; };
 document.getElementById("fs").onclick = () => document.documentElement.requestFullscreen?.().catch(() => {});
-document.addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); document.getElementById("play").click(); } });
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" || e.code === "ArrowRight") { e.preventDefault(); if (stepMode) advance(); else document.getElementById("play").click(); }
+});
 // 立刻开播，不等字体；手写英文字体到了再重新排版（否则量到的是后备字体的宽度）
 buildSound();
 requestAnimationFrame(frame);
