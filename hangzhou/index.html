@@ -53,6 +53,14 @@ h1 i{display:inline-block;width:.55em;height:.55em;background:var(--cinnabar);bo
 @keyframes ink{60%{filter:blur(1.5px)}to{opacity:1;filter:blur(0);transform:none}}
 @keyframes seal{to{opacity:.95;transform:none}}
 @keyframes inkout{from{opacity:1;filter:blur(0)}to{opacity:0;filter:blur(8px);transform:translateY(.2em)}}
+.export{overflow:hidden}
+.export .screen{position:fixed;left:0;top:0;width:854px;height:480px;max-width:none;aspect-ratio:auto;z-index:100;border-radius:0}
+.export .play-big,.export .loading,.export .note-chip,.export .fs-close{display:none!important}
+.export .poem span,.export .poem i,.export .poem em,.export .title,.export .kv{animation:none!important;transition:none!important}
+.exp-panel{position:absolute;left:10px;bottom:10px;width:56%;background:rgba(10,12,16,.62);border-left:2px solid #c8372d;border-radius:3px;padding:7px 10px 8px;font-size:11px;line-height:1.5;color:rgba(246,242,232,.95);display:grid;grid-template-columns:4.2em 1fr;gap:1px 8px}
+.exp-panel b{grid-column:1/-1;font-weight:500;font-size:12px;letter-spacing:.08em;margin-bottom:2px}
+.exp-panel b small{font-weight:400;font-size:10px;color:#e0a39a;margin-left:.6em;letter-spacing:.04em}
+.exp-panel dt{color:#e7a097}.exp-panel dd{margin:0;min-width:0}
 @media (prefers-reduced-motion:reduce){.poem span,.poem i,.poem em{animation-duration:.01s}}
 .poem.hide{opacity:0;filter:blur(6px)}
 .note-chip{position:absolute;left:1.6%;bottom:2.6%;max-width:70%;display:grid;gap:.1em;font-size:clamp(10px,1.35vw,16px);line-height:1.45;color:rgba(244,240,230,.9);background:rgba(10,12,16,.5);backdrop-filter:blur(3px);padding:.4em .75em;border-radius:3px;border-left:2px solid rgba(200,55,45,.8);transition:opacity .4s}
@@ -146,6 +154,7 @@ section h2{margin:0 0 6px;font-size:17px;font-weight:500;letter-spacing:.22em}
         <div class="note-chip" id="noteChip"><div><b id="nKind"></b><span id="nLoc"></span></div></div>
         <div class="kv" id="kv"><div class="cn">一丝千年</div><div class="en">势起东方 · 时尚杭州</div><div class="seal"></div></div>
         <div class="loading" id="loading">载入画面…</div>
+        <div class="exp-panel" id="expPanel" hidden></div>
         <button class="play-big" id="bigPlay" aria-label="播放">▶</button>
       </div>
       <button class="fs-close" id="fsClose" hidden>退出全屏</button>
@@ -158,7 +167,7 @@ section h2{margin:0 0 6px;font-size:17px;font-weight:500;letter-spacing:.22em}
       <button class="btn" id="restart">从头</button>
       <button class="btn" id="fsBtn">全屏</button>
       <button class="btn" id="notesBtn" aria-pressed="true">演示说明：显示</button>
-      <button class="btn" id="soundBtn" aria-pressed="true">声音：开</button>
+      <button class="btn" id="soundBtn" aria-pressed="true">声音：开（点击关闭）</button>
       <span class="time" id="time">00:00 / 01:35</span>
     </div>
     <div class="live" id="live"><div class="live-hd"><span id="lId"></span><span class="lk" id="lKind"></span><em>演示说明 · 成片去除</em></div><dl><dt>地点</dt><dd id="lLoc"></dd><dt>寓意</dt><dd id="lMean"></dd><dt>成片做法</dt><dd id="lMake"></dd><dt>素材</dt><dd id="lAsset"></dd><dt id="lCopyT">甲方文案</dt><dd id="lCopy"></dd></dl></div>
@@ -226,7 +235,7 @@ let acc=0;S.forEach(s=>{s.t0=acc;acc+=s.d;s.t1=acc});
 const TOTAL=acc;
 S.forEach(s=>{s.img=new Image();s.img.src='kf/'+s.f+'.jpg';if(s.vid){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.preload='auto';v.src='vid/'+s.vid+'.mp4';s.v=v}});
 function vidReady(s){return s.v&&s.v.readyState>=2}
-function syncVid(s,p,run){const v=s.v;if(!v)return;const vt=Math.min(4.95,p*4.95);
+function syncVid(s,p,run){const v=s.v;if(!v||window.__exporting)return;const vt=Math.min(4.95,p*4.95);
   if(run){v.playbackRate=Math.max(.5,Math.min(1,5/s.d));if(v.paused){const pr=v.play();if(pr&&pr.catch)pr.catch(()=>{})}if(Math.abs(v.currentTime-vt)>.3)v.currentTime=vt}
   else{if(!v.paused)v.pause();if(Math.abs(v.currentTime-vt)>.05)v.currentTime=vt}}
 
@@ -292,7 +301,7 @@ function drawShot(s,p,t){
   const g=ctx.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*1.05);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(10,12,16,.38)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
 }
 
-const XF=1.2;const snap=document.createElement('canvas');snap.width=W;snap.height=H;const snapN=document.createElement('canvas');snapN.width=W;snapN.height=H;
+const XF=1.8;const snap=document.createElement('canvas');snap.width=W;snap.height=H;const snapN=document.createElement('canvas');snapN.width=W;snapN.height=H;
 const $=id=>document.getElementById(id);
 const poemEl=$('poem'),noteChip=$('noteChip'),nKind=$('nKind'),nLoc=$('nLoc'),titleEl=$('title'),kvEl=$('kv'),timeEl=$('time'),head=$('head'),strip=$('strip'),playBtn=$('play'),bigPlay=$('bigPlay');
 const KL={'画':'成片：插画动画','画→实':'成片：画转实拍','实':'成片：接实拍'};const KC={'画':'k-画','画→实':'k-画实','实':'k-实'};const STL={ok:'齐',part:'部分暂缺',miss:'暂缺'};
@@ -307,8 +316,16 @@ function render(T){
   const i=shotAt(T),s=S[i],p=clamp((T-s.t0)/s.d);
   S.forEach((x,j)=>{if(!x.v)return;if(j===i)syncVid(x,p,playing);else if(j===i+1&&T>s.t1-XF)syncVid(x,0,false);else if(!x.v.paused)x.v.pause()});
   ctx.save();drawShot(s,p,T);ctx.restore();
-  if(i<S.length-1&&T>s.t1-XF){const k=(T-(s.t1-XF))/XF,n=S[i+1];snap.getContext('2d').drawImage(cv,0,0);drawShot(n,0,T);const nx=snapN.getContext('2d');nx.clearRect(0,0,W,H);nx.drawImage(cv,0,0);ctx.drawImage(snap,0,0);ctx.save();ctx.globalAlpha=ease(k);ctx.drawImage(snapN,0,0);ctx.restore();
-    const a=Math.sin(Math.PI*k);mistBand(T*3,H*.5,2.6,-260,.9*a);mistBand(T*3+30,H*.3,2.2,-180,.6*a);mistBand(T*3+60,H*.8,2.2,-200,.6*a)}
+  if(i<S.length-1&&T>s.t1-XF){const k=(T-(s.t1-XF))/XF,n=S[i+1],e=ease(k),F=360;
+    // handscroll: the current picture slides right, the next one follows in from the left, seam feathered into one long scroll
+    snap.getContext('2d').drawImage(cv,0,0);drawShot(n,0,T);const nx=snapN.getContext('2d');nx.clearRect(0,0,W,H);nx.drawImage(cv,0,0);
+    const off=e*(W+F),xC=off,xN=off-W-F+F;
+    ctx.fillStyle='#e9e4d8';ctx.fillRect(0,0,W,H);ctx.drawImage(snapN,xN-F*0,0);
+    tctx.globalCompositeOperation='source-over';tctx.clearRect(0,0,W,H);tctx.drawImage(snap,0,0);tctx.globalCompositeOperation='destination-in';
+    const g=tctx.createLinearGradient(0,0,F,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,1)');tctx.fillStyle=g;tctx.fillRect(0,0,W,H);tctx.globalCompositeOperation='source-over';
+    ctx.drawImage(tmp,xC,0);
+    const sx=xC+F*.5;ctx.save();ctx.translate(sx,H/2);ctx.rotate(Math.PI/2);ctx.globalAlpha=.55*Math.sin(Math.PI*k);ctx.drawImage(mist,-H*.75,-260*1.1,H*1.5,520*1.1);ctx.restore();
+    mistBand(T*3,H*.85,1.6,-120,.35*Math.sin(Math.PI*k))}
   if(i===0&&p<.25){ctx.fillStyle=`rgba(12,16,22,${1-ease(p/.25)})`;ctx.fillRect(0,0,W,H)}
   let pm='',side='R',sub='';for(const c of s.poem){if(p>=c[0]&&p<c[1]){pm=c[2];side=c[3];sub=c[4]||''}}setPoem(pm,side,sub);
   if(noteChip._id!==s.id){noteChip._id=s.id;nKind.textContent=KL[s.kind];nLoc.textContent=s.loc;
@@ -329,12 +346,18 @@ const grid=$('grid');S.forEach(s=>{const d=document.createElement('div');d.class
 
 
 /* ---------- score: Suno track edited to 95 s; the audio clock drives the film while sound is on ---------- */
-let audioEl=null,soundOn=true;
-function initAudio(){if(audioEl)return;audioEl=new Audio('music/score.mp3');audioEl.preload='auto'}
-function audioSync(T){if(!soundOn)return;initAudio();try{audioEl.currentTime=T}catch(_){}const p=audioEl.play();if(p&&p.catch)p.catch(()=>{})}
+let soundOn=true,audioUnlocked=false;
+const audioEl=new Audio();audioEl.preload='auto';audioEl.setAttribute('playsinline','');audioEl.setAttribute('webkit-playsinline','');audioEl.src='music/score.mp3';
+function initAudio(){}
+function setT(t){if(audioEl.readyState>=1){try{audioEl.currentTime=t}catch(_){}}else audioEl.addEventListener('loadedmetadata',()=>{try{audioEl.currentTime=t}catch(_){}},{once:true})}
+function soundBlocked(on){const b=document.getElementById('soundBtn');if(!b)return;b.classList.toggle('primary',on);b.textContent=on?'点此开启声音':(soundOn?'声音：开（点击关闭）':'声音：关（点击开启）')}
+function audioSync(T){if(!soundOn)return;setT(T);const p=audioEl.play();if(p&&p.then)p.then(()=>{audioUnlocked=true;soundBlocked(false)}).catch(()=>soundBlocked(true))}
 function audioTick(T){}
-function audioPause(){if(audioEl)audioEl.pause()}
-function audioClock(){return soundOn&&audioEl&&!audioEl.paused&&audioEl.readyState>=2?audioEl.currentTime:null}
+function audioPause(){audioEl.pause()}
+function audioClock(){return soundOn&&!audioEl.paused&&audioEl.readyState>=2?audioEl.currentTime:null}
+// iPhone: unlock audio on the first touch or click anywhere, inside the gesture
+function unlockAudio(){if(audioUnlocked)return;const p=audioEl.play();if(p&&p.then)p.then(()=>{audioUnlocked=true;if(!playing||!soundOn)audioEl.pause()}).catch(()=>{})}
+document.addEventListener('touchend',unlockAudio,{passive:true});document.addEventListener('click',unlockAudio,true);
 let T=0,playing=false,last=0;
 function loop(now){if(!playing)return;const ck=audioClock();T=ck!==null?ck:T+Math.min(.1,(now-last)/1000);last=now;if(T>=TOTAL){T=TOTAL-.001;setPlaying(false)}render(T);if(playing){audioTick(T);requestAnimationFrame(loop)}}
 function setPlaying(v){playing=v;playBtn.textContent=v?'暂停':'播放';if(v){bigPlay.hidden=true;if(T>=TOTAL-.01)T=0;if(soundOn)audioSync(T);last=performance.now();requestAnimationFrame(loop)}else audioPause()}
@@ -347,7 +370,7 @@ function setFs(on){scr.classList.toggle('fs',on);fsClose.hidden=!on;document.bod
   render(T)}
 $('fsBtn').onclick=()=>setFs(true);fsClose.onclick=()=>setFs(false);
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&scr.classList.contains('fs'))setFs(false)});
-const sb=$('soundBtn');sb.onclick=()=>{soundOn=!soundOn;sb.textContent='声音：'+(soundOn?'开':'关');sb.setAttribute('aria-pressed',String(soundOn));if(soundOn){if(playing)audioSync(T)}else audioPause()};
+const sb=$('soundBtn');sb.onclick=()=>{if(sb.classList.contains('primary')){soundOn=true;audioSync(T);if(!playing)setPlaying(true);return}soundOn=!soundOn;sb.setAttribute('aria-pressed',String(soundOn));soundBlocked(false);if(soundOn){audioSync(T);if(!playing)audioEl.pause()}else audioPause()};soundBlocked(false);
 const nb=$('notesBtn');nb.onclick=()=>{const off=document.body.classList.toggle('notes-off');nb.textContent='演示说明：'+(off?'隐藏':'显示');nb.setAttribute('aria-pressed',String(!off))};bigPlay.onclick=()=>setPlaying(true);
 $('restart').onclick=()=>{seek(0);setPlaying(true)};
 $('prev').onclick=()=>{const i=shotAt(T);seek(T-S[i].t0>.8?S[i].t0:S[Math.max(0,i-1)].t0)};
@@ -361,6 +384,28 @@ S.forEach(s=>{if(s.v)s.v.addEventListener('seeked',()=>{if(!playing)render(T)})}
 let n=0;S.forEach(s=>{const done=()=>{n++;if(n===S.length)$('loading').hidden=true;if(!playing)render(T)};if(s.img.complete)done();else{s.img.onload=done;s.img.onerror=done}});
 T=3.2;render(T);
 window.__seek=t=>{T=t;render(T)};
+/* ---------- export mode: deterministic frame rendering for the 480p file ---------- */
+const easeC=t=>1-Math.pow(1-t,3);
+function exportText(t){const i=shotAt(t),s=S[i],p=clamp((t-s.t0)/s.d);
+  let c=null;for(const x of s.poem)if(p>=x[0]&&p<x[1])c=x;
+  const key=c?s.id+c[2]:'';if(poemEl._ek!==key){poemEl._ek=key;poemEl.innerHTML='';poemEl.className='poem '+(c?c[3]:'R')+(c?'':' hide');
+    if(c){[...c[2]].forEach(ch=>{if(ch==='　'){poemEl.appendChild(document.createElement('br'));return}const sp=document.createElement('span');sp.textContent=ch;poemEl.appendChild(sp)});poemEl.appendChild(document.createElement('i'));if(c[4]){const e=document.createElement('em');e.textContent=c[4];poemEl.appendChild(e)}}}
+  if(c){const lt=(p-c[0])*s.d,end=(c[1]-c[0])*s.d,out=clamp((lt-(end-.7))/.7),n=c[2].length;let k=0;
+    [...poemEl.children].forEach(el=>{let e;if(el.tagName==='SPAN'){while(c[2][k]==='　')k++;e=easeC(clamp((lt-k*.13)/1.3));k++}else if(el.tagName==='I')e=clamp((lt-(n*.13+.3))/.5);else if(el.tagName==='EM')e=easeC(clamp((lt-(n*.13+.6))/1.2));else return;
+      el.style.opacity=String(e*(1-out)*(el.tagName==='I'?.95:1));el.style.filter=`blur(${(10*(1-e)+8*out).toFixed(2)}px)`;el.style.transform=el.tagName==='SPAN'?`translateY(${(-.35*(1-e)).toFixed(3)}em)`:'none'})}
+  const tOn=!!s.title,ta=tOn?clamp((p-.25)*s.d/1.2)*clamp((.88-p)*s.d/1.2):0;titleEl.style.opacity=String(ta);titleEl.style.filter=`blur(${6*(1-ta)}px)`;
+  kvEl.style.opacity=String(s.kv?clamp((p-.4)*s.d/1.4):0);
+  const ep=document.getElementById('expPanel');if(ep._id!==s.id){ep._id=s.id;
+    ep.innerHTML=`<b>${s.id}　${s.ch} · ${s.t}<small>演示说明 · 成片去除</small></b><dt>地点</dt><dd>${s.loc}</dd><dt>寓意</dt><dd>${s.mean}</dd><dt>成片做法</dt><dd>${KL[s.kind]}。${s.make}</dd><dt>素材</dt><dd>${s.asset}</dd>${s.note?`<dt>甲方文案</dt><dd>${s.note}</dd>`:''}`}}
+window.__exportStart=async()=>{window.__exporting=true;document.body.classList.add('export');document.getElementById('expPanel').hidden=false;
+  await Promise.all(S.filter(s=>s.v).map(s=>s.v.readyState>=2?0:new Promise(r=>s.v.addEventListener('loadeddata',r,{once:true}))));
+  await Promise.all(S.map(s=>s.img.complete?0:new Promise(r=>{s.img.onload=r;s.img.onerror=r})));
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;return TOTAL};
+window.__exportFrame=async t=>{const i=shotAt(t),s=S[i],p=clamp((t-s.t0)/s.d);const waits=[];
+  S.forEach((x,j)=>{if(!x.v)return;let need=null;if(j===i)need=Math.min(4.95,p*4.95);else if(j===i+1&&t>s.t1-XF)need=0;
+    if(need!==null&&Math.abs(x.v.currentTime-need)>.004)waits.push(new Promise(r=>{x.v.addEventListener('seeked',r,{once:true});x.v.currentTime=need}))});
+  await Promise.all(waits);T=t;render(t);exportText(t);return true};
+
 })();
 </script>
 
