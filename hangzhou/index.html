@@ -319,8 +319,8 @@ function render(T){
   if(i<S.length-1&&T>s.t1-XF){const k=(T-(s.t1-XF))/XF,n=S[i+1],e=ease(k),F=360;
     // handscroll: the current picture slides right, the next one follows in from the left, seam feathered into one long scroll
     snap.getContext('2d').drawImage(cv,0,0);drawShot(n,0,T);const nx=snapN.getContext('2d');nx.clearRect(0,0,W,H);nx.drawImage(cv,0,0);
-    const off=e*(W+F),xC=off,xN=off-W-F+F;
-    ctx.fillStyle='#e9e4d8';ctx.fillRect(0,0,W,H);ctx.drawImage(snapN,xN-F*0,0);
+    const xC=e*W,xN=xC-W+F*(1-e);
+    ctx.fillStyle='#e9e4d8';ctx.fillRect(0,0,W,H);ctx.drawImage(snapN,xN,0);
     tctx.globalCompositeOperation='source-over';tctx.clearRect(0,0,W,H);tctx.drawImage(snap,0,0);tctx.globalCompositeOperation='destination-in';
     const g=tctx.createLinearGradient(0,0,F,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,1)');tctx.fillStyle=g;tctx.fillRect(0,0,W,H);tctx.globalCompositeOperation='source-over';
     ctx.drawImage(tmp,xC,0);
