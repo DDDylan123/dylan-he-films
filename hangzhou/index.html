@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>一丝千年 · 动态预演</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Cormorant+Garamond:wght@500&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout: a screening room. The film sits on a dark ink ground; production notes follow beneath on the same ground. Single deliberate dark theme. */
+:root{
+  --ink:#16191d;        /* page ground */
+  --panel:#1e2227;      /* raised notes */
+  --line:#2f353c;       /* hairlines */
+  --paper:#ece6d8;      /* primary text, 月白 */
+  --mist:#9aa3a8;       /* secondary text, 烟灰 */
+  --celadon:#7fb3a0;    /* 青绿 */
+  --cinnabar:#c8372d;   /* 朱砂 */
+  --serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --latin:"Cormorant Garamond","Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--ink);color:var(--paper)}
+body{font-family:var(--serif);font-size:15px;line-height:1.75;padding-inline:16px;padding-block:28px 72px}
+.wrap{max-width:1200px;margin:0 auto;display:grid;gap:28px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+h1{margin:0;font-size:clamp(26px,3.6vw,38px);font-weight:700;letter-spacing:.24em;line-height:1.2}
+h1 i{display:inline-block;width:.55em;height:.55em;background:var(--cinnabar);border-radius:2px;margin-left:.35em;vertical-align:middle}
+.meta{margin:4px 0 0;color:var(--mist);font-size:13px;letter-spacing:.08em}
+.stamp{font-size:12px;color:var(--mist);text-align:right;line-height:1.6}
+
+.screen{position:relative;width:100%;max-width:100%;aspect-ratio:16/9;background:#0b0d0f;overflow:hidden;border-radius:2px;box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+.screen canvas{display:block;width:100%;height:100%}
+.ov{position:absolute;inset:0;pointer-events:none}
+.seal-mark{position:absolute;right:2.6%;top:4%;width:clamp(16px,2.2vw,30px);aspect-ratio:1;border:1.5px solid rgba(200,55,45,.85);border-radius:3px;display:grid;place-items:center;color:rgba(200,55,45,.9);font-size:clamp(9px,1.1vw,15px);font-weight:700;opacity:.85}
+.title{position:absolute;right:12%;top:14%;display:flex;gap:1.2em;align-items:flex-start;opacity:0;filter:blur(6px);transition:opacity 1.2s,filter 1.2s}
+.title.on{opacity:1;filter:blur(0)}
+.title .main{writing-mode:vertical-rl;font-size:clamp(26px,5vw,68px);font-weight:700;letter-spacing:.35em;color:#f4efe2;text-shadow:0 0 24px rgba(10,20,40,.55)}
+.title .sub{display:none;writing-mode:vertical-rl;font-size:clamp(10px,1.3vw,17px);letter-spacing:.5em;color:rgba(240,235,222,.85);margin-top:.6em}
+.title .seal{width:clamp(14px,1.8vw,24px);aspect-ratio:1;background:var(--cinnabar);border-radius:2px;margin-top:.3em}
+.poem{position:absolute;top:16%;writing-mode:vertical-rl;font-size:clamp(13px,1.9vw,26px);font-weight:400;letter-spacing:.6em;line-height:2.2;color:#f7f3ea;text-shadow:0 0 16px rgba(0,0,0,.45);transition:opacity 1.4s,filter 1.4s}
+.poem.L{left:9%}.poem.R{right:9%}
+.poem.hide{opacity:0;filter:blur(6px)}
+.note-chip{position:absolute;left:1.6%;bottom:2.6%;max-width:70%;display:grid;gap:.1em;font-size:clamp(10px,1.35vw,16px);line-height:1.45;color:rgba(244,240,230,.9);background:rgba(10,12,16,.5);backdrop-filter:blur(3px);padding:.4em .75em;border-radius:3px;border-left:2px solid rgba(200,55,45,.8);transition:opacity .4s}
+.note-chip b{font-weight:500;color:#f0b8ae;margin-right:.5em}
+.notes-off .note-chip,.notes-off .live{display:none}
+.kv{position:absolute;left:0;right:0;top:12%;text-align:center;display:grid;gap:.7em;justify-items:center;opacity:0;transition:opacity 1.4s}
+.kv.on{opacity:1}
+.kv .cn{font-size:clamp(22px,4.4vw,58px);font-weight:500;letter-spacing:.6em;padding-left:.4em;color:#fbf7ee;text-shadow:0 2px 30px rgba(30,40,60,.45)}
+.kv .en{font-size:clamp(10px,1.3vw,17px);letter-spacing:.6em;padding-left:.5em;color:#f8f1e2}
+.kv .seal{width:clamp(14px,1.7vw,22px);aspect-ratio:1;background:var(--cinnabar);border-radius:2px}
+.play-big{position:absolute;inset:0;margin:auto;width:clamp(60px,8vw,88px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(200,55,45,.85);color:#fff;font-size:clamp(18px,2.4vw,26px);cursor:pointer;pointer-events:auto}
+.play-big[hidden]{display:none}
+.play-big:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.loading{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);font-size:12px;letter-spacing:.2em;color:rgba(240,235,222,.7)}
+.loading[hidden]{display:none}
+
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:12px}
+.btn{font:inherit;font-size:13px;letter-spacing:.1em;color:var(--paper);background:transparent;border:1px solid var(--line);border-radius:3px;padding:6px 14px;cursor:pointer}
+.btn:hover{border-color:var(--mist)}
+.btn:focus-visible{outline:2px solid var(--cinnabar);outline-offset:2px}
+.btn.primary{background:var(--cinnabar);border-color:var(--cinnabar);color:#fff}
+.time{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--mist);font-variant-numeric:tabular-nums}
+.live{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--cinnabar);border-radius:3px;padding:12px 16px 14px;font-size:15.5px;line-height:1.7}
+.live-hd{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-bottom:6px}
+.live-hd span:first-child{font-weight:500;letter-spacing:.1em;font-size:16.5px}
+.live-hd em{font-style:normal;margin-left:auto;font-size:12.5px;color:var(--mist);letter-spacing:.1em}
+.lk,.kb{display:inline-block;font-size:12.5px;padding:0 8px;border-radius:2px;border:1px solid var(--line)}
+.k-画{color:var(--celadon);border-color:#3e5c52}.k-实{color:#e0b86c;border-color:#6a5734}.k-画实{color:#c9a7e0;border-color:#54476a}
+.live dl{display:grid;grid-template-columns:5.2em 1fr;gap:4px 12px;margin:0}
+.live dt{color:#e09a90;font-size:14px;padding-top:.1em}
+.live dd{margin:0;min-width:0}
+.st-miss{color:#ff8a7a}.st-part{color:#e0b86c}.st-ok{color:var(--celadon)}
+.strip{position:relative;display:flex;gap:2px;margin-top:8px;height:46px;cursor:pointer;touch-action:none;user-select:none}
+.strip .cell{position:relative;flex:1 1 0;min-width:0;background-size:cover;background-position:center;opacity:.55;transition:opacity .2s}
+.strip .cell.on{opacity:1}
+.strip .cell span{position:absolute;left:3px;bottom:2px;font-family:var(--mono);font-size:9.5px;color:#fff;text-shadow:0 0 4px #000}
+.strip .head{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--cinnabar);pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+
+section h2{margin:0 0 6px;font-size:17px;font-weight:500;letter-spacing:.22em}
+.note{margin:0 0 14px;color:var(--mist);font-size:13px;max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.kf{background:var(--panel);border:1px solid var(--line);border-radius:3px;overflow:hidden;cursor:pointer;min-width:0}
+.kf:focus-visible{outline:2px solid var(--cinnabar);outline-offset:2px}
+.kf img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.kf .t{padding:8px 12px 10px;display:grid;gap:2px}
+.kf .t b{font-weight:500;letter-spacing:.1em;font-size:14px}
+.kf .t small{color:var(--mist);font-size:13px;line-height:1.6}
+.kf .t .cn-note{color:#c98c84;font-size:11.5px}
+.kf .t em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mist)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.1em;padding:0 6px;border-radius:2px;border:1px solid var(--line);margin-left:6px;vertical-align:1px;color:#d8b26a}
+.todo{background:var(--panel);border-left:2px solid var(--cinnabar);padding:12px 16px;font-size:15px;color:var(--paper);display:grid;gap:8px}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.plan>div{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:12px 14px;font-size:15px;min-width:0}
+.plan b{display:block;margin-bottom:4px;font-weight:400}
+.ul{margin:0;padding-left:1.2em;font-size:15px;display:grid;gap:4px;max-width:72ch}
+.todo b{font-weight:500}
+.screen canvas{object-fit:contain}
+.screen.fs{position:fixed;inset:0;z-index:50;width:100vw;height:100vh;height:100dvh;max-width:none;aspect-ratio:auto;border-radius:0;background:#000}
+.screen.fs .ov{inset:50% auto auto 50%;transform:translate(-50%,-50%);width:min(100vw,calc(100dvh*16/9));height:min(100dvh,calc(100vw*9/16))}
+.fs-close{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));z-index:60;font:inherit;font-size:14px;color:#fff;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.4);border-radius:3px;padding:6px 12px;cursor:pointer}
+.fs-close[hidden]{display:none}
+@media (orientation:landscape) and (max-height:540px){
+  body{padding-block:8px 40px}
+  header{display:none}
+  .screen{width:min(100%,calc((100dvh - 64px)*16/9));margin-inline:auto}
+  .strip,.bar{width:min(100%,calc((100dvh - 64px)*16/9));margin-inline:auto}
+  .live{font-size:14px}
+}
+@media (max-width:560px){.bar .btn{padding:6px 10px}.live{font-size:15px}}
+@media (prefers-reduced-motion:reduce){.title,.poem,.kv{transition:none}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>一丝千年<i aria-hidden="true"></i></h1>
+      <p class="meta">诗意短片　动态预演　约 90 秒</p>
+    </div>
+    <div class="stamp">画面：授权画师画风参考 + 杭州实景参考生成<br>动态：代码实现（推拉、雾带、粒子、转场）<br>配乐：Suno 生成，按画面节点剪辑到 95 秒</div>
+  </header>
+
+  <div>
+    <div class="screen" id="screen">
+      <canvas id="cv" width="1920" height="1080" aria-label="预演画面"></canvas>
+      <div class="ov">
+        <div class="title" id="title"><div class="seal"></div><div class="sub">势起东方 · 时尚杭州</div><div class="main">一丝千年</div></div>
+        <div class="poem hide" id="poem"></div>
+        <div class="note-chip" id="noteChip"><div><b id="nKind"></b><span id="nLoc"></span></div></div>
+        <div class="kv" id="kv"><div class="cn">一丝千年</div><div class="en">势起东方 · 时尚杭州</div><div class="seal"></div></div>
+        <div class="loading" id="loading">载入画面…</div>
+        <button class="play-big" id="bigPlay" aria-label="播放">▶</button>
+      </div>
+      <button class="fs-close" id="fsClose" hidden>退出全屏</button>
+    </div>
+    <div class="strip" id="strip" role="slider" tabindex="0" aria-label="时间轴" aria-valuemin="0" aria-valuemax="95" aria-valuenow="0"><div class="head" id="head"></div></div>
+    <div class="bar">
+      <button class="btn primary" id="play">播放</button>
+      <button class="btn" id="prev">上一镜</button>
+      <button class="btn" id="next">下一镜</button>
+      <button class="btn" id="restart">从头</button>
+      <button class="btn" id="fsBtn">全屏</button>
+      <button class="btn" id="notesBtn" aria-pressed="true">演示说明：显示</button>
+      <button class="btn" id="soundBtn" aria-pressed="true">声音：开</button>
+      <span class="time" id="time">00:00 / 01:35</span>
+    </div>
+    <div class="live" id="live"><div class="live-hd"><span id="lId"></span><span class="lk" id="lKind"></span><em>演示说明 · 成片去除</em></div><dl><dt>地点</dt><dd id="lLoc"></dd><dt>寓意</dt><dd id="lMean"></dd><dt>成片做法</dt><dd id="lMake"></dd><dt>素材</dt><dd id="lAsset"></dd><dt id="lCopyT">甲方文案</dt><dd id="lCopy"></dd></dl></div>
+  </div>
+
+  <section>
+    <h2>关键帧</h2>
+    <p class="note">点任一张跳到该镜。片中只留少量竖排短句。播放器下方的"演示说明"写明每镜的地点、寓意、成片做法、素材状态和甲方文案，给甲方讲解用；画面左下角只留一行简注。成片时全部去除，可一键隐藏。标"实景参考"的镜头，建筑与景观对照杭州实景照片生成。</p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section>
+    <h2>成片怎么做</h2>
+    <p class="note">预演里每一镜都用画面示意，是为了先定意境和节奏。成片不是全动画：活动现场全部用你们已有的实拍素材，画面负责开场、串联和转场。</p>
+    <div class="plan">
+      <div><b><span class="kb k-画">插画动画</span></b>开篇、借伞、亭中系线、结尾，共 5 镜。画师按关键帧绘制分层，做 2.5D 动画，雾、水、红线用特效。</div>
+      <div><b><span class="kb k-画实">画转实拍</span></b>全域秀场、品牌、汉帛杯、四季之夜、媒体发布，共 6 镜。每段先用 1—2 秒画面开门，再用晕染、匹配剪辑（帘对帘、手对手、线对灯带）接进实拍。</div>
+      <div><b><span class="kb k-实">接实拍</span></b>织机、时尚之夜、商业街区，共 3 镜。以实拍为主，必要时把画中人物合成进实拍画面。</div>
+    </div>
+    <h2 style="margin-top:20px">实拍素材统一处理</h2>
+    <ul class="ul">
+      <li>调色统一往低饱和、青灰方向走，暗部微微提亮，和画面的绢本色调接上；叠一层很淡的绢纹和颗粒。</li>
+      <li>只选慢节奏、构图干净的镜头，必要时升格慢放；避开大横幅、主持人、领导讲话、观众举手机这类画面。</li>
+      <li>每个实拍镜头都叠一根代码或后期做的朱砂红线（细、慢、半透明），让红线贯穿全片。</li>
+      <li>画面边缘加雾化压暗，画实交界处用水墨晕染或云雾扫过过渡。</li>
+    </ul>
+    <h2 style="margin-top:20px">素材暂缺</h2>
+    <div class="todo">
+      <div><b class="st-miss">暂缺</b>　织机、缂丝、宋锦特写实拍（S03）：需补拍（中国丝绸博物馆、宋锦工坊）或购买素材。</div>
+      <div><b class="st-part">部分缺</b>　LV「秘境臻藏」只有图片，没有视频（S07）：先用图片推拉加光效，有视频再替换。</div>
+      <div><b class="st-part">部分缺</b>　万象城外立面空镜（S11）：可用画中版替代，或补拍一组航拍。</div>
+      <div><b class="st-part">需重选</b>　杭州时尚之夜（S06）：按客户反馈换掉原镜头，需从活动素材里挑秀场、珠宝、彩妆、潮流镜头。</div>
+      <div><b class="st-part">待补照片</b>　杭罐1958、高德置地水域秀场、湖滨步行街的实景照片：只影响这三处的画中版，实拍本身原片已有。</div>
+    </div>
+  </section>
+</div>
+
+<script>
+(()=>{
+const W=1920,H=1080;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rng=s=>()=>{s=(s*16807)%2147483647;return(s-1)/2147483646};
+
+/* shots: cam = [scale0,x0,y0, scale1,x1,y1]  (x,y in -1..1 of the spare margin) */
+const S=[
+ {id:'S01',vid:'v01',water:.69,wamp:.35,cam:[1.0,0,.4,1.16,0,-.3],birds:0,glow:[.6,.17,.07],kind:'画',make:'全画面：画中长卷做分层 2.5D 动画（雾、水波、红线游走）。',asset:'本片新出插画',st:'ok',loc:'西湖 · 三潭印月',mean:'开篇。月夜西湖，一根红丝在水面出现，这是"一丝"的起点。',f:'s01',d:7,ch:'序',t:'月下',fx:['mist','mote'],night:1,title:1,poem:[],note:'',desc:'月夜西湖，三潭印月，一缕红丝漂过湖面。',real:1},
+ {id:'S02',vid:'v02',cam:[1.12,-.9,.1,1.12,.9,-.1],birds:1,kind:'画',make:'全画面插画动画。',asset:'本片新出插画',st:'ok',loc:'西湖北岸，远景宝石山保俶塔、断桥',mean:'白娘子是东方之美的化身，她从扇面牵出红丝，引向远处的城市。',f:'s02',d:6,ch:'序',t:'扇上牵丝',fx:['mist','petal'],poem:[[.2,.95,'丝自扇底出','L']],note:'',desc:'白娘子执扇牵丝，红线越湖，远景宝石山与保俶塔。',real:1},
+ {id:'S03',cam:[1.0,-.2,0,1.2,.35,.2],kind:'实',make:'实拍为主：织机、缂丝、宋锦特写。片头画中白娘子的手，匹配剪辑到实拍匠人的手。',asset:'织机/缂丝/宋锦实拍：暂缺，需补拍（中国丝绸博物馆、宋锦工坊）或购买素材',st:'miss',loc:'丝绸工艺（实拍可取中国丝绸博物馆、宋锦工坊）',mean:'丝从织机上来。东方工艺是时尚的源头。',f:'s03',d:7,ch:'起',t:'织机牵线',fx:['mote'],poem:[[.25,.95,'经纬之间　宋韵成锦','R']],note:'东方之美　中西融合 / 宋韵美学　时尚灵感',desc:'宋锦织机，一双手把红丝穿入经线。'},
+ {id:'S04a',cam:[1.06,-.6,.2,1.16,.5,-.2],birds:1,kind:'画→实',make:'画中德寿宫约 2 秒，晕染过渡到德寿宫活动实拍。',asset:'德寿宫活动实拍：原片已有',st:'ok',loc:'南宋德寿宫遗址博物馆',mean:'红线掠过宋代宫殿屋脊，古都底色。',f:'s04a',d:5,ch:'承',t:'德寿宫',fx:['mist'],poem:[[.2,.95,'旧宫晨雾未散','R']],note:'全域秀场　时尚发声 · 德寿宫',desc:'晨雾中的德寿宫，红线掠过屋脊，古今行人同框。',real:1},
+ {id:'S04b',water:.7,wamp:.8,cam:[1.0,0,.6,1.16,0,-.5],birds:1,kind:'画→实',make:'画中钱江世纪城约 2 秒，过渡到实拍航拍。湖滨步行街、杭罐1958、高德置地水域秀场三处直接用实拍串联（客户反馈：高德置地用水域秀场镜头）。',asset:'五处场域实拍：原片已有；其中三处的画中版待补实景照片',st:'part',loc:'钱江世纪城 · 杭州之门、奥体莲花碗',mean:'同一根线穿过新城，古与今相连。',f:'s04b',d:5,ch:'承',t:'钱江世纪城',fx:['mist'],poem:[],note:'全域秀场　时尚发声 · 钱江世纪城',desc:'杭州之门双塔与奥体莲花碗，红线自江面穿塔而过。',real:1},
+ {id:'S05',vid:'v05',cam:[1.2,0,-.2,1.04,0,.1],kind:'画',make:'全画面插画动画。',asset:'本片新出插画',st:'ok',loc:'西湖断桥一带',mean:'借伞相逢的典故，引出"相遇"，转入时尚之夜。',f:'s05',d:5,ch:'承',t:'借伞',fx:['rain','mist'],poem:[[.2,.95,'雨落湖心　伞下初见','R']],note:'',desc:'细雨西湖，许仙撑伞，伞沿一圈红线。'},
+ {id:'S06',cam:[1.0,0,.4,1.2,0,-.2],beams:1,kind:'实',make:'实拍快切：秀场、珠宝、彩妆、潮流。T台尽头的白娘子可用画中人物合成进实拍。',asset:'按客户反馈替换原"时尚之夜"镜头，需从活动素材中重新挑选',st:'part',loc:'杭州时尚之夜秀场',mean:'古人立于T台尽头，东方之美走上秀场。',f:'s06',d:5,ch:'承',t:'杭州时尚之夜',fx:['mote'],night:1,poem:[[.3,.95,'灯起　人来','L']],note:'杭州时尚之夜：时装　美妆　潮流 / 汇聚　演绎　发布',desc:'T台上现代白裙模特，尽头白娘子立于光中。'},
+ {id:'S07',cam:[1.0,-.3,0,1.2,.5,0],glow:[.62,.48,.22],kind:'画→实',make:'画中推门，门内光里接现场：LV 用图片做推拉加金线光效，Armani/Privé 接"清樽别院"实拍。',asset:'LV：只有图片，缺视频；Armani/Privé：原片已有',st:'part',loc:'LV「秘境臻藏」、Armani/Privé「清樽别院」现场',mean:'推开一扇东方的门，国际品牌在其中发布。',f:'s07',d:7,ch:'转',t:'画门',fx:['gold'],poem:[[.3,.95,'推门　见光','L']],note:'国际品牌　东方秀场 · Louis Vuitton「秘境臻藏」 / Armani/Privé「清樽别院」',desc:'白娘子推开格扇门，门内金光与华服。'},
+ {id:'S08',cam:[1.12,-.9,0,1.12,.9,0],kind:'画→实',make:'红线勾出礼服线稿，叠化进汉帛杯成衣走秀实拍；三届同机位叠化，分别出届次。',asset:'第31—33届汉帛杯实拍：原片已有',st:'ok',loc:'汉帛杯（第31—33届）',mean:'红线勾出一件礼服，代表新一代设计力量。',f:'s08',d:8,ch:'转',t:'穿针',fx:['mist'],poem:[[.25,.95,'一针　一线　皆是新衣','R']],note:'国际赛事　设计新生 · 第31 / 32 / 33届 汉帛杯',desc:'小青穿针，红线在留白里勾出一件现代礼服。'},
+ {id:'S09',cam:[1.02,0,.2,1.16,0,-.1],beams:1,kind:'画→实',make:'屏风翻开后，接四季之夜舞台实拍。',asset:'四季之夜实拍：原片已有',st:'ok',loc:'四季之夜品牌联合发布',mean:'四季屏风对应"四季之夜"，品牌在此汇聚。',f:'s09',d:6,ch:'转',t:'四季屏风',fx:['mote'],night:1,poem:[[.25,.95,'四时有序','R']],note:'时尚产业　品牌合聚 · 四季之夜品牌联合发布',desc:'四扇屏风春夏秋冬，舞台光下红线穿过屏底。'},
+ {id:'S10',cam:[1.12,.9,0,1.12,-.9,0],sway:1,kind:'画→实',make:'画中青帘与芭莎现场的绿色帘幕做匹配转场，再接 VOGUE Business 现场。',asset:'芭莎×万象城、VOGUE Business 实拍：原片已有',st:'ok',loc:'时尚芭莎×万象城、VOGUE Business 现场',mean:'青帘与芭莎现场的绿色帘幕做匹配转场，媒体发布。',f:'s10',d:8,ch:'转',t:'青绿帘',fx:['mist','mist2'],poem:[[.25,.95,'青帘深处　有人走过','L']],note:'时尚媒体　发布现场 · 时尚芭莎X万象城「人间胜景 万象风华」 / VOGUE Business「文化新生」',desc:'青绿丝帘垂落，白娘子从帘间走过，红线穿梭。'},
+ {id:'S11',cam:[1.08,-.8,.2,1.16,.7,-.2],sweep:[.32,.62],kind:'实',make:'湖滨五周年、万象城十五周年实拍；删去 1:13 万象天地镜头（客户反馈）。画中万象城可做开场或补空镜。',asset:'活动实拍：原片已有；万象城外立面空镜：暂缺，可用画中版替代或补拍航拍',st:'part',loc:'杭州万象城、湖滨步行街',mean:'红线点亮街区灯火，时尚落进城市日常。',f:'s11',d:10,ch:'转',t:'万象城',fx:['firefly'],night:1,poem:[[.3,.95,'万家灯火　一线相牵','R']],note:'时尚商业　首秀首展 · 湖滨步行街开街五周年 / 杭州万象城十五周年',desc:'入夜的万象城弧形立面灯带亮起，白娘子与小青走过广场。',real:1},
+ {id:'S12',water:.9,wamp:.6,cam:[1.0,0,-.2,1.18,0,.25],glow:[.25,.08,.05],kind:'画',make:'全画面插画动画。',asset:'本片新出插画',st:'ok',loc:'西湖边木亭',mean:'白娘子与许仙系结，古今之约，全片收束。',f:'s12',d:8,ch:'合',t:'亭中系线',fx:['mist','firefly'],night:1,poem:[[.3,.95,'千年一结　系于此夜','L']],note:'起，东方之美 / 承，杭州之韵',desc:'月下木亭，白娘子与许仙手间系红线成结。'},
+ {id:'S13',water:.67,wamp:1,cam:[1.18,0,-.5,1.0,0,.1],birds:1,kind:'画',make:'全画面插画动画加落版；也可叠化接一镜实拍杭州日落。',asset:'本片新出插画；如需实拍日落，需补拍',st:'ok',loc:'西湖远眺：雷峰塔与城市天际线',mean:'红线连起古塔与新城，落版。',f:'s13',d:8,ch:'合',t:'一丝千年',fx:['mist'],poem:[],kv:1,note:'势起东方　时尚杭州 · EAST POWER FASHION HANGZHOU',desc:'黄昏西湖，雷峰塔与城市天际线由一根红线相连。',real:1}
+];
+let acc=0;S.forEach(s=>{s.t0=acc;acc+=s.d;s.t1=acc});
+const TOTAL=acc;
+S.forEach(s=>{s.img=new Image();s.img.src='kf/'+s.f+'.jpg';if(s.vid){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.preload='auto';v.src='vid/'+s.vid+'.mp4';s.v=v}});
+function vidReady(s){return s.v&&s.v.readyState>=2}
+function syncVid(s,p,run){const v=s.v;if(!v)return;const vt=Math.min(4.95,p*4.95);
+  if(run){v.playbackRate=Math.max(.5,Math.min(1,5/s.d));if(v.paused){const pr=v.play();if(pr&&pr.catch)pr.catch(()=>{})}if(Math.abs(v.currentTime-vt)>.3)v.currentTime=vt}
+  else{if(!v.paused)v.pause();if(Math.abs(v.currentTime-vt)>.05)v.currentTime=vt}}
+
+/* mist sprite: a soft cloud band, built once */
+const mist=document.createElement('canvas');mist.width=2400;mist.height=520;
+(()=>{const m=mist.getContext('2d');const r=rng(9);
+  for(let i=0;i<260;i++){const x=r()*2400,y=260+(r()-.5)*300*Math.pow(r(),.6),rad=40+r()*170;
+    const g=m.createRadialGradient(0,0,0,0,0,rad);const a=.05+r()*.09;g.addColorStop(0,`rgba(255,255,255,${a})`);g.addColorStop(1,'rgba(255,255,255,0)');m.fillStyle=g;
+    for(const ox of[0,-2400,2400]){if(x+ox+rad<0||x+ox-rad>2400)continue;m.save();m.translate(x+ox,y);m.fillRect(-rad,-rad,rad*2,rad*2);m.restore()}}
+})();
+function mistBand(t,y,scale,speed,alpha){const w=2400*scale,h=520*scale;let x=-(((t*speed)%w)+w)%w;ctx.save();ctx.globalAlpha*=alpha;for(;x<W;x+=w)ctx.drawImage(mist,x,y-h/2,w,h);ctx.restore()}
+
+function fx(kind,t,s){
+  const r=rng(kind.length*97+s.f.charCodeAt(2)*7+11);
+  if(kind==='mist'){mistBand(t,H*.78,1.2,60,s.night?.55:.8);mistBand(t+40,H*.95,1.6,95,s.night?.6:.85);mistBand(t+90,H*.38,1,34,s.night?.3:.4)}
+  if(kind==='mist2'){mistBand(t+20,H*.55,1.4,-34,.55);mistBand(t+60,H*.2,1.1,22,.4)}
+  if(kind==='rain'){ctx.save();ctx.strokeStyle='rgba(240,244,248,.42)';ctx.lineWidth=1.6;ctx.beginPath();for(let i=0;i<340;i++){const sp=900+r()*600,x0=r()*W*1.3,y=((r()*H+t*sp)%(H+100))-50,x=((x0-t*sp*.16)%(W*1.3)+W*1.3)%(W*1.3)-W*.1;ctx.moveTo(x,y);ctx.lineTo(x-7,y+34)}ctx.stroke();ctx.restore()}
+  if(kind==='petal'){for(let i=0;i<26;i++){const sp=.03+r()*.04,ph=r(),x=((r()+t*sp)%1.2-.1)*W,y=((ph+t*sp*1.3)%1.15-.08)*H+Math.sin(t*1.5+i)*18,rot=t*(1+r())+i,sz=9+r()*10,al=.55+r()*.3;
+    ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(1,.55+.4*Math.sin(t*2+i));ctx.fillStyle=`rgba(236,176,180,${al})`;ctx.beginPath();ctx.ellipse(0,0,sz,sz*.6,0,0,7);ctx.fill();ctx.restore()}}
+  if(kind==='mote'||kind==='gold'){const col=kind==='gold'?'255,226,170':'255,250,240';for(let i=0;i<60;i++){const x=r()*W+Math.sin(t*.3+i)*30,y=((r()*H-t*(8+r()*16))%H+H)%H,a=(.25+.6*r())*(.5+.5*Math.sin(t*1.7+i*3)),rad=1+r()*2.6;
+    const g=ctx.createRadialGradient(x,y,0,x,y,rad*4);g.addColorStop(0,`rgba(${col},${a})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.fillRect(x-rad*4,y-rad*4,rad*8,rad*8)}}
+  if(kind==='firefly'){for(let i=0;i<40;i++){const x=r()*W+Math.sin(t*.5+i*1.3)*40,y=H*(.35+r()*.6)+Math.cos(t*.4+i)*20,a=Math.max(0,Math.sin(t*1.3+i*2.1))*(.5+.5*r()),rad=2+r()*2;
+    const g=ctx.createRadialGradient(x,y,0,x,y,rad*6);g.addColorStop(0,`rgba(255,220,160,${a})`);g.addColorStop(1,'rgba(255,220,160,0)');ctx.fillStyle=g;ctx.fillRect(x-rad*6,y-rad*6,rad*12,rad*12)}}
+}
+
+
+/* ---------- motion layer ---------- */
+const frame=document.createElement('canvas');frame.width=W;frame.height=H;const fctx=frame.getContext('2d');
+const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;const tctx=tmp.getContext('2d');
+function threadLayer(s){if(s.thr!==undefined)return s.thr;s.thr=null;try{const w=960,h=542,c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(s.img,0,0,w,h);
+  const d=x.getImageData(0,0,w,h),p=d.data;let n=0;for(let i=0;i<p.length;i+=4){const r=p[i],g=p[i+1],b=p[i+2];if(r>130&&r-g>60&&r-b>50){p[i]=255;p[i+1]=150;p[i+2]=120;p[i+3]=255;n++}else p[i+3]=0}
+  if(n>40){x.putImageData(d,0,0);s.thr=c}}catch(_){}return s.thr}
+function camRect(s,p){const c=s.cam,k=ease(p),sc=lerp(c[0],c[3],k)+.006*Math.sin(p*6.28),ox=lerp(c[1],c[4],k),oy=lerp(c[2],c[5],k);const w=W*sc,h=H*sc;return[(W-w)/2+ox*(w-W)/2,(H-h)/2+oy*(h-H)/2,w,h]}
+function bird(x,y,sz,ph){const f=Math.sin(ph);ctx.save();ctx.translate(x,y);ctx.strokeStyle='rgba(250,248,240,.92)';ctx.fillStyle='rgba(250,248,240,.92)';ctx.lineWidth=sz*.18;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-sz,-f*sz*.8);ctx.quadraticCurveTo(-sz*.45,-sz*.2-f*sz*.3,0,0);ctx.quadraticCurveTo(sz*.45,-sz*.2-f*sz*.3,sz,-f*sz*.8);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(0,sz*.05,sz*.32,sz*.1,0,0,7);ctx.fill();ctx.beginPath();ctx.moveTo(sz*.3,0);ctx.lineTo(sz*.7,-sz*.12);ctx.stroke();ctx.restore()}
+function motion(s,p,t,R){const [rx,ry,rw,rh]=R;
+  // water: row displacement below the shoreline
+  if(s.water){const wy=Math.floor(ry+rh*s.water);if(wy<H){fctx.clearRect(0,0,W,H);fctx.drawImage(cv,0,0);for(let y=Math.max(0,wy);y<H;y+=3){const d=(y-wy)/(H-wy+1),A=s.wamp||1,dx=A*((1+7*d)*Math.sin(y*.06-t*2.2)+(.5+2.5*d)*Math.sin(y*.17+t*3.1));ctx.drawImage(frame,0,y,W,3,dx,y,W,3)}
+    // glints on water
+    const r=rng(5);for(let i=0;i<70;i++){const gx=r()*W,gy=wy+Math.pow(r(),1.6)*(H-wy),a=Math.max(0,Math.sin(t*2.4+i*1.7))*.5,len=6+r()*26*(gy-wy)/(H-wy+1);ctx.fillStyle=`rgba(255,252,240,${a})`;ctx.fillRect(gx+Math.sin(t+i)*8,gy,len,1.5)}}}
+  // thread shimmer: a light travelling along every red stroke
+  const th=threadLayer(s);if(th){tctx.clearRect(0,0,W,H);tctx.globalCompositeOperation='source-over';tctx.drawImage(th,rx,ry,rw,rh);tctx.globalCompositeOperation='destination-in';
+    const cx=((t*.22)%1.4-.2)*W,g=tctx.createLinearGradient(cx-260,0,cx+260,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');tctx.fillStyle=g;tctx.fillRect(0,0,W,H);tctx.globalCompositeOperation='source-over';
+    ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.9;ctx.filter='blur(3px)';ctx.drawImage(tmp,0,0);ctx.filter='none';ctx.globalAlpha=.8;ctx.drawImage(tmp,0,0);ctx.globalAlpha=.10+.08*Math.sin(t*2);ctx.drawImage(th,rx,ry,rw,rh);ctx.restore()}
+  // glow breathing (moon, door light)
+  if(s.glow){const [gx,gy,gr]=s.glow,x=rx+rw*gx,y=ry+rh*gy,rad=rw*gr*(1+.08*Math.sin(t*1.6));const g=ctx.createRadialGradient(x,y,0,x,y,rad);g.addColorStop(0,`rgba(255,240,205,${.28+.1*Math.sin(t*1.6)})`);g.addColorStop(1,'rgba(255,240,205,0)');ctx.save();ctx.globalCompositeOperation='screen';ctx.fillStyle=g;ctx.fillRect(x-rad,y-rad,rad*2,rad*2);ctx.restore()}
+  // spotlight beams swaying
+  if(s.beams){ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<4;i++){const bx=W*(.2+.2*i)+Math.sin(t*.7+i*1.4)*90,a=.07+.04*Math.sin(t*1.3+i);const g=ctx.createLinearGradient(bx,0,bx,H*.9);g.addColorStop(0,`rgba(220,230,255,${a*2})`);g.addColorStop(1,'rgba(220,230,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(bx-30,0);ctx.lineTo(bx+30,0);ctx.lineTo(bx+260+Math.sin(t*.7+i)*80,H*.9);ctx.lineTo(bx-260+Math.sin(t*.7+i)*80,H*.9);ctx.fill()}ctx.restore()}
+  // light band sweeping over a facade
+  if(s.sweep){const [y0,y1]=s.sweep,top=ry+rh*y0,bot=ry+rh*y1,cx=((t*.35)%1.5-.25)*W;const g=ctx.createLinearGradient(cx-220,0,cx+220,0);g.addColorStop(0,'rgba(255,225,170,0)');g.addColorStop(.5,'rgba(255,225,170,.38)');g.addColorStop(1,'rgba(255,225,170,0)');ctx.save();ctx.globalCompositeOperation='screen';ctx.fillStyle=g;ctx.fillRect(0,top,W,bot-top);ctx.restore()}
+  // curtain sway: wavy column displacement
+  if(s.sway){fctx.clearRect(0,0,W,H);fctx.drawImage(cv,0,0);for(let x=0;x<W;x+=4){const dy=6*Math.sin(x*.012+t*1.4)+3*Math.sin(x*.05-t*2);ctx.drawImage(frame,x,0,4,H,x,dy,4,H)}}
+  // birds crossing the sky
+  if(s.birds){const r=rng(31);for(let i=0;i<5;i++){const sp=.05+r()*.03,x=((r()*.5+t*sp)%1.4-.2)*W,y=H*(.12+r()*.18)+Math.sin(t*.8+i)*14,sz=10+r()*9;bird(x,y,sz,t*(6+r()*2)+i)}}
+}
+
+function drawShot(s,p,t){
+  const R=camRect(s,p);
+  if(vidReady(s)){const vw=s.v.videoWidth,vh=s.v.videoHeight,sc=Math.max(W/vw,H/vh)*(1+.03*ease(p));ctx.drawImage(s.v,(W-vw*sc)/2,(H-vh*sc)/2,vw*sc,vh*sc)}
+  else if(s.img.complete&&s.img.naturalWidth){ctx.drawImage(s.img,R[0],R[1],R[2],R[3]);motion(s,p,t,R)}else{ctx.fillStyle='#20262b';ctx.fillRect(0,0,W,H)}
+  s.fx.forEach(f=>fx(f,t,s));
+  const g=ctx.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*1.05);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(10,12,16,.38)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+}
+
+const XF=1.2;const snap=document.createElement('canvas');snap.width=W;snap.height=H;const snapN=document.createElement('canvas');snapN.width=W;snapN.height=H;
+const $=id=>document.getElementById(id);
+const poemEl=$('poem'),noteChip=$('noteChip'),nKind=$('nKind'),nLoc=$('nLoc'),titleEl=$('title'),kvEl=$('kv'),timeEl=$('time'),head=$('head'),strip=$('strip'),playBtn=$('play'),bigPlay=$('bigPlay');
+const KL={'画':'成片：插画动画','画→实':'成片：画转实拍','实':'成片：接实拍'};const KC={'画':'k-画','画→实':'k-画实','实':'k-实'};const STL={ok:'齐',part:'部分暂缺',miss:'暂缺'};
+function shotAt(t){for(let i=0;i<S.length;i++)if(t<S[i].t1)return i;return S.length-1}
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
+let lastI=-1;
+function setPoem(txt,side){const key=txt+side;if(poemEl._k===key)return;poemEl._k=key;poemEl.classList.add('hide');clearTimeout(poemEl._h);poemEl._h=setTimeout(()=>{poemEl.textContent=txt;poemEl.className='poem '+side+(txt?'':' hide')},poemEl.textContent?700:0)}
+function render(T){
+  const i=shotAt(T),s=S[i],p=clamp((T-s.t0)/s.d);
+  S.forEach((x,j)=>{if(!x.v)return;if(j===i)syncVid(x,p,playing);else if(j===i+1&&T>s.t1-XF)syncVid(x,0,false);else if(!x.v.paused)x.v.pause()});
+  ctx.save();drawShot(s,p,T);ctx.restore();
+  if(i<S.length-1&&T>s.t1-XF){const k=(T-(s.t1-XF))/XF,n=S[i+1];snap.getContext('2d').drawImage(cv,0,0);drawShot(n,0,T);const nx=snapN.getContext('2d');nx.clearRect(0,0,W,H);nx.drawImage(cv,0,0);ctx.drawImage(snap,0,0);ctx.save();ctx.globalAlpha=ease(k);ctx.drawImage(snapN,0,0);ctx.restore();
+    const a=Math.sin(Math.PI*k);mistBand(T*3,H*.5,2.6,-260,.9*a);mistBand(T*3+30,H*.3,2.2,-180,.6*a);mistBand(T*3+60,H*.8,2.2,-200,.6*a)}
+  if(i===0&&p<.25){ctx.fillStyle=`rgba(12,16,22,${1-ease(p/.25)})`;ctx.fillRect(0,0,W,H)}
+  let pm='',side='R';for(const c of s.poem){if(p>=c[0]&&p<c[1]){pm=c[2];side=c[3]}}setPoem(pm,side);
+  if(noteChip._id!==s.id){noteChip._id=s.id;nKind.textContent=KL[s.kind];nLoc.textContent=s.loc;
+    $('lId').textContent=s.id+'　'+s.ch+' · '+s.t;const lk=$('lKind');lk.textContent=KL[s.kind];lk.className='lk '+KC[s.kind];
+    $('lLoc').textContent=s.loc;$('lMean').textContent=s.mean;$('lMake').textContent=s.make;const la=$('lAsset');la.textContent=s.asset;la.className='st-'+s.st;
+    $('lCopy').textContent=s.note||'—'}
+  titleEl.classList.toggle('on',!!s.title&&p>.25&&p<.88);
+  kvEl.classList.toggle('on',!!s.kv&&p>.4);
+  if(i!==lastI){lastI=i;[...strip.querySelectorAll('.cell')].forEach((c,j)=>c.classList.toggle('on',j===i))}
+  timeEl.textContent=fmt(T)+' / '+fmt(TOTAL);head.style.left=(T/TOTAL*100)+'%';strip.setAttribute('aria-valuenow',T.toFixed(1));
+}
+
+S.forEach(s=>{const c=document.createElement('div');c.className='cell';c.style.flexGrow=s.d;c.style.backgroundImage=`url(kf/${s.f}.jpg)`;c.innerHTML=`<span>${s.id.slice(1)}</span>`;strip.insertBefore(c,head)});
+const grid=$('grid');S.forEach(s=>{const d=document.createElement('div');d.className='kf';d.tabIndex=0;
+  const pm=s.poem.map(c=>c[2]).join(' ');
+  d.innerHTML=`<img src="kf/${s.f}.jpg" alt="${s.t}" loading="lazy"><div class="t"><b>${s.id}　${s.ch}·${s.t}${s.real?'<span class="tag">实景参考</span>':''}</b><small>${s.desc}</small>${s.vid?'<small class="st-ok">已用 AI 视频做出动画样片</small>':''}<small><span class="kb ${KC[s.kind]}">${KL[s.kind]}</span></small><small>地点：${s.loc}</small><small>成片做法：${s.make}</small><small class="st-${s.st}">素材：${s.asset}</small><em>${fmt(s.t0)}–${fmt(s.t1)}${pm?'　「'+pm+'」':''}</em>${s.note?`<small class="cn-note">甲方文案：${s.note}</small>`:''}</div>`;
+  const go=()=>{seek(s.t0+.05);$('screen').scrollIntoView({behavior:'smooth',block:'center'})};d.addEventListener('click',go);d.addEventListener('keydown',e=>{if(e.key==='Enter')go()});grid.appendChild(d)});
+
+
+/* ---------- score: Suno track edited to 95 s; the audio clock drives the film while sound is on ---------- */
+let audioEl=null,soundOn=true;
+function initAudio(){if(audioEl)return;audioEl=new Audio('music/score.mp3');audioEl.preload='auto'}
+function audioSync(T){if(!soundOn)return;initAudio();try{audioEl.currentTime=T}catch(_){}const p=audioEl.play();if(p&&p.catch)p.catch(()=>{})}
+function audioTick(T){}
+function audioPause(){if(audioEl)audioEl.pause()}
+function audioClock(){return soundOn&&audioEl&&!audioEl.paused&&audioEl.readyState>=2?audioEl.currentTime:null}
+let T=0,playing=false,last=0;
+function loop(now){if(!playing)return;const ck=audioClock();T=ck!==null?ck:T+Math.min(.1,(now-last)/1000);last=now;if(T>=TOTAL){T=TOTAL-.001;setPlaying(false)}render(T);if(playing){audioTick(T);requestAnimationFrame(loop)}}
+function setPlaying(v){playing=v;playBtn.textContent=v?'暂停':'播放';if(v){bigPlay.hidden=true;if(T>=TOTAL-.01)T=0;if(soundOn)audioSync(T);last=performance.now();requestAnimationFrame(loop)}else audioPause()}
+function seek(t){T=clamp(t,0,TOTAL-.001);bigPlay.hidden=true;if(playing)audioSync(T);else render(T)}
+playBtn.onclick=()=>setPlaying(!playing);
+const scr=$('screen'),fsClose=$('fsClose');
+function setFs(on){scr.classList.toggle('fs',on);fsClose.hidden=!on;document.body.style.overflow=on?'hidden':'';
+  if(on){const r=scr.requestFullscreen||scr.webkitRequestFullscreen;if(r){try{const pr=r.call(scr);if(pr&&pr.catch)pr.catch(()=>{})}catch(_){}}try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(_){}}
+  else{const x=document.exitFullscreen||document.webkitExitFullscreen;if((document.fullscreenElement||document.webkitFullscreenElement)&&x)try{x.call(document)}catch(_){}}
+  render(T)}
+$('fsBtn').onclick=()=>setFs(true);fsClose.onclick=()=>setFs(false);
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&scr.classList.contains('fs'))setFs(false)});
+const sb=$('soundBtn');sb.onclick=()=>{soundOn=!soundOn;sb.textContent='声音：'+(soundOn?'开':'关');sb.setAttribute('aria-pressed',String(soundOn));if(soundOn){if(playing)audioSync(T)}else audioPause()};
+const nb=$('notesBtn');nb.onclick=()=>{const off=document.body.classList.toggle('notes-off');nb.textContent='演示说明：'+(off?'隐藏':'显示');nb.setAttribute('aria-pressed',String(!off))};bigPlay.onclick=()=>setPlaying(true);
+$('restart').onclick=()=>{seek(0);setPlaying(true)};
+$('prev').onclick=()=>{const i=shotAt(T);seek(T-S[i].t0>.8?S[i].t0:S[Math.max(0,i-1)].t0)};
+$('next').onclick=()=>{const i=shotAt(T);if(i<S.length-1)seek(S[i+1].t0+.05)};
+const tx=x=>{const r=strip.getBoundingClientRect();return clamp((x-r.left)/r.width)*TOTAL};
+let drag=false;strip.addEventListener('pointerdown',e=>{drag=true;try{strip.setPointerCapture(e.pointerId)}catch(_){}seek(tx(e.clientX))});
+strip.addEventListener('pointermove',e=>{if(drag)seek(tx(e.clientX))});strip.addEventListener('pointerup',()=>drag=false);
+strip.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){seek(T+2);e.preventDefault()}if(e.key==='ArrowLeft'){seek(T-2);e.preventDefault()}});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/BUTTON|INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();setPlaying(!playing)}});
+S.forEach(s=>{if(s.v)s.v.addEventListener('seeked',()=>{if(!playing)render(T)})});
+let n=0;S.forEach(s=>{const done=()=>{n++;if(n===S.length)$('loading').hidden=true;if(!playing)render(T)};if(s.img.complete)done();else{s.img.onload=done;s.img.onerror=done}});
+T=3.2;render(T);
+window.__seek=t=>{T=t;render(T)};
+})();
+</script>
+
+</body>
+</html>
