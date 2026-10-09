@@ -88,7 +88,6 @@ PD_MATCH = 'aud_PD_老金_夜里冷迭盒自来火拿去_b.mp3'
 PD_THERE = 'aud_PD_老金_依bebe有啥好_a.mp3'
 VO_S24 = 'aud_VO_S24口型版音轨_父女.mp3'
 
-K_LADY = '2016，浦西老太太立在阿乔出租房的窗口（他的母亲）'
 
 # 2026-10-08 Dylan 选定的 v2 静帧（LibTV 节点 V2_*，Seedream 5.0 Pro）
 I_TABLE = 'KF_V2_01_1991灶间两只碗_b'
@@ -105,6 +104,12 @@ I_PIER = 'KF_V2_11b_1995码头末班轮渡_a'
 I_JIN = 'KF_V2_14_2016老金老阿乔灶间修车_a'
 I_CURTAIN = 'KF_V2_15_2016拉窗帘_b'
 I_STOVE = 'KF_V2_16_空火柴盒放回灶头_b'
+# 2026-10-09 第二轮选定
+I_38F = 'KF_V2_12c_2016老阿乔38楼俯视_a'
+I_VIEWING = 'KF_V2_13c_2016周敏领老太太看房_a'
+I_LADY = 'KF_V2_21c_2016老太太立在窗口_a'
+I_BEHIND = 'KF_V2_17c_2016老新村窗口_陆家嘴背面_b'
+I_LASTWIN = 'KF_V2_VN5c_2016老金的窗_陆家嘴背面_a'
 
 nodes = {
  'prologue': {'year': '2016', 'music': WALTZ, 'shots': [
@@ -260,9 +265,9 @@ nodes = {
     vid('VID_S26_Kling3_v3', **V('对岸个灯，我看了一世人生。呒没一盏，是为我亮个。', '对岸的灯，我看了一辈子。没有一盏，是为我亮的。',
         'I watched the lights on the other shore all my life. Not one of them was lit for me.')),
     vid('VN4_老金厨房2016'),
-    vid('VN5_对岸远窗2016', **V('……有一盏，辣楼背后。我看了一世人生，一趟也没看见。', '……有一盏，在楼背后。我看了一辈子，一次也没看见。',
+    img(I_LASTWIN, **V('……有一盏，辣楼背后。我看了一世人生，一趟也没看见。', '……有一盏，在楼背后。我看了一辈子，一次也没看见。',
         '…There was one, behind the towers. I looked all my life and never once saw it.'),
-        need='反打要是全片唯一一个不动的镜头，考虑换成静帧'),
+        dur=7, fixed=True),  # 全片唯一不动的镜头：老金的窗在陆家嘴背后
     card('人望了一辈子对岸。对岸也在望，望个是另一个对岸。', 'We spend our lives looking at the other shore. The other shore is looking too — at another shore.'),
    ]},
 
@@ -287,15 +292,15 @@ nodes = {
         'Pudong rose. Four flats — I collected rent on them all my life.')),
     img('KF_N4b_2016老金厨房窗', **V('老金就住辣隔开两条马路个新村里。我一年去看伊一趟。', '老金就住在隔两条马路的新村里。我一年去看他一次。',
         'Lao Jin lived in the estate two streets away. I went to see him once a year.')),
-    ph('2016，老阿乔在浦东三十八楼窗前，望浦西', **V('二〇一六年，我立辣三十八楼，终于比对岸高了。', '二〇一六年，我站在三十八楼，终于比对岸高了。',
+    img(I_38F, **V('二〇一六年，我立辣三十八楼，终于比对岸高了。', '二〇一六年，我站在三十八楼，终于比对岸高了。',
        '2016. Thirty-eight floors up, I was finally higher than the other shore.'), year='2016'),
-    ph('周敏领一位浦西老太太来看房', **V('有一日，周敏领一个浦西老太太来租我个房子。伊老屋动迁了，要搬到浦东来。',
+    img(I_VIEWING, **V('有一日，周敏领一个浦西老太太来租我个房子。伊老屋动迁了，要搬到浦东来。',
        '有一天，周敏领着一位浦西老太太来租我的房子。她的老房子动迁了，要搬到浦东来。',
        'One day Zhou Min brought an old lady from Puxi to rent one of my flats. Her old house was being torn down; she was moving to Pudong.'), dur=5.5),
-    ph(K_LADY, '浦东现在挺好的。', '“Pudong’s quite nice now.”', who='老太太（市区话）', line='浦东现在蛮好。', dur=3.5),
-    ph(K_LADY, **V('我认得伊。伊不认得我。', '我认得她。她不认得我。', 'I knew her. She didn’t know me.')),
-    ph(K_LADY, **V('我收了伊三个号头押金。我没叫伊姆妈。', '我收了她三个月押金。我没叫她妈。', 'I took three months’ deposit. I didn’t call her Mum.')),
-    ph(K_LADY, **V('我一直以为，对岸是一个地方。', en='All along, I thought the other shore was a place.')),
+    img(I_LADY, '浦东现在挺好的。', '“Pudong’s quite nice now.”', who='老太太（市区话）', line='浦东现在蛮好。', dur=3.5),
+    img(I_LADY, **V('我认得伊。伊不认得我。', '我认得她。她不认得我。', 'I knew her. She didn’t know me.')),
+    img(I_LADY, **V('我收了伊三个号头押金。我没叫伊姆妈。', '我收了她三个月押金。我没叫她妈。', 'I took three months’ deposit. I didn’t call her Mum.')),
+    img(I_LADY, **V('我一直以为，对岸是一个地方。', en='All along, I thought the other shore was a place.')),
     card('立得再高，也看不见自家身后。', 'However high you stand, you can’t see what’s behind you.'),
    ]},
 
@@ -307,7 +312,7 @@ nodes = {
        need='暂用中年老金的声音，老年版待生成'),
     img(I_JIN, **V('伊讲个是脚踏车。我晓得，伊讲个是人。', '他说的是自行车。我知道，他说的是人。', 'He meant the bicycle. I knew he meant me.')),
     met(img(I_CURTAIN, dur=3.5)),
-    ph('灶间窗口，窗外是陆家嘴的背影', **V('我一世人生没过江。对岸个灯是啥样子，我只看过。', '我一辈子没过江。对岸的灯是什么样子，我只看过。',
+    img(I_BEHIND, **V('我一世人生没过江。对岸个灯是啥样子，我只看过。', '我一辈子没过江。对岸的灯是什么样子，我只看过。',
        'I never crossed the river in my life. The lights over there — I only ever looked at them.')),
     img(I_STOVE, dur=3.5, box=False),
     img(I_STOVE, **V('二〇一六年冬天，老金走了。', en='In the winter of 2016, Lao Jin died.')),
