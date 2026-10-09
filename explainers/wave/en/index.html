@@ -33,7 +33,7 @@
   #controls { position: fixed; left: 16px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--ink); opacity: 0; transition: opacity .3s; }
   body:hover #controls { opacity: 1; }
   /* 触屏：控制条默认收起，轻点画面出现，几秒后自动收起 */
-  @media (hover: none) { #controls { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); pointer-events: none; } body:hover #controls { opacity: 0; } body.ui #controls, body.ui:hover #controls { opacity: 1; pointer-events: auto; } body.ui #hint { opacity: 0; pointer-events: none; } }
+  @media (hover: none) { #controls { left: 8px; right: 8px; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); pointer-events: none; } body:hover #controls { opacity: 0; } body.ui #controls, body.ui:hover #controls { opacity: 1; pointer-events: auto; } body.ui #hint { opacity: 0; pointer-events: none; } }
   #controls button { background: var(--paper); color: var(--ink); border: 1px solid rgba(61, 42, 45, .35); border-radius: 6px; padding: 4px 9px; font: inherit; cursor: pointer; }
   #controls button.on { background: var(--ink); color: var(--paper); }
   #home { background: var(--paper); color: var(--ink); border: 1px solid rgba(61, 42, 45, .35); border-radius: 6px; padding: 4px 9px; text-decoration: none; }
@@ -50,6 +50,20 @@
   #next { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 2; color: var(--ink); font-size: 14px; letter-spacing: 2px; opacity: 0; pointer-events: none; transition: opacity .5s; white-space: nowrap; }
   #next.on { opacity: .7; animation: nudge 1.6s ease-in-out infinite; }
   @keyframes nudge { 50% { opacity: .35; } }
+  body.ui #next { opacity: 0; animation: none; }
+  /* 手机上的控制条开关：左下角的小圆钮，和右下角的声音钮对称；打开时变成 × */
+  #uibtn { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 3; width: 38px; height: 38px; border-radius: 50%;
+           border: 1px solid rgba(61, 42, 45, .28); background: rgba(236, 230, 218, .92); color: var(--ink); padding: 0; cursor: pointer; box-shadow: 0 2px 10px rgba(61, 42, 45, .12);
+           -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: background .25s, color .25s, transform .2s; }
+  #uibtn:active { transform: scale(.92); }
+  #uibtn svg { width: 18px; height: 18px; display: block; margin: auto; }
+  #uibtn .x { display: none; }
+  body.ui #uibtn { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  body.ui #uibtn .bars { display: none; }
+  body.ui #uibtn .x { display: block; }
+  #uibtn:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+  @media (hover: none) { #uibtn { display: block; } }
+  @media (hover: none) { #controls { padding: 12px; border-radius: 14px; background: rgba(236, 230, 218, .94); border: 1px solid rgba(61, 42, 45, .14); box-shadow: 0 8px 28px rgba(61, 42, 45, .16); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); transform: translateY(8px); transition: opacity .3s, transform .3s; } body.ui #controls { transform: none; } }
   body.inv #next { color: var(--paper); }
 </style>
 </head>
@@ -57,6 +71,7 @@
 <div id="stage"><canvas id="cv" aria-label="Animation: a giant wave washes away sandcastles, explaining a Zeng Ming interview"></canvas></div>
 <div id="ringtip" role="status"></div>
 <div id="next" aria-hidden="true"></div>
+<button id="uibtn" type="button" aria-label="Controls"><svg class="bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2.2" fill="var(--paper)"/><circle cx="16" cy="12" r="2.2" fill="var(--paper)"/><circle cx="7" cy="17" r="2.2" fill="var(--paper)"/></svg><svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
 <button id="hint" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>Sound on</button>
 <div id="controls">
   <a id="home" href="https://dylanhe.cn/en/#explainers">Dylan He home</a><button id="snd">Sound on</button><button id="play">Pause</button><button id="mode"></button><button id="restart">Replay</button><button id="ratio">Rotate</button><button id="fs">Fullscreen</button>
@@ -1037,12 +1052,17 @@ document.getElementById("play").onclick = () => { if (playing) { offset = now();
 document.getElementById("snd").onclick = enableSound;
 document.getElementById("hint").onclick = enableSound;
 let uiTimer = 0;
+// 控制条：手机上由左下角的小圆钮开关；开着时点画面只是把它收起
+const uiBtn = document.getElementById("uibtn");
+function setUI(on) { document.body.classList.toggle("ui", on); uiBtn.setAttribute("aria-expanded", on); clearTimeout(uiTimer); if (on) uiTimer = setTimeout(() => setUI(false), 6000); }
+uiBtn.onclick = () => setUI(!document.body.classList.contains("ui"));
 cv.addEventListener("click", e => {
-  if (stepMode && !(isTouch && e.clientY > innerHeight * 0.82)) { advance(); return; }
+  if (isTouch && document.body.classList.contains("ui")) { setUI(false); return; }
+  if (stepMode) { advance(); return; }
   document.body.classList.toggle("ui");
   clearTimeout(uiTimer); uiTimer = setTimeout(() => document.body.classList.remove("ui"), 4000);
 });
-document.getElementById("controls").addEventListener("click", () => { clearTimeout(uiTimer); uiTimer = setTimeout(() => document.body.classList.remove("ui"), 4000); });
+document.getElementById("controls").addEventListener("click", () => { clearTimeout(uiTimer); uiTimer = setTimeout(() => setUI(false), 6000); });
 document.getElementById("restart").onclick = () => go(0);
 document.getElementById("ratio").onclick = () => { const t = now(); build(R === "v" ? "h" : "v"); buildSound(); offset = t; startAt = performance.now(); lastFt = null; };
 document.getElementById("fs").onclick = () => document.documentElement.requestFullscreen?.().catch(() => {});
