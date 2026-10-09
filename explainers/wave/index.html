@@ -43,10 +43,14 @@
   #hint { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 6px; background: rgba(61, 42, 45, .86); color: var(--paper); border: 0; padding: 8px 14px; border-radius: 999px; font: inherit; font-size: 14px; letter-spacing: 1px; cursor: pointer; z-index: 3; transition: opacity .3s; }
   #hint svg { width: 16px; height: 16px; }
   #hint.off { opacity: 0; pointer-events: none; }
+  /* 手机静音键会让网页没声：开声音后在原位置提示几秒 */
+  #ringtip { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 3; background: rgba(61, 42, 45, .86); color: var(--paper); padding: 8px 14px; border-radius: 999px; font-size: 13px; letter-spacing: .5px; opacity: 0; pointer-events: none; transition: opacity .4s; }
+  #ringtip.on { opacity: 1; }
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="cv" aria-label="动画：巨浪冲走沙堡，解读曾鸣访谈"></canvas></div>
+<div id="ringtip" role="status"></div>
 <button id="hint" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>开启声音</button>
 <div id="controls">
   <a id="home" href="https://dylanhe.cn/zh/#explainers">Dylan He 首页</a><button id="snd">开启声音</button><button id="play">暂停</button><button id="restart">重播</button><button id="ratio">切换横竖屏</button><button id="fs">全屏</button>
@@ -950,8 +954,25 @@ function audioTick(ft) {
   OCEAN.g.gain.setTargetAtTime((0.035 + 0.1 * Math.min(1.2, wv)) * (1 - 0.5 * inv) * (ft > 172 ? 1 - prog(ft, 172, 4) : 1), at, 0.2);
   OCEAN.lp.frequency.setTargetAtTime((380 + 1500 * Math.min(1.2, wv) + 80 * Math.sin(ft * 0.6)) * (1 - 0.45 * inv), at, 0.2);
 }
+// iPhone 的静音键会把网页声音一起关掉：先请求「媒体播放」模式（Safari 16.4+），旧系统用一段循环的静音 <audio> 达到同样效果
+let silentEl = null, ringTipShown = false;
+function unmuteIOS() {
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) { }
+  if (silentEl) return silentEl.play().catch(() => { });
+  const n = 800, b = new Uint8Array(44 + n), v = new DataView(b.buffer), w = (o, t) => [...t].forEach((c, i) => b[o + i] = c.charCodeAt(0));
+  w(0, "RIFF"); v.setUint32(4, 36 + n, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, "data"); v.setUint32(40, n, true); b.fill(128, 44);
+  silentEl = new Audio(URL.createObjectURL(new Blob([b], { type: "audio/wav" }))); silentEl.loop = true; silentEl.setAttribute("playsinline", "");
+  silentEl.play().catch(() => { });
+}
+function ringTip() {
+  if (ringTipShown || !matchMedia("(hover: none)").matches) return;   // 只在手机上提示一次
+  ringTipShown = true; const el = document.getElementById("ringtip");
+  el.textContent = LANG === "en" ? "No sound? Turn off silent mode" : "没声音？请关掉手机的静音"; el.classList.add("on");
+  setTimeout(() => el.classList.remove("on"), 5000);
+}
 function enableSound() {
-  if (!soundOn) startSound(); else { soundOn = false; AC.suspend(); }
+  if (!soundOn) { unmuteIOS(); ringTip(); startSound(); } else { soundOn = false; AC.suspend(); if (silentEl) silentEl.pause(); }
   document.getElementById("snd").textContent = tr(soundOn ? "关闭声音" : "开启声音");
   document.getElementById("hint").classList.toggle("off", soundOn);
 }
