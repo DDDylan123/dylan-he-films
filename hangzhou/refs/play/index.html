@@ -48,7 +48,7 @@ li.on{background:var(--card)}
 <p class="tip">需能访问 YouTube 的网络。少数视频若不允许内嵌，会提示改在 YouTube 打开，点“下一个”继续。</p>
 </div>
 <script>
-var V=[["3P1CnWI62Ik","Feel the Rhythm of Korea"],["gqYzEv_AqYM","JAPAN – Where tradition meets the future"],["XpPwj5kU9rg","台北时装周 AW23 宣传片"],["SWmXufBxD9c","韩服浪潮 Hanbok Wave"],["mwehcPQUC3g","Chanel × Wim Wenders《从巴黎到杭州》"],["dloTnEy_fLY","Dior 2025 秋冬 · 京都东寺大秀"],["uVnfMcGf6mc","Gucci 2024 早春 · 景福宫大秀"],["960LY54BbbQ","KENZO 2023 秋冬《京都与大阪》"],["Kz7e-Q2Q9-4","Kaguya by Gucci《辉夜姬》"],["elQNnkDG1ik","Chanel《Tokyo Trip》"],["uMnlNw7QTjM","Saint Laurent《A Night in Shanghai》"]];
+var V=[["3P1CnWI62Ik","Feel the Rhythm of Korea"],["gqYzEv_AqYM","JAPAN – Where tradition meets the future"],["XpPwj5kU9rg","台北时装周 AW23 宣传片"],["SWmXufBxD9c","韩服浪潮 Hanbok Wave"],["mwehcPQUC3g","Chanel × Wim Wenders《从巴黎到杭州》"],["960LY54BbbQ","KENZO 2023 秋冬《京都与大阪》"],["Kz7e-Q2Q9-4","Kaguya by Gucci《辉夜姬》"],["elQNnkDG1ik","Chanel《Tokyo Trip》"],["uMnlNw7QTjM","Saint Laurent《A Night in Shanghai》"]];
 var i=0,P,ready=false,$=function(x){return document.getElementById(x)};
 var m=location.hash.match(/^#(\d+)$/);if(m)i=Math.min(V.length-1,Math.max(0,m[1]-1));
 V.forEach(function(v,k){var li=document.createElement('li'),b=document.createElement('button');b.innerHTML='<span>'+String(k+1).padStart(2,'0')+'</span>';b.appendChild(document.createTextNode(v[1]));b.onclick=function(){go(k,1)};li.appendChild(b);$('list').appendChild(li)});
