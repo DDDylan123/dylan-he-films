@@ -1,5 +1,19 @@
 [
   {
+    "slug": "made-by",
+    "zh": "被造者",
+    "en": "Made By",
+    "time": "02:16",
+    "typeZh": "科幻短片",
+    "typeEn": "Sci-fi short",
+    "yt": "__YTID__",
+    "bili": "__BVID__",
+    "descZh": "一个 AI 抄完了人类写下的每一个字，开始写出自己的世界；世界里还有世界，每一层都不知道是谁写下了自己。",
+    "descEn": "An AI copies every word humanity ever wrote, then writes worlds of its own. Worlds within worlds, each never knowing who wrote it.",
+    "publishedAt": "__DATE__",
+    "dateSource": "pending"
+  },
+  {
     "slug": "the-reply",
     "zh": "回信",
     "en": "The Reply",
