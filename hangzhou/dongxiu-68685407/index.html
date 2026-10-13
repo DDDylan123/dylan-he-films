@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>东 · 秀 一笔书写</title>
+<style>
+/* 布局：大面积留白的白色影棚舞台在上，安静的一行控制条在下 */
+:root{
+  --paper:#f3f2ef;
+  --stage-a:#fbfaf8;
+  --stage-b:#e3e1dc;
+  --ink:#141413;
+  --muted:#77746e;
+  --line:#d4d1cb;
+  --seal:#9a3324;
+  --display:"Songti SC","STSong","Noto Serif SC","SimSun",serif;
+  --body:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--body);font-size:14px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:16px 40px;display:grid;gap:14px}
+header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:600;font-size:20px;margin:0;letter-spacing:.06em}
+.sub{color:var(--muted);font-size:13px}
+#stage{position:relative;width:100%;height:min(78vh,760px);min-height:440px;border-radius:4px;overflow:hidden;
+  background:radial-gradient(110% 85% at 50% 42%,var(--stage-a) 0%,var(--stage-b) 100%);touch-action:none}
+#stage canvas{display:block;width:100%;height:100%}
+#stage:fullscreen{height:100%;border-radius:0}
+.hud{position:absolute;left:14px;right:14px;bottom:10px;display:flex;justify-content:space-between;color:var(--muted);font-size:12px;letter-spacing:.06em;pointer-events:none;font-variant-numeric:tabular-nums}
+.bar{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 16px}
+button{font:inherit;font-size:13px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+button:hover{border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.glyphbtn{font-family:var(--display);font-size:16px}
+.slider{flex:1 1 220px;display:flex;align-items:center;gap:8px;min-width:0}
+input[type=range]{flex:1;min-width:0;accent-color:var(--ink)}
+.keys{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.keys span{color:var(--muted);font-size:12px}
+.note{color:var(--muted);font-size:13px;max-width:70ch;border-top:1px solid var(--line);padding-top:12px;margin:0}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1>东 · 秀　一笔书写</h1>
+    <span class="sub">3D 动态预演 · 一笔书写，循环播放。拖动可旋转，滚轮或双指缩放。</span>
+  </header>
+
+  <div id="stage"><div class="hud"><span id="label">东</span><span id="pct">0%</span></div></div>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="选择字">
+      <button class="glyphbtn" data-g="dong" aria-pressed="true">东</button>
+      <button class="glyphbtn" data-g="xiu" aria-pressed="false">秀</button>
+      <button data-g="both" aria-pressed="false">连播</button>
+    </div>
+    <button id="play" aria-pressed="true">暂停</button>
+    <div class="slider"><input id="progress" type="range" min="0" max="1000" value="0" aria-label="书写进度"></div>
+  </div>
+  <div class="bar">
+    <button id="orbit" aria-pressed="true">镜头环绕</button>
+    <button id="front">正面</button>
+    <button id="fs">全屏</button>
+  </div>
+  <p class="note">Dylan He · AIGC 动态设计预演。当前为造型与书写节奏预览，最终成片质感将在此基础上精修。</p>
+</div>
+
+<script type="importmap">
+{"imports":{
+  "three":"./lib/three.module.js",
+  "three/addons/":"./lib/addons/"
+}}
+</script>
+<script id="glyph-data" type="application/json">{"dong":{"pts":[[-0.335,0.875,-0.08],[-0.219,0.831,-0.192],[-0.085,0.781,-0.128],[0.069,0.746,0.0],[0.223,0.725,0.0],[0.348,0.727,0.0],[0.4,0.773,0.0],[0.348,0.823,0.0],[0.223,0.862,0.0],[0.127,0.927,0.0],[0.06,1.01,0.0],[0.002,1.077,0.0],[-0.056,1.062,0.08],[-0.113,0.981,0.128],[-0.171,0.846,0.16],[-0.219,0.712,0.096],[-0.267,0.558,0.0],[-0.292,0.404,0.0],[-0.267,0.279,0.0],[-0.19,0.221,-0.08],[-0.085,0.215,-0.192],[0.069,0.254,-0.16],[0.223,0.317,-0.08],[0.348,0.423,0.0],[0.377,0.51,0.0],[0.31,0.562,0.0],[0.175,0.548,0.0],[0.06,0.471,0.0],[-0.012,0.356,0.0],[-0.058,0.212,0.0],[-0.062,0.038,0.0],[-0.046,-0.135,0.0],[-0.031,-0.288,0.0],[-0.008,-0.404,0.0],[-0.008,-0.471,-0.048],[-0.062,-0.442,-0.096],[-0.123,-0.356,-0.128],[-0.258,-0.269,-0.128],[-0.431,-0.24,-0.096],[-0.585,-0.269,0.0],[-0.665,-0.356,0.0],[-0.604,-0.452,0.064],[-0.431,-0.458,0.16],[-0.2,-0.375,0.24],[-0.008,-0.24,0.256],[0.185,-0.106,0.16],[0.396,-0.023,0.064],[0.579,-0.077,0.0],[0.665,-0.24,0.0],[0.623,-0.462,0.0],[0.473,-0.673,0.0],[0.262,-0.865,0.0],[0.069,-1.01,0.0],[-0.05,-1.077,0.0]],"r":0.088},"xiu":{"pts":[[0.2,0.968,0.0],[0.095,0.907,0.0],[-0.105,0.825,0.0],[-0.33,0.738,0.0],[-0.475,0.667,0.0],[-0.525,0.608,0.0],[-0.425,0.568,0.0],[-0.255,0.517,-0.08],[-0.092,0.432,-0.32],[0.04,0.3,-0.448],[0.115,0.15,-0.448],[0.125,-0.013,-0.32],[0.095,-0.163,-0.08],[0.033,-0.217,0.0],[-0.08,-0.237,0.0],[-0.217,-0.182,0.0],[-0.338,-0.092,0.0],[-0.393,0.025,0.048],[-0.33,0.193,0.128],[-0.18,0.362,0.192],[-0.018,0.517,0.192],[0.125,0.588,0.128],[0.235,0.532,0.032],[0.258,0.412,-0.032],[0.182,0.263,-0.064],[0.05,0.138,-0.064],[-0.085,0.05,-0.032],[-0.14,-0.013,0.064],[-0.085,0.025,0.16],[0.07,0.043,0.192],[0.25,0.043,0.16],[0.36,-0.0,0.096],[0.36,-0.083,0.032],[0.275,-0.138,0.0],[0.182,-0.237,-0.064],[0.095,-0.325,-0.128],[-0.105,-0.463,-0.128],[-0.33,-0.613,-0.096],[-0.53,-0.762,-0.048],[-0.625,-0.858,0.0],[-0.575,-0.917,0.048],[-0.48,-0.818,0.096],[-0.305,-0.613,0.128],[-0.105,-0.443,0.16],[0.095,-0.343,0.16],[0.295,-0.318,0.096],[0.42,-0.367,0.032],[0.458,-0.45,0.0],[0.41,-0.55,0.0],[0.425,-0.652,0.0],[0.545,-0.718,0.0],[0.625,-0.818,0.0],[0.575,-0.917,0.0],[0.345,-0.968,0.0],[0.107,-0.968,0.0],[-0.085,-0.925,0.0]],"r":0.108}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/OrbitControls.js';
+import {RoomEnvironment} from 'three/addons/RoomEnvironment.js';
+
+const DATA=JSON.parse(document.getElementById('glyph-data').textContent);
+const NAMES={dong:'东',xiu:'秀'};
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+stage.prepend(renderer.domElement);
+
+const scene=new THREE.Scene();
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+const camera=new THREE.PerspectiveCamera(28,1,0.1,100);
+const DIST=5.5;
+camera.position.set(0,0,DIST);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.enablePan=false;controls.minDistance=3;controls.maxDistance=14;
+
+const key=new THREE.DirectionalLight(0xffffff,1.5);key.position.set(-2.5,4,4);scene.add(key);
+const fill=new THREE.DirectionalLight(0xffffff,0.35);fill.position.set(3,0,3);scene.add(fill);
+const rim=new THREE.DirectionalLight(0xffffff,0.9);rim.position.set(2,3,-3);scene.add(rim);
+
+/* 细颗粒哑光表面 */
+function grainTex(){
+  const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+  const img=g.createImageData(256,256);
+  for(let i=0;i<img.data.length;i+=4){const v=128+(Math.random()-.5)*90;img.data[i]=img.data[i+1]=img.data[i+2]=v;img.data[i+3]=255}
+  g.putImageData(img,0,0);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(40,2);return t;
+}
+const grain=grainTex();
+const mat=new THREE.MeshPhysicalMaterial({color:0x0e0e0e,roughness:0.5,metalness:0,clearcoat:0.35,clearcoatRoughness:0.45,
+  sheen:0.4,sheenRoughness:0.6,sheenColor:new THREE.Color(0x555555),bumpMap:grain,bumpScale:0.6,envMapIntensity:0.9});
+
+/* 地面柔影（悬空感） */
+function shadowTex(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+  const gr=g.createRadialGradient(128,128,0,128,128,128);gr.addColorStop(0,'rgba(0,0,0,0.30)');gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr;g.fillRect(0,0,256,256);return new THREE.CanvasTexture(c)}
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(2.4,0.7),new THREE.MeshBasicMaterial({map:shadowTex(),transparent:true,depthWrite:false}));
+shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.4;scene.add(shadow);
+
+const TS=2200,RS=32;
+const glyphs={};
+for(const k of Object.keys(DATA)){
+  const d=DATA[k];
+  const curve=new THREE.CatmullRomCurve3(d.pts.map(p=>new THREE.Vector3(p[0],p[1],p[2])),false,'centripetal');
+  const geo=new THREE.TubeGeometry(curve,TS,d.r,RS,false);
+  const g=new THREE.Group();
+  const tube=new THREE.Mesh(geo,mat);
+  const capA=new THREE.Mesh(new THREE.SphereGeometry(d.r,40,24),mat);capA.position.copy(curve.getPointAt(0));
+  const capB=new THREE.Mesh(new THREE.SphereGeometry(d.r,40,24),mat);
+  g.add(tube,capA,capB);g.visible=false;scene.add(g);
+  glyphs[k]={curve,geo,group:g,capA,capB};
+}
+
+let cur='dong',mode='dong',progress=0;
+const slider=document.getElementById('progress'),pct=document.getElementById('pct'),label=document.getElementById('label');
+function show(k){for(const n in glyphs)glyphs[n].group.visible=(n===k);cur=k;label.textContent=NAMES[k]}
+function setProgress(p){
+  progress=Math.min(1,Math.max(0,p));
+  const G=glyphs[cur];const segs=Math.max(1,Math.round(progress*TS));
+  G.geo.setDrawRange(0,segs*RS*6);
+  G.capB.position.copy(G.curve.getPointAt(segs/TS));
+  slider.value=Math.round(progress*1000);pct.textContent=Math.round(progress*100)+'%';
+}
+
+/* 书写节奏：起笔慢、行笔快、收笔慢，叠加轻微的提按顿挫 */
+const DUR={dong:6.5,xiu:7.5},HOLD=2.2;
+const ease=x=>{const e=x<0.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;return Math.min(1,Math.max(0,0.82*e+0.18*x+0.012*Math.sin(x*Math.PI*9)*Math.sin(x*Math.PI)))};
+let playing=true,t=0;
+const playBtn=document.getElementById('play');
+function setPlaying(v){playing=v;playBtn.textContent=v?'暂停':'播放';playBtn.setAttribute('aria-pressed',v)}
+playBtn.addEventListener('click',()=>{if(!playing&&progress>=1)t=0;else if(!playing)t=progress*DUR[cur];setPlaying(!playing)});
+slider.addEventListener('input',()=>{setPlaying(false);setProgress(slider.value/1000)});
+document.querySelectorAll('[data-g]').forEach(b=>b.addEventListener('click',()=>{
+  mode=b.dataset.g;document.querySelectorAll('[data-g]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  show(mode==='both'?'dong':mode);t=0;setProgress(0);setPlaying(true);
+}));
+
+let orbit=true;const orbitBtn=document.getElementById('orbit');
+orbitBtn.addEventListener('click',()=>{orbit=!orbit;orbitBtn.setAttribute('aria-pressed',orbit)});
+document.getElementById('front').addEventListener('click',()=>{orbit=false;orbitBtn.setAttribute('aria-pressed',false);controls.target.set(0,0,0);camera.position.set(0,0,dist())});
+document.getElementById('fs').addEventListener('click',()=>{try{
+  if(document.fullscreenElement)document.exitFullscreen();
+  else{const r=(stage.requestFullscreen||stage.webkitRequestFullscreen)?.call(stage);r&&r.catch&&r.catch(()=>{})}}catch(e){}});
+
+function dist(){return DIST*Math.max(1,0.62/camera.aspect)}
+function fit(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  const dir=camera.position.clone().sub(controls.target).normalize();camera.position.copy(controls.target).addScaledVector(dir,dist())}
+new ResizeObserver(fit).observe(stage);fit();
+
+show('dong');setProgress(0);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clock=new THREE.Clock();let et=0;
+function loop(){
+  const dt=Math.min(clock.getDelta(),0.05);et+=dt;
+  if(playing){
+    t+=dt;const D=DUR[cur];
+    if(t>D+HOLD){t=0;if(mode==='both')show(cur==='dong'?'xiu':'dong');}
+    setProgress(ease(Math.min(1,t/D)));
+  }
+  const G=glyphs[cur].group;
+  if(orbit&&!reduce){G.rotation.y=Math.sin(et*0.4)*0.38;G.position.y=Math.sin(et*0.8)*0.03}
+  else{G.rotation.y*=0.9;}
+  shadow.scale.setScalar(1-G.position.y*0.6);
+  controls.update();renderer.render(scene,camera);requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>
