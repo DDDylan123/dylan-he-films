@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>豆豆 · 遛狗小狗原型</title>
+<style>
+:root{--ink:#2A2622;--paper:#FFFCF4;--bg:#F3EDE0;--muted:#5A5650}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif}
+.hand{font-family:"Hannotate SC","HanziPen SC","Kaiti SC","STKaiti","KaiTi",cursive}
+.wrap{max-width:1280px;margin:0 auto;padding:40px 48px;display:flex;gap:40px;flex-wrap:wrap}
+.stage{flex:999 1 560px;min-width:0;min-height:640px;background:var(--paper);border:3px solid var(--ink);border-radius:30px 26px 32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:120px 24px 44px;position:relative;overflow:hidden}
+.bubble{position:absolute;top:32px;left:32px;background:#fff;border:2.5px solid var(--ink);border-radius:22px 18px 24px 16px;padding:12px 20px;font-size:28px;line-height:1.3}
+.meta{position:absolute;top:36px;right:36px;font-size:14px;color:var(--muted);text-align:right;line-height:1.6}
+.meta b{display:block;font-size:22px;color:var(--ink)}
+.side{flex:1 1 340px;max-width:400px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-size:44px;font-weight:400;line-height:1.1}
+.sub{font-size:15px;color:var(--muted);margin-top:6px;line-height:1.6}
+.lbl{font-size:14px;font-weight:700;margin-bottom:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+button{font:inherit;color:var(--ink);background:var(--paper);border:2.5px solid var(--ink);border-radius:15px 12px 16px 11px;cursor:pointer;min-height:56px;padding:6px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;-webkit-tap-highlight-color:transparent}
+button.on{background:var(--ink);color:var(--paper)}
+.br{align-items:center}
+.br .n{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700}
+.br .sw{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);flex:0 0 auto}
+.br .s{font-size:12px;opacity:.8}
+.ac{text-align:left;align-items:flex-start;padding:8px 14px}
+.ac .n{font-size:17px;font-weight:700}
+.ac .s{font-size:12px;opacity:.85;line-height:1.4}
+.note{border-top:2px dashed #B8B0A2;padding-top:14px;font-size:13px;line-height:1.7;color:#3D3A35}
+.foot{max-width:1280px;margin:0 auto;padding:0 48px 32px;font-size:12px;color:var(--muted)}
+.ground{width:100%;height:3px;margin-top:-6px;background-image:repeating-linear-gradient(90deg,var(--ink) 0 18px,transparent 18px 42px);background-size:42px 3px;background-repeat:repeat-x}
+svg.dog{max-width:100%;height:auto;transition:width .3s}
+.dog path,.dog ellipse,.dog circle,.dog g{transform-box:fill-box}
+.leg{transform-origin:50% 0%}.tail{transform-origin:0% 100%}
+.head{transform-origin:85% 80%;transition:transform .35s}
+.fhead{transform-origin:50% 95%}
+.eye{transform-origin:50% 50%;animation:blink 3.6s ease-in-out infinite}
+.nose{transform-origin:50% 50%}
+.body-all,.front-all{transform-origin:50% 100%}
+.leash{opacity:0;transition:opacity .3s}.tongue{opacity:0}
+@keyframes wag{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(16deg)}}
+@keyframes slowwag{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(16deg)}80%{transform:rotate(-6deg)}90%{transform:rotate(12deg)}}
+@keyframes stepA{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-18deg)}}
+@keyframes stepB{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(18deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}15%{transform:translateY(0) scale(1.04,.95)}45%,55%{transform:translateY(-16px) scale(.98,1.03)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,.975)}}
+@keyframes sniffn{0%,100%{transform:translate(0,0)}50%{transform:translate(-1.5px,1.2px)}}
+@keyframes tilt{0%,60%,100%{transform:rotate(0)}70%,88%{transform:rotate(-10deg)}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.12)}}
+@keyframes groundmove{from{background-position:0 0}to{background-position:42px 0}}
+.st-idle .tail{animation:wag .35s ease-in-out infinite}
+.st-idle .front-all{animation:hop .7s ease-in-out infinite}
+.st-idle .tongue{opacity:1}
+.st-walk .legA{animation:stepA .56s ease-in-out infinite}.st-walk .legB{animation:stepB .56s ease-in-out infinite}
+.st-walk .tail{animation:wag .56s ease-in-out infinite}.st-walk .body-all{animation:bob .28s ease-in-out infinite}
+.st-walk .ground{animation:groundmove .9s linear infinite}
+.st-run .legA{animation:stepA .3s ease-in-out infinite}.st-run .legB{animation:stepB .3s ease-in-out infinite}
+.st-run .tail{animation:wag .3s ease-in-out infinite}.st-run .body-all{animation:bob .15s ease-in-out infinite}
+.st-run .ground{animation:groundmove .38s linear infinite}
+.st-sniff .head{transform:rotate(-17deg)}.st-sniff .nose{animation:sniffn .2s ease-in-out infinite}
+.st-sniff .tail{animation:wag .75s ease-in-out infinite}
+.st-walk .leash,.st-run .leash,.st-sniff .leash{opacity:1}
+.st-sit .tail{animation:wag .9s ease-in-out infinite}.st-sit .fhead{animation:tilt 3.4s ease-in-out infinite}
+.st-sit .front-all{animation:breathe 2.6s ease-in-out infinite}
+.st-wait .tail{animation:slowwag 4.5s ease-in-out infinite}
+.st-wait .lie-body{animation:breathe 3.4s ease-in-out infinite;transform-origin:50% 100%}
+@media (max-width:720px){
+.wrap{padding:16px;gap:20px}
+.stage{min-height:480px;padding:100px 12px 32px}
+.bubble{top:16px;left:16px;font-size:22px}
+.meta{top:20px;right:16px}
+.side{max-width:none}
+.foot{padding:0 16px 24px}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="sketch" x="-10%" y="-10%" width="120%" height="120%">
+<feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="1" result="noise"/>
+<feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+</filter></defs></svg>
+<div class="wrap">
+<div class="stage" id="stage">
+<div class="bubble hand" id="line"></div>
+<div class="meta" id="meta"></div>
+<div id="dog"></div>
+<div class="ground"></div>
+</div>
+<div class="side">
+<div>
+<h1 class="hand">豆豆</h1>
+<div class="sub">走路 = 遛狗 · 动作原型<br>先选品种，再点动作</div>
+</div>
+<div><div class="lbl">选一只狗</div><div class="grid4" id="breeds"></div></div>
+<div><div class="lbl">动作</div><div class="grid2" id="acts"></div></div>
+<div class="note">
+<b>步频 → 动作</b><br>
+抬腕 / 打开 → 迎接（正面）<br>
+&lt; 10 步/分 持续 3 秒 → 坐下等（正面）<br>
+今天还没走 → 趴门口（正面）<br>
+10–60 → 闻一闻 · 60–140 → 走 · &gt;140 → 跑（侧面）
+</div>
+</div>
+</div>
+<div class="foot">Dylan He · 黑客松概念原型，仅供内部讨论</div>
+<script>
+const W='#FFFCF4',K='#2A2622';
+const base={white:W,patch:0,muzzle:0,blaze:0,fluff:0,ring:0,floppy:1,pointy:0,tailN:1,tailC:0,tailS:0,eye:K,legEnd:134};
+const BREEDS=[
+{id:'tianyuan',name:'田园犬',size:'中型',body:W,earL:'#D9A066',earR:W,patch:1},
+{id:'corgi',name:'柯基',size:'小型',body:'#E79A4F',earL:'#E79A4F',earR:'#E79A4F',muzzle:1,floppy:0,pointy:1,tailN:0,tailS:1,legEnd:120},
+{id:'teddy',name:'泰迪',size:'小型',body:'#A8673A',earL:'#A8673A',earR:'#A8673A',fluff:1,tailN:0,tailS:1,legEnd:126},
+{id:'bichon',name:'比熊',size:'小型',body:'#FFFFFF',earL:'#FFFFFF',earR:'#FFFFFF',fluff:1,tailN:0,tailC:1,legEnd:126},
+{id:'shiba',name:'柴犬',size:'中型',body:'#D9843F',earL:'#D9843F',earR:'#D9843F',muzzle:1,floppy:0,pointy:1,tailN:0,tailC:1},
+{id:'golden',name:'金毛',size:'大型',body:'#E3B062',earL:'#D49A45',earR:'#D49A45'},
+{id:'husky',name:'哈士奇',size:'大型',body:'#8E9399',earL:'#8E9399',earR:'#8E9399',muzzle:1,blaze:1,floppy:0,pointy:1,eye:'#3D86C6'},
+{id:'collie',name:'边牧',size:'大型',body:'#3A3634',earL:'#3A3634',earR:'#3A3634',muzzle:1,blaze:1,ring:1}
+];
+const SIZES={'小型':[380,294,360,327],'中型':[480,371,450,409],'大型':[580,448,530,482]};
+const ACTS=[
+{id:'idle',label:'迎接',sub:'正面蹦跶，吐舌头',line:'你来啦？出门吗？',view:'正面'},
+{id:'sit',label:'坐下等',sub:'正面坐好，歪头看你',line:'红灯，我等你。',view:'正面'},
+{id:'wait',label:'趴门口',sub:'下巴搭在爪子上看你',line:'……今天不出门吗？',view:'正面'},
+{id:'walk',label:'走',sub:'跟着你的步子小跑',line:'走走走！',view:'侧面'},
+{id:'run',label:'跑',sub:'你快它就撒欢',line:'冲呀——',view:'侧面'},
+{id:'sniff',label:'闻一闻',sub:'你慢下来，它低头闻',line:'这里有猫的味道…',view:'侧面'}
+];
+let S={act:'idle',breed:'tianyuan'};
+const st=(w)=>`stroke="${K}" stroke-width="${w}"`;
+function ears(b){return `
+<g opacity="${b.floppy}"><path d="M72 50 C52 46 42 72 48 94 C60 88 72 72 74 56 Z" fill="${b.earL}" ${st(4.5)} stroke-linejoin="round"/>
+<path d="M148 50 C168 46 178 72 172 94 C160 88 148 72 146 56 Z" fill="${b.earR}" ${st(4.5)} stroke-linejoin="round"/></g>
+<g opacity="${b.pointy}"><path d="M74 50 C66 32 68 16 76 8 C88 16 96 30 96 42 Z" fill="${b.earL}" ${st(4.5)} stroke-linejoin="round"/>
+<path d="M146 50 C154 32 152 16 144 8 C132 16 124 30 124 42 Z" fill="${b.earR}" ${st(4.5)} stroke-linejoin="round"/>
+<path d="M79 36 C77 28 78 22 80 18 C85 24 87 30 87 36 Z" fill="#F2B0A0" opacity=".7"/>
+<path d="M141 36 C143 28 142 22 140 18 C135 24 133 30 133 36 Z" fill="#F2B0A0" opacity=".7"/></g>
+<g opacity="${b.fluff}">${[[80,44,15],[140,44,15],[96,32,16],[124,32,16],[110,26,15]].map(c=>`<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="${b.body}" ${st(4)}/>`).join('')}</g>`}
+function frontFace(b,lie){const ey=lie?71:76,er=lie?6:5.5;return `
+<path d="M110 34 C142 34 160 56 158 80 C156 104 136 116 110 116 C84 116 64 104 62 80 C60 56 78 34 110 34 Z" fill="${b.body}" ${st(5)} stroke-linejoin="round"/>
+<path d="M104 38 C106 36 114 36 116 38 L114 80 L106 80 Z" fill="${b.white}" opacity="${b.blaze}"/>
+<ellipse cx="110" cy="97" rx="25" ry="17" fill="${b.white}" opacity="${b.muzzle}"/>
+<ellipse cx="88" cy="74" rx="15" ry="13" fill="#D9A066" opacity="${b.patch}"/>
+${lie?`<path d="M78 58 C84 54 92 55 97 59" ${st(3)} fill="none" stroke-linecap="round"/><path d="M123 59 C128 55 136 54 142 58" ${st(3)} fill="none" stroke-linecap="round"/>`:''}
+<circle cx="88" cy="${ey}" r="9.5" fill="${W}" opacity="${b.ring}"/><circle cx="132" cy="${ey}" r="9.5" fill="${W}" opacity="${b.ring}"/>
+<circle class="eye" cx="88" cy="${ey}" r="${er}" fill="${b.eye}"/><circle class="eye" cx="132" cy="${ey}" r="${er}" fill="${b.eye}"/>
+<circle cx="90" cy="${ey-2.5}" r="1.9" fill="#fff"/><circle cx="134" cy="${ey-2.5}" r="1.9" fill="#fff"/>
+${lie?'':`<path class="tongue" d="M104 100 C103 114 117 114 116 100 Z" fill="#F08A8A" ${st(3)} stroke-linejoin="round"/>`}
+<ellipse class="nose" cx="110" cy="90" rx="7.5" ry="5.5" fill="${K}"/>
+${lie?`<path d="M103 100 C106 98 114 98 117 100" ${st(3.5)} fill="none" stroke-linecap="round"/>`:`<path d="M99 98 C103 104 108 103 110 97 C112 103 117 104 121 98" ${st(3.5)} fill="none" stroke-linecap="round" stroke-linejoin="round"/>`}
+<circle cx="78" cy="97" r="7" fill="#F2B0A0" opacity=".8"/><circle cx="142" cy="97" r="7" fill="#F2B0A0" opacity=".8"/>`}
+function frontSit(b){return `<svg class="dog" viewBox="0 0 220 200" width="${b.fw}" height="${b.fh}" role="img" aria-label="小狗正面坐着看你"><g filter="url(#sketch)"><g class="front-all">
+<g opacity="${b.tailN}"><path class="tail" d="M146 162 C164 158 174 142 170 128" ${st(5)} fill="none" stroke-linecap="round"/></g>
+<g opacity="${b.tailC}"><path class="tail" d="M144 156 C152 138 174 140 172 154 C170 164 156 162 158 152" ${st(5)} fill="${b.body}" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="M74 178 C66 140 80 108 110 106 C140 108 154 140 146 178 C130 186 90 186 74 178 Z" fill="${b.body}" ${st(5)} stroke-linejoin="round"/>
+<ellipse cx="110" cy="142" rx="19" ry="26" fill="${b.white}" opacity="${b.muzzle}"/>
+<path d="M130 122 C142 128 148 142 146 156 C136 150 130 138 130 122 Z" fill="#D9A066" opacity="${b.patch}"/>
+<path d="M97 140 L96 175" ${st(5)} stroke-linecap="round"/><path d="M123 140 L124 175" ${st(5)} stroke-linecap="round"/>
+<ellipse cx="94" cy="180" rx="12" ry="6.5" fill="${b.paw}" ${st(4.5)}/><ellipse cx="126" cy="180" rx="12" ry="6.5" fill="${b.paw}" ${st(4.5)}/>
+<path d="M84 112 C98 122 122 122 136 112" stroke="#E2574C" stroke-width="7" fill="none" stroke-linecap="round"/>
+<circle cx="110" cy="125" r="5.5" fill="#E9C46A" ${st(3)}/>
+<g class="fhead">${ears(b)}${frontFace(b,false)}</g></g></g></svg>`}
+function frontLie(b){return `<svg class="dog" viewBox="0 0 220 200" width="${b.fw}" height="${b.fh}" role="img" aria-label="小狗趴着正面看你"><g filter="url(#sketch)">
+<g opacity="${b.tailN}"><path class="tail" d="M166 160 C180 154 190 142 188 128" ${st(5)} fill="none" stroke-linecap="round"/></g>
+<g opacity="${b.tailC}"><path class="tail" d="M164 154 C172 136 194 138 192 152 C190 162 176 160 178 150" ${st(5)} fill="${b.body}" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="lie-body"><path d="M50 178 C46 148 76 132 110 132 C144 132 174 148 170 178 C150 188 70 188 50 178 Z" fill="${b.body}" ${st(5)} stroke-linejoin="round"/>
+<path d="M140 138 C156 142 166 156 166 170 C154 164 144 152 140 138 Z" fill="#D9A066" opacity="${b.patch}"/></g>
+<path d="M22 192 C70 186 150 188 198 194" stroke="#3E8E85" stroke-width="4" fill="none" stroke-linecap="round"/>
+<g transform="translate(0,62)">${ears(b)}${frontFace(b,true)}</g>
+<ellipse cx="84" cy="182" rx="17" ry="8.5" fill="${b.paw}" ${st(4.5)}/><ellipse cx="136" cy="182" rx="17" ry="8.5" fill="${b.paw}" ${st(4.5)}/>
+<path d="M78 178 L78 186 M86 178 L86 186 M130 178 L130 186 M138 178 L138 186" ${st(2.5)} stroke-linecap="round"/>
+</g></svg>`}
+function side(b){const e=b.legEnd;return `<svg class="dog" viewBox="0 0 220 170" width="${b.sw}" height="${b.sh}" role="img" aria-label="小狗侧面走路"><g filter="url(#sketch)"><g transform="translate(0,${134-e})"><g class="body-all">
+<path class="leash" d="M82 94 C58 60 26 30 0 4" stroke="#3E8E85" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<g opacity="${b.tailN}"><path class="tail" d="M152 88 C166 82 172 70 166 60" ${st(5)} fill="none" stroke-linecap="round"/></g>
+<g opacity="${b.tailC}"><path class="tail" d="M150 82 C156 64 176 64 174 78 C172 88 158 86 160 76" ${st(5)} fill="${b.body}" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g opacity="${b.tailS}"><path class="tail" d="M152 86 C158 84 161 80 159 75" ${st(6)} fill="none" stroke-linecap="round"/></g>
+<path class="leg legB" d="M132 106 L133 ${e}" ${st(6)} stroke-linecap="round"/>
+<path class="leg legA" d="M145 104 L146 ${e-2}" ${st(6)} stroke-linecap="round"/>
+<path class="leg legA" d="M80 106 L79 ${e}" ${st(6)} stroke-linecap="round"/>
+<path class="leg legB" d="M94 108 L94 ${e+1}" ${st(6)} stroke-linecap="round"/>
+<path d="M66 96 C60 74 86 64 114 66 C142 68 158 80 155 98 C152 114 74 116 66 96 Z" fill="${b.body}" ${st(5)} stroke-linejoin="round"/>
+<path d="M80 100 C90 110 120 112 140 106" fill="${b.white}" opacity="${b.muzzle}"/>
+<path d="M120 70 C132 66 146 74 150 86 C138 86 126 80 120 70 Z" fill="#D9A066" opacity="${b.patch}"/>
+<path d="M76 84 C80 94 86 100 92 102" stroke="#E2574C" stroke-width="6" fill="none" stroke-linecap="round"/>
+<g class="head">
+<g opacity="${b.fluff}"><circle cx="48" cy="50" r="12" fill="${b.body}" ${st(4)}/><circle cx="66" cy="46" r="13" fill="${b.body}" ${st(4)}/><circle cx="82" cy="56" r="11" fill="${b.body}" ${st(4)}/></g>
+<g opacity="${b.pointy}"><path d="M64 52 C64 36 70 24 78 20 C84 30 84 44 80 54 Z" fill="${b.earR}" ${st(4)} stroke-linejoin="round"/></g>
+<ellipse cx="60" cy="72" rx="30" ry="26" fill="${b.body}" ${st(5)}/>
+<ellipse cx="40" cy="81" rx="13" ry="10" fill="${b.white}" opacity="${b.muzzle}"/>
+<ellipse cx="52" cy="66" rx="10" ry="9" fill="#D9A066" opacity="${b.patch}"/>
+<circle cx="50" cy="67" r="6" fill="${W}" opacity="${b.ring}"/>
+<circle class="eye" cx="50" cy="67" r="3.6" fill="${b.eye}"/>
+<ellipse class="nose" cx="31.5" cy="76" rx="4.2" ry="3.4" fill="${K}"/>
+<path d="M35 83 C38.5 86.5 42 86.5 45 83.5" ${st(3.5)} fill="none" stroke-linecap="round"/>
+<circle cx="58" cy="83" r="4.5" fill="#F2B0A0" opacity=".8"/>
+<g opacity="${b.floppy}"><path d="M68 48 C82 44 90 60 80 74 C74 68 70 58 68 48 Z" fill="${b.earL}" ${st(4)} stroke-linejoin="round"/></g>
+</g></g></g></g></svg>`}
+function render(){
+const d=BREEDS.find(x=>x.id===S.breed),b=Object.assign({},base,d),s=SIZES[b.size];
+Object.assign(b,{sw:s[0],sh:s[1],fw:s[2],fh:s[3],paw:b.muzzle?W:b.body});
+const a=ACTS.find(x=>x.id===S.act);
+document.getElementById('stage').className='stage st-'+a.id;
+document.getElementById('line').textContent=a.line;
+document.getElementById('meta').innerHTML=`${b.name} · ${b.size} · ${a.view}<b>${a.label}</b>`;
+document.getElementById('dog').innerHTML=['walk','run','sniff'].includes(a.id)?side(b):a.id==='wait'?frontLie(b):frontSit(b);
+document.getElementById('breeds').innerHTML=BREEDS.map(x=>`<button type="button" class="br${x.id===S.breed?' on':''}" data-b="${x.id}"><span class="n"><span class="sw" style="background:${x.body}"></span>${x.name}</span><span class="s">${x.size}</span></button>`).join('');
+document.getElementById('acts').innerHTML=ACTS.map(x=>`<button type="button" class="ac${x.id===S.act?' on':''}" data-a="${x.id}"><span class="n">${x.label}</span><span class="s">${x.sub}</span></button>`).join('');
+}
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;if(t.dataset.b)S.breed=t.dataset.b;if(t.dataset.a)S.act=t.dataset.a;render();});
+render();
+</script>
+</body>
+</html>
