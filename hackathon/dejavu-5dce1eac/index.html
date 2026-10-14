@@ -87,7 +87,7 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 .pass .portrait{padding:10px 22px 16px;font-size:14px;line-height:1.8;color:#3b2f86}
 .pass .stampmark{position:absolute;right:18px;top:56px;transform:rotate(-12deg);border:2px solid rgba(214,150,60,.75);color:rgba(194,128,40,.9);border-radius:6px;padding:2px 8px;font-size:13px;letter-spacing:.2em}
 .pass .stub .tear{font-size:12px;letter-spacing:.2em;color:#8c80b8}
-.card{touch-action:auto;display:block;width:auto;max-width:min(400px,100%);max-height:calc(100vh - 150px);height:auto;filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));animation:rise 1.2s cubic-bezier(.2,.8,.2,1);-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
+.card{touch-action:auto;display:block;width:auto;max-width:min(400px,100%);max-height:calc(100vh - 150px);height:auto;filter:drop-shadow(0 24px 50px rgba(36,31,61,.22));animation:rise 1.2s cubic-bezier(.2,.8,.2,1);-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
 @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
 .snd{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;z-index:5;font-family:var(--serif);font-size:12px;letter-spacing:.2em;color:var(--ink-faint);background:rgba(16,13,36,.35);border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 14px;cursor:pointer;backdrop-filter:blur(6px)}
 .snd:hover{color:var(--ink)}
@@ -101,6 +101,20 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 .choose{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .ripple{position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;border:1px solid var(--ink);animation:rip 1.2s ease-out forwards;pointer-events:none}
 @keyframes rip{from{transform:scale(1);opacity:.9}to{transform:scale(9);opacity:0}}
+#wash{position:fixed;inset:0;background:#f9f7fc;opacity:0;pointer-events:none;transition:opacity 2.6s ease}
+body.paper{background:#f9f7fc;--ink:#241f3d;--ink-dim:#4a4468;--ink-faint:#8a83a6;--gold:#a9822f;--line:rgba(36,31,61,.2);--glass:rgba(36,31,61,.05);--mint:#6b5fa0;--peach:#3b2f5e}
+body.paper .big,body.paper h1,body.paper .caption,body.paper .whisper{text-shadow:none}
+body.paper .snd{background:rgba(255,255,255,.6)}
+.sum{font-size:clamp(17px,4.6vw,21px);letter-spacing:.08em;color:var(--ink-dim);font-variant-numeric:tabular-nums;min-height:1.6em}
+.sum b{font-weight:400;color:var(--gold)}
+.scale{width:min(260px,70vw);height:auto;overflow:visible}
+.scale line,.scale path{stroke:var(--ink-dim);stroke-width:1.4;fill:none;stroke-linecap:round}
+.scale .g{fill:var(--gold)}
+.scale .wt{fill:none;stroke:var(--gold);stroke-width:1.2}
+.scale text{fill:var(--gold);font-family:var(--serif);font-size:11px;text-anchor:middle;letter-spacing:.05em}
+.scale .drop{fill:var(--gold);animation:drop .5s cubic-bezier(.3,1.4,.6,1)}
+@keyframes drop{from{transform:translateY(-46px);opacity:0}to{transform:none;opacity:1}}
+.fog{position:absolute;pointer-events:none;transition:opacity 1.2s}
 .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 @media (prefers-reduced-motion:reduce){.scene{transition:none}.ring,.ring::after{animation:none}}
 </style>
@@ -108,11 +122,13 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 <body>
 
 
+<div id="wash"></div>
 <div id="fx"></div>
 <button class="snd" id="snd" type="button" aria-pressed="true">声音 · 开</button>
 <div class="stage" id="stage"></div>
 
 <script src="three.min.js"></script>
+<script src="qrcode.js"></script>
 <script>
 (() => {
 const V3=THREE.Vector3, rnd=(a,b)=>a+Math.random()*(b-a), sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -123,30 +139,31 @@ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(FOV,W/H,.05,600
 let SCALE=H*DPR/(2*Math.tan(FOV*Math.PI/360));
 
 /* ---------- sky ---------- */
-const skyU={uLight:{value:.12}};
+const skyU={uLight:{value:.12},uWhite:{value:0}};
 const sky=new THREE.Mesh(new THREE.SphereGeometry(400,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,uniforms:skyU,
  vertexShader:`varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
- fragmentShader:`uniform float uLight;varying vec3 vP;void main(){float y=vP.y;
+ fragmentShader:`uniform float uLight,uWhite;varying vec3 vP;void main(){float y=vP.y;
   vec3 top=vec3(.05,.045,.11),mid=vec3(.12,.105,.22),hor=vec3(.25,.22,.36),glow=vec3(.62,.58,.72);
   vec3 c=mix(hor,mid,smoothstep(0.,.3,y));c=mix(c,top,smoothstep(.3,.95,y));c=mix(c,vec3(.12,.09,.22),smoothstep(0.,-.35,y));
   c+=glow*.16*exp(-abs(y-.02)*12.);
-  c*=min(uLight,1.);c+=vec3(1.,.96,.9)*max(0.,uLight-1.)*(.4+.6*pow(max(y,0.),.6));gl_FragColor=vec4(c,1.);}`}));
+  c*=min(uLight,1.);c+=vec3(1.,.96,.9)*max(0.,uLight-1.)*(.4+.6*pow(max(y,0.),.6));c=mix(c,vec3(.975,.968,.988)-vec3(.03,.03,.02)*smoothstep(.2,-.3,y),uWhite);gl_FragColor=vec4(c,1.);}`}));
 scene.add(sky);
 
 /* ---------- particle groups ---------- */
-const VS=`attribute vec3 acol;attribute float asz;attribute float aph;uniform float uScale,uS,uTime,uWob,uGold,uFog;varying vec3 vC;varying float vA;
+const VS=`attribute vec3 acol;attribute float asz;attribute float aph;uniform float uScale,uS,uTime,uWob,uGold,uFog,uInk;varying vec3 vC;varying float vA;
 void main(){vec3 p=position+vec3(sin(uTime*1.3+aph*6.3),cos(uTime*1.1+aph*9.1),sin(uTime*.9+aph*4.7))*uWob;
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;float d=max(-mv.z,.05);
- gl_PointSize=min(asz*uS*uScale/d,96.);vC=mix(acol,vec3(1.,.9,.7),uGold);vA=exp(-d*uFog)*(.75+.25*sin(uTime*2.+aph*20.));}`;
+ gl_PointSize=min(asz*uS*uScale/d,96.);vC=mix(mix(acol,vec3(1.,.9,.7),uGold),mix(vec3(.2,.17,.33)+(1.-acol)*.25,vec3(.66,.5,.2),uGold),uInk);vA=exp(-d*uFog)*(.75+.25*sin(uTime*2.+aph*20.));}`;
 const FS=`uniform float uOp;varying vec3 vC;varying float vA;void main(){vec2 c=gl_PointCoord-.5;float r=length(c);if(r>.5)discard;float a=1.-r*2.;a=a*a;gl_FragColor=vec4(vC,a*uOp*vA);}`;
-const ALL=[];let TIME=0;
+const ALL=[];let TIME=0,INK=0;
+function inkMode(){INK=1;ALL.forEach(g=>{g.u.uInk.value=1;g.pts.material.blending=THREE.NormalBlending;g.pts.material.needsUpdate=true;});skyU.uWhite.value=1;document.body.classList.add('paper');}
 class PG{
   constructor(cap,parent=scene){this.cap=cap;this.pos=new Float32Array(cap*3);this.tgt=new Float32Array(cap*3);this.col=new Float32Array(cap*3);this.sz=new Float32Array(cap);this.ph=new Float32Array(cap);this.sp=new Float32Array(cap);
     for(let i=0;i<cap;i++){this.ph[i]=Math.random();this.sp[i]=Math.random();}
     const g=new THREE.BufferGeometry();this.aPos=new THREE.BufferAttribute(this.pos,3).setUsage(THREE.DynamicDrawUsage);
     g.setAttribute('position',this.aPos);this.aCol=new THREE.BufferAttribute(this.col,3);g.setAttribute('acol',this.aCol);this.aSz=new THREE.BufferAttribute(this.sz,1);g.setAttribute('asz',this.aSz);g.setAttribute('aph',new THREE.BufferAttribute(this.ph,1));g.setDrawRange(0,0);
-    this.u={uScale:{value:SCALE},uS:{value:1},uTime:{value:0},uWob:{value:.006},uGold:{value:0},uFog:{value:.018},uOp:{value:0}};
-    this.pts=new THREE.Points(g,new THREE.ShaderMaterial({uniforms:this.u,vertexShader:VS,fragmentShader:FS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+    this.u={uScale:{value:SCALE},uS:{value:1},uTime:{value:0},uWob:{value:.006},uGold:{value:0},uFog:{value:.018},uOp:{value:0},uInk:{value:INK}};
+    this.pts=new THREE.Points(g,new THREE.ShaderMaterial({uniforms:this.u,vertexShader:VS,fragmentShader:FS,transparent:true,depthWrite:false,blending:INK>.5?THREE.NormalBlending:THREE.AdditiveBlending}));
     this.pts.frustumCulled=false;this.obj=new THREE.Group();this.obj.add(this.pts);parent.add(this.obj);
     this.n=0;this.tp=null;this.ts=null;this.op=0;this.top=1;this.gold=0;this.tgold=0;this.moving=false;this.k=2.4;this.pk=3;ALL.push(this);}
   shape(pts,spawn){const nn=pts.length;if(!nn)return this;const n=Math.min(this.cap,Math.max(nn,this.n));
@@ -290,7 +307,7 @@ const pick1=a=>a[Math.random()*a.length|0];
 const [DEST,DEST_E]=pick1(DESTS);
 const FLIGHT='DV-'+Math.floor(1000+Math.random()*9000),SEAT=Math.floor(1+Math.random()*80)+'ABCDEF'[Math.random()*6|0];
 const sampleP=window.claude?.use?window.claude.use('sample'):Promise.resolve(null);
-const items=[];let hidden=-1,scanP=null,totalG=0,resultP=null,result=null,destG=null,skyT=.12;
+const items=[];let hidden=-1,scanData=null,scanP=null,totalG=0,resultP=null,result=null,destG=null,skyT=.12;
 async function emojiFor(text){const s=await sampleP;
   if(s){try{const r=await s.json(`为下面这件东西挑一个外形最能代表它的单个 emoji。抽象的味道、声音、瞬间或人，挑最能让人联想到它的画面。只回复 JSON：{"e":"🐈"}\n东西：${text}`,{modelTier:'quick'});
     const e=String(r?.e||'').trim();if(e&&e.length<=8&&/\p{Extended_Pictographic}/u.test(e))return e;}catch(e){}}
@@ -345,7 +362,7 @@ async function deskScene(){
   const say=async(a,b2,ms)=>{const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${a}</div>${b2?`<div class="desk">${b2}</div>`:''}`;const off=follow(b,attendant.obj);tone(740,0,.8,.05);await sleep(ms);off();};
   const el=show(`<button class="btn ghost" id="skip">跳过</button>`,'bottom');let skip=false;el.querySelector('#skip').onclick=()=>{skip=true;};
   const wait=async ms=>{const t=performance.now();while(!skip&&performance.now()-t<ms)await sleep(80);};
-  let b=document.createElement('div');b.className='bubble';b.innerHTML='<div>您好，请出示这辈子。</div>';let off=follow(b,attendant.obj);tone(740,0,.8,.05);await wait(2000);off();
+  let b=document.createElement('div');b.className='bubble';b.innerHTML='<div>您好，欢迎来到转世柜台。</div>';let off=follow(b,attendant.obj);tone(740,0,.8,.05);await wait(2000);off();
   b=document.createElement('div');b.className='bubble';b.innerHTML='<div>请申报<b style="color:var(--gold)">五件「免洗」行李</b>。</div><div class="desk">汤洗不掉它们。下辈子，你会莫名地喜欢它们。</div>';off=follow(b,attendant.obj);tone(784,0,.8,.05);
   for(let i=0;i<5;i++){slots[i].obj.position.copy(trayPos(i));slots[i].obj.scale.setScalar(slotSize());slots[i].top=1;const t=document.createElement('div');t.className='tag';t.textContent='免洗';t.dataset.below='1';t.style.color='var(--gold)';slots[i].tagOff=follow(t,slots[i].obj);tone(880+i*110,0,.6,.03);await sleep(skip?60:280);}
   await wait(3600);off();declare(0);
@@ -395,8 +412,8 @@ function security(){
   vline.at(0,FY+FH/2,-D+.01);vline.top=0;vline.u.uFog.value=0;vline.u.uWob.value=.001;
   const hline=new PG(160,camera);{const o=[];for(let k=0;k<160;k++)o.push([rnd(-FW/2,FW/2),rnd(-.006,.006),0,1,.95,.85,.03]);hline.shape(o);}
   hline.at(0,FY-FH/2,-D+.01);hline.top=0;hline.u.uFog.value=0;hline.u.uWob.value=.001;
-  const GEST=[['wipe','用手指擦开上面的雾'],['ripple','轻点三下，敲出波纹'],['xray','按住，从上往下扫过去'],['hold','按住不放，让时间慢下来'],['lift','从下往上，把它托起来']];
-  let cur=null,busy=false,done=0,data=null,finishing=false,down=false,rv=null,cnt=0,S=1,G='',scanX=0,level=0,lastY=0,holdR=0,taps=0,ringOff=null,raf=0;
+  const GEST=[['wipe','用手指，擦开这层雾'],['ripple','轻点三下，听它的回声'],['xray','按住，从上往下扫过去'],['hold','按住不放，让时间慢下来'],['lift','从下往上，把它托起来']];
+  let liftO=null,liftG=null;let cur=null,busy=false,done=0,data=null,finishing=false,down=false,rv=null,cnt=0,S=1,G='',scanX=0,level=0,lastY=0,holdR=0,taps=0,ringOff=null,raf=0;
   const next=()=>{const it=items.find(it=>!it.passed);cueOn(it&&!busy?it.g:null);};setTimeout(next,1400);
   const toCam=p=>({x:((p.x/W)*2-1)*hw,y:(1-(p.y/H)*2)*hh-FY});
   const reveal=pred=>{if(!cur||finishing)return;const g=cur.g,A=cur.A,B=cur.B;let ch=false;
@@ -405,41 +422,91 @@ function security(){
     if(cnt>=g.n*.9&&!cur.full){cur.full=true;reveal(()=>true);finishScan();}};
   const ringAt=(obj,dy=0)=>{if(ringOff)ringOff();const r=document.createElement('div');r.className='ring';ringOff=follow(r,obj,dy);};
   const ripple=p=>{const d=document.createElement('div');d.className='ripple';d.style.left=p.x+'px';d.style.top=p.y+'px';fx.appendChild(d);setTimeout(()=>d.remove(),1300);};
+  const rect=()=>{const cx0=W/2,cy0=H/2-FY*PX;return{x:cx0-FW*PX/2,y:cy0-FH*PX/2,w:FW*PX,h:FH*PX};};
+  const ov=document.createElement('canvas');ov.className='fog';{const R=rect();Object.assign(ov.style,{left:R.x+'px',top:R.y+'px',width:R.w+'px',height:R.h+'px'});ov.width=R.w*DPR;ov.height=R.h*DPR;}fx.appendChild(ov);const oc=ov.getContext('2d');oc.scale(DPR,DPR);
+  let fogOn=false;
+  const fogFill=()=>{const R=rect();oc.clearRect(0,0,R.w,R.h);oc.globalCompositeOperation='source-over';oc.fillStyle='rgba(206,200,226,.82)';oc.fillRect(0,0,R.w,R.h);
+    for(let k=0;k<140;k++){const x=rnd(0,R.w),y=rnd(0,R.h),rr=rnd(20,70),gg=oc.createRadialGradient(x,y,0,x,y,rr);gg.addColorStop(0,`rgba(245,242,252,${rnd(.15,.35)})`);gg.addColorStop(1,'rgba(245,242,252,0)');oc.fillStyle=gg;oc.beginPath();oc.arc(x,y,rr,0,6.283);oc.fill();}
+    ov.style.opacity=1;fogOn=true;};
+  const fogWipe=p=>{const R=rect(),x=p.x-R.x,y=p.y-R.y,rr=FW*.17*PX,gg=oc.createRadialGradient(x,y,0,x,y,rr);gg.addColorStop(0,'rgba(0,0,0,1)');gg.addColorStop(.6,'rgba(0,0,0,.8)');gg.addColorStop(1,'rgba(0,0,0,0)');
+    oc.globalCompositeOperation='destination-out';oc.fillStyle=gg;oc.beginPath();oc.arc(x,y,rr,0,6.283);oc.fill();oc.globalCompositeOperation='source-over';};
+  const waves=[];let wRaf=0;
+  const drawWaves=()=>{const R=rect();if(!fogOn)oc.clearRect(0,0,R.w,R.h);const now=performance.now();
+    for(let k=waves.length-1;k>=0;k--){const w=waves[k],t=(now-w.t)/1400;if(t>1){waves.splice(k,1);continue;}
+      for(let j=0;j<5;j++){const rr=Math.max(0,(t*1.15-j*.07))*R.w*.75;if(rr<=0)continue;oc.strokeStyle=`rgba(236,232,250,${(1-t)*(.55-j*.09)})`;oc.lineWidth=2.2-j*.3;oc.beginPath();
+        for(let a=0;a<=64;a++){const th=a/64*6.283,wob=Math.sin(th*10+now/90)*3*(1-t);const px=w.x+Math.cos(th)*(rr+wob),py=w.y+Math.sin(th)*(rr+wob);a?oc.lineTo(px,py):oc.moveTo(px,py);}oc.stroke();}}
+    if(waves.length)wRaf=requestAnimationFrame(drawWaves);else oc.clearRect(0,0,R.w,R.h);};
+  const sonar=(p,c)=>{const R=rect();waves.push({x:p.x-R.x,y:p.y-R.y,t:performance.now()});cancelAnimationFrame(wRaf);drawWaves();
+    const a=ac();if(a){const t=a.currentTime,o=a.createOscillator(),g2=a.createGain();o.type='sine';o.frequency.setValueAtTime(Hz(1)*(1+taps*.125),t);o.frequency.exponentialRampToValueAtTime(Hz(1/2),t+1.2);g2.gain.setValueAtTime(0,t);g2.gain.linearRampToValueAtTime(.08,t+.01);g2.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g2);g2.connect(out());const rv2=rev();if(rv2)g2.connect(rv2);o.start(t);o.stop(t+1.7);tone(108,0,1.2,.06);}
+    // push particles outward as the wave front passes
+    const g=cur.g,st=performance.now(),lx=c.x/S,ly=c.y/S;const push=now=>{const u=(now-st)/1100;if(u>1||!cur)return;const rf=u*1.1;
+      for(let k=0;k<g.n;k++){const dx=g.pos[k*3]-lx,dy=g.pos[k*3+1]-ly,dd=Math.hypot(dx,dy)||1;if(Math.abs(dd-rf)<.05){g.pos[k*3]+=dx/dd*.035;g.pos[k*3+1]+=dy/dd*.035;g.pos[k*3+2]+=.04;}}g.moving=true;g.aPos.needsUpdate=true;requestAnimationFrame(push);};requestAnimationFrame(push);};
   const begin=async it=>{busy=true;cur=it;cueOn(null);const g=it.g;it.home=null;g.tp=new V3(0,FY,-D+.05);g.ts=FW*.62;S=g.ts;g.pk=3;frame.top=1;tone(Hz(5/4),0,.8,.04);
-    if(!data)data=await scanP;
+    if(!data)data=scanData=await scanP;
     const inner=glyph(data[it.i].inner,true,g.n,.05)||ball(g.n,.45,.06);
     it.A=g.tgt.slice(0,g.n*3);it.B=new Float32Array(g.n*3);for(let k=0;k<g.n;k++){const q=inner[k%inner.length];it.B[k*3]=q[0];it.B[k*3+1]=q[1];it.B[k*3+2]=q[2];}
     rv=new Uint8Array(g.n);cnt=0;G=GEST[it.i][0];hint.textContent=GEST[it.i][1];
     await sleep(700);g.u.uGold.value=0;
     if(G==='xray'){scanX=FH/2+.04;vline.obj.position.y=FY+scanX;vline.top=1;ringAt(vline.obj);}
-    else if(G==='lift'){level=-FH/2-.04;hline.obj.position.y=FY+level;hline.top=1;ringAt(hline.obj);}
+    else if(G==='lift'){level=-FH/2-.04;hline.obj.position.y=FY+level;hline.top=1;hline.tgold=1;ringAt(hline.obj);mood('hide');skyT=.7;
+      hint.innerHTML='最后一件，是一个人。<br>从下往上，慢慢把 TA 托起来';
+      const a=ac();if(a){liftO=a.createOscillator();liftG=a.createGain();liftO.type='sine';liftO.frequency.value=Hz(1/2);liftG.gain.value=0;liftO.connect(liftG);liftG.connect(out());const rv3=rev();if(rv3)liftG.connect(rv3);liftO.start();}}
     else{ringAt(frame.obj,-FY*PX);}
-    if(G==='wipe'){g.top=.45;}
+    if(G==='wipe'){fogFill();}
     holdR=0;taps=0;it.ready=true;
     const loop=()=>{if(!cur||finishing)return;if(G==='hold'&&down){holdR+=.016*FW*.32;const r2=holdR*holdR;reveal((x,y)=>x*x+y*y<r2);}raf=requestAnimationFrame(loop);};loop();
     MODE=p=>{if(!cur||finishing)return;down=true;const c=toCam(p);if(ringOff&&G!=='xray'&&G!=='lift'){ringOff();ringOff=null;}
-      if(G==='wipe'){reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<(FW*.17)**2);}
-      else if(G==='ripple'){taps++;ripple(p);tone(Hz(PENT[taps%5]),0,2.4,.04);const R=taps>=3?FW*1.4:FW*.42,st=performance.now();
+      if(G==='wipe'){fogWipe(p);reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<(FW*.17)**2);}
+      else if(G==='ripple'){taps++;sonar(p,c);const R=taps>=3?FW*1.4:FW*.42,st=performance.now();
         const grow=now=>{const u=Math.min(1,(now-st)/900),r=R*u;reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<r*r);if(u<1&&cur&&!finishing)requestAnimationFrame(grow);};requestAnimationFrame(grow);}
       else if(G==='xray'){lastY=p.y;}
       else if(G==='hold'){mood('hide');}
       else if(G==='lift'){lastY=p.y;}};
     MOVE=p=>{if(!down||!cur||finishing)return;const c=toCam(p);
-      if(G==='wipe'){if(cur.g.top<1)cur.g.top=Math.min(1,cur.g.top+.01);reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<(FW*.17)**2);}
+      if(G==='wipe'){fogWipe(p);reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<(FW*.17)**2);}
       else if(G==='xray'){const dy=(p.y-lastY)/PX;lastY=p.y;if(dy>0){scanX=Math.max(-FH/2-.05,scanX-dy);vline.obj.position.y=FY+scanX;reveal((x,y)=>y>scanX);}}
-      else if(G==='lift'){const dy=(lastY-p.y)/PX;lastY=p.y;if(dy>0){level=Math.min(FH/2+.05,level+dy);hline.obj.position.y=FY+level;reveal((x,y)=>y<level);}}};
-    UP=()=>{down=false;if(G==='hold')mood('scan');};};
-  const finishScan=async()=>{if(finishing)return;finishing=true;down=false;MODE=MOVE=UP=null;cancelAnimationFrame(raf);const it=cur,g=it.g;g.top=1;if(ringOff){ringOff();ringOff=null;}vline.top=0;hline.top=0;mood('scan');
+      else if(G==='lift'){const dy=(lastY-p.y)/PX;lastY=p.y;if(dy>0){level=Math.min(FH/2+.05,level+dy*.45);hline.obj.position.y=FY+level;const pr=(level+FH/2)/FH;cur.g.tgold=Math.min(.9,pr);
+        if(liftO&&AC){const st=Math.min(4,Math.floor(pr*5));liftO.frequency.setTargetAtTime(Hz(PENT[st]/2),AC.currentTime,.25);liftG.gain.setTargetAtTime(.05,AC.currentTime,.3);}
+        reveal((x,y)=>y<level);}}};
+    UP=()=>{down=false;if(G==='hold')mood('scan');if(G==='lift'&&liftG&&AC)liftG.gain.setTargetAtTime(0,AC.currentTime,.4);};};
+  const finishScan=async()=>{if(finishing)return;finishing=true;down=false;MODE=MOVE=UP=null;cancelAnimationFrame(raf);const it=cur,g=it.g;g.top=1;if(fogOn){ov.style.opacity=0;setTimeout(()=>{const R=rect();oc.clearRect(0,0,R.w,R.h);ov.style.opacity=1;fogOn=false;},1300);}if(ringOff){ringOff();ringOff=null;}vline.top=0;hline.top=0;mood('scan');
+    if(G==='lift'){if(liftG&&AC){liftG.gain.setTargetAtTime(0,AC.currentTime,.6);setTimeout(()=>{try{liftO.stop();}catch(e){}},2500);}
+      hint.textContent='';g.tgold=1;g.ts=S*1.12;await sleep(900);skyT=1.35;tone(Hz(1/2),0,6,.06);tone(Hz(5/8),.2,6,.05);tone(Hz(3/4),.4,6,.045);tone(Hz(1),.6,6,.04);
+      const w=document.createElement('p');w.className='whisper';w.style.cssText='position:absolute;left:0;right:0;text-align:center;top:'+(H*.2)+'px';w.textContent='托住了。';fx.appendChild(w);
+      await sleep(2600);w.remove();skyT=1;g.ts=S;g.tgold=0;mood('scan');}
     const d=data[it.i];totalG+=d.grams;ding();
-    const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克 / 21 克</div>`;b.style.transform='translate(-50%,0)';const bOff=follow(b,frame.obj,-(FY-FH/2)*PX+14);
+    const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克</div>`;b.style.transform='translate(-50%,0)';const bOff=follow(b,frame.obj,-(FY-FH/2)*PX+14);
     await sleep(2600);bOff();
     for(let k=0;k<g.n*3;k++)g.tgt[k]=it.A[k];g.moving=true;g.tgold=1;if(it.tag)it.tag.classList.add('gold');stampAt(frame.obj,'放行');
     await sleep(700);it.home='tray';g.ts=slotSize();it.passed=true;cur=null;busy=false;finishing=false;done++;frame.top=0;hint.textContent='点一件行李，放进安检机';
     if(done===5)return end();MODE=pickH;next();};
   const pickH=p=>{if(busy)return;const g=pick(items.filter(i=>!i.passed).map(i=>i.g),p,50);const it=items.find(i=>i.g===g);if(!it)return;MODE=null;begin(it);};
   MODE=pickH;
-  const end=async()=>{MODE=MOVE=UP=null;cueOn(null);await sleep(800);belt.top=0;gate.top=0;frame.top=0;
-    const hv=data.reduce((m,q,i)=>q.grams>data[m].grams?i:m,0);show(`<div class="eyebrow">灵魂总重</div><div class="big">21 克</div><div class="hint">其中最重的，是「${esc(items[hv].text)}」</div>`,'top');await sleep(2600);hideScene();};
+  const end=async()=>{MODE=MOVE=UP=null;cueOn(null);ov.remove();await sleep(800);belt.top=0;gate.top=0;frame.top=0;
+    const hv=data.reduce((m,q,i)=>q.grams>data[m].grams?i:m,0);
+    const PAN=d=>`<line x1="0" y1="0" x2="-24" y2="62"/><line x1="0" y1="0" x2="24" y2="62"/><path d="M-38 62 Q0 86 38 62" />${d}`;
+    const el2=show(`<div class="eyebrow">称一称灵魂</div>
+      <svg class="scale" viewBox="0 0 300 240" role="img" aria-label="天平">
+        <line x1="150" y1="44" x2="150" y2="216"/><path d="M112 216 H188"/><circle cx="150" cy="30" r="5" class="g"/>
+        <g id="beam"><line x1="40" y1="44" x2="260" y2="44"/><circle cx="150" cy="44" r="3.5" class="g"/></g>
+        <g id="pl">${PAN('<g id="dots"></g>')}</g>
+        <g id="pr">${PAN('<rect x="-17" y="44" width="34" height="18" rx="3" class="wt"/><text x="0" y="57">21 克</text>')}</g>
+      </svg>
+      <div class="sum" id="sum"></div>
+      <div class="big" id="tot" style="opacity:0;transition:opacity 1.2s">= 21 克</div>
+      <div class="hint" id="hv" style="opacity:0;transition:opacity 1.2s">人们说，灵魂的重量是 21 克。<br>其中最重的，是「${esc(items[hv].text)}」。</div>`,'top');
+    const beam=el2.querySelector('#beam'),pl=el2.querySelector('#pl'),pr=el2.querySelector('#pr'),dots=el2.querySelector('#dots'),sm=el2.querySelector('#sum');
+    let ang=14,vel=0,tgt=14,alive=true;
+    const draw=()=>{const a=ang*Math.PI/180,c=Math.cos(a)*110,sn=Math.sin(a)*110;beam.setAttribute('transform',`rotate(${ang} 150 44)`);
+      pl.setAttribute('transform',`translate(${150-c},${44-sn})`);pr.setAttribute('transform',`translate(${150+c},${44+sn})`);};
+    const spring=()=>{if(!alive)return;vel+=(tgt-ang)*.012;vel*=.93;ang+=vel;draw();requestAnimationFrame(spring);};spring();
+    await sleep(1000);let sum=0;
+    for(let q=0;q<5;q++){const w=data[q].grams;sum+=w;
+      const dt=document.createElementNS('http://www.w3.org/2000/svg','circle');dt.setAttribute('cx',String(-22+q*11));dt.setAttribute('cy','58');dt.setAttribute('r',String(3+Math.min(4,w/4)));dt.setAttribute('class','drop');dots.appendChild(dt);
+      sm.innerHTML+=(q?' + ':'')+`<b>${data[q].grams}</b>`;tone(Hz(PENT[q]),0,1.4,.04);tone(140-q*6,0,.5,.03);
+      tgt=14*(1-sum/21);vel-=1.2;await sleep(1100);}
+    tgt=0;await sleep(1400);el2.querySelector('#tot').style.opacity=1;tone(Hz(1/2),0,4,.06);tone(Hz(3/4),.15,4,.05);tone(Hz(1),.3,4,.04);
+    await sleep(1500);el2.querySelector('#hv').style.opacity=1;await sleep(3800);alive=false;hideScene();};
   autoB.onclick=async()=>{autoB.disabled=true;for(const it of items){if(it.passed)continue;while(busy&&!cur)await sleep(100);
       if(!cur){pickH(scr(it.g.obj));while(!cur||!cur.ready)await sleep(80);}
       let t=-FW;while(cur&&!finishing){t+=FW*.05;const tt=t;reveal((x,y)=>x+y<tt);await sleep(30);}while(busy)await sleep(100);}};
@@ -478,8 +545,8 @@ function drink(){
   show(`<div class="eyebrow">孟婆汤</div><div class="hint">点碗，喝下</div>`,'top');setTimeout(()=>cueOn(bowl),1600);
   MODE=async p=>{if(!pick([bowl],p,90))return;MODE=null;cueOn(null);show(``);
     mood('drink');bowl.tp=camera.localToWorld(new V3(0,-.15,-.9));bowl.pk=1.6;bowl.ts=.9;tone(330,0,3,.06,'triangle');
-    await sleep(1200);skyT=2.4;bowl.top=0;ENV.forEach(g=>g.top=0);dust.top=.25;slots.forEach(s=>s.top=0);items.forEach(it=>{if(it.tag)it.tag.style.opacity=0;});
-    await sleep(900);skyT=.35;await sleep(1600);reveal();};
+    await sleep(1100);const wash=document.getElementById('wash');skyT=2.6;wash.style.opacity='1';bowl.top=0;ENV.forEach(g=>g.top=0);slots.forEach(s=>s.top=0);items.forEach(it=>{if(it.tag)it.tag.style.opacity=0;});
+    await sleep(2900);inkMode();dust.top=.35;skyT=1;await sleep(400);wash.style.opacity='0';await sleep(1800);reveal();};
 }
 function fallback(){return{lines:['冬天，你总会游回同一片暖处。','有个声音一响，你就回头。','你在一个转角，慢了半步。','某个黄昏，你忽然笑了一下。','初见一个人，像久别重逢。'],portrait:'带着五件行李出发的人。'};}
 async function fetchResult(){const s=await sampleP;if(!s)return fallback();
@@ -518,68 +585,63 @@ async function reveal(){
     if(!it.open){it.open=true;opened++;}nx();if(opened===5)go.disabled=false;};
   go.onclick=()=>{MODE=null;cueOn(null);passScene();};
 }
+const SHARE_URL='https://dylanhe.cn/hackathon/dejavu-5dce1eac/';
 async function makeCard(){
   try{await document.fonts.ready;}catch(e){}
-  const CW=1080,CH=1700,TOP=1060,c=document.createElement('canvas');c.width=CW;c.height=CH;const x=c.getContext('2d');
-  const SER='"Noto Serif SC","Songti SC",serif',LAT='"Cormorant Garamond","Noto Serif SC",serif',R=44,NOTCH=34;
-  // ticket outline with notches
-  x.save();x.beginPath();x.moveTo(R,0);x.lineTo(CW-R,0);x.quadraticCurveTo(CW,0,CW,R);x.lineTo(CW,TOP-NOTCH);x.arc(CW,TOP,NOTCH,-Math.PI/2,Math.PI/2,true);x.lineTo(CW,CH-R);x.quadraticCurveTo(CW,CH,CW-R,CH);
-  x.lineTo(R,CH);x.quadraticCurveTo(0,CH,0,CH-R);x.lineTo(0,TOP+NOTCH);x.arc(0,TOP,NOTCH,Math.PI/2,-Math.PI/2,true);x.lineTo(0,R);x.quadraticCurveTo(0,0,R,0);x.closePath();x.clip();
-  // sky half
-  let g=x.createLinearGradient(0,0,0,TOP);g.addColorStop(0,'#0e0c22');g.addColorStop(1,'#241f40');x.fillStyle=g;x.fillRect(0,0,CW,TOP);
-  const hz=x.createRadialGradient(CW/2,TOP,0,CW/2,TOP,700);hz.addColorStop(0,'rgba(190,180,225,.18)');hz.addColorStop(1,'rgba(190,180,225,0)');x.fillStyle=hz;x.fillRect(0,0,CW,TOP);
-  x.globalCompositeOperation='lighter';
-  for(let i=0;i<260;i++){x.fillStyle=`rgba(235,230,250,${rnd(.08,.4)})`;x.beginPath();x.arc(rnd(0,CW),rnd(0,TOP),rnd(.6,1.6),0,6.283);x.fill();}
-  // destination figure
-  const k=640,cx0=CW/2,cy0=560,T=destG.tgt,N=destG.n;
-  for(let i=0;i<N;i++){const px=cx0+T[i*3]*k,py=cy0-T[i*3+1]*k;x.fillStyle=`rgba(240,236,252,${rnd(.25,.7)})`;x.beginPath();x.arc(px,py,rnd(.9,2),0,6.283);x.fill();}
-  // constellation
-  const P=items.map(it=>{const a=it.g.tp;return[cx0+a.x*k,cy0-a.y*k];});
-  x.strokeStyle='rgba(236,217,166,.75)';x.lineWidth=2;x.setLineDash([2,8]);x.beginPath();P.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke();x.setLineDash([]);
-  P.forEach(p=>{const rg=x.createRadialGradient(p[0],p[1],0,p[0],p[1],46);rg.addColorStop(0,'rgba(255,236,190,.85)');rg.addColorStop(.25,'rgba(236,217,166,.35)');rg.addColorStop(1,'rgba(236,217,166,0)');x.fillStyle=rg;x.beginPath();x.arc(p[0],p[1],46,0,6.283);x.fill();
-    x.fillStyle='#fff6e2';x.beginPath();x.arc(p[0],p[1],6,0,6.283);x.fill();});
-  x.globalCompositeOperation='source-over';
-  x.font=`30px ${SER}`;x.textBaseline='middle';
-  P.forEach((p,i)=>{const t=i===hidden?'':items[i].text;if(!t)return;const w=x.measureText(t).width;let lx=p[0]+22,al='left';if(lx+w>CW-50){lx=p[0]-22;al='right';}
-    x.textAlign=al;x.fillStyle='rgba(16,13,36,.55)';x.fillText(t,lx+1,p[1]+1);x.fillStyle='#ecd9a6';x.fillText(t,lx,p[1]);});
+  const CW=1080,CH=1700,CUT=1250,c=document.createElement('canvas');c.width=CW;c.height=CH;const x=c.getContext('2d');
+  const SER='"Noto Serif SC","Songti SC",serif',LAT='"Cormorant Garamond","Noto Serif SC",serif',R=40,NOTCH=30,INKC='#241f3d',DIM='#7d76a0',GOLD='#a9822f';
+  x.save();x.beginPath();x.moveTo(R,0);x.lineTo(CW-R,0);x.quadraticCurveTo(CW,0,CW,R);x.lineTo(CW,CUT-NOTCH);x.arc(CW,CUT,NOTCH,-Math.PI/2,Math.PI/2,true);x.lineTo(CW,CH-R);x.quadraticCurveTo(CW,CH,CW-R,CH);
+  x.lineTo(R,CH);x.quadraticCurveTo(0,CH,0,CH-R);x.lineTo(0,CUT+NOTCH);x.arc(0,CUT,NOTCH,Math.PI/2,-Math.PI/2,true);x.lineTo(0,R);x.quadraticCurveTo(0,0,R,0);x.closePath();x.clip();
+  let g=x.createLinearGradient(0,0,0,CH);g.addColorStop(0,'#fbfaff');g.addColorStop(1,'#f1eef8');x.fillStyle=g;x.fillRect(0,0,CW,CH);
+  for(let i=0;i<1800;i++){x.fillStyle=`rgba(60,50,100,${rnd(.015,.05)})`;x.fillRect(rnd(0,CW),rnd(0,CH),1.4,1.4);}
   // header
-  x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#e9e4f7';x.font=`italic 54px ${LAT}`;x.fillText('Déjà vu',64,104);
-  x.font=`24px ${SER}`;x.fillStyle='rgba(233,228,247,.6)';x.fillText('孟婆汤 · 转世航空',66,146);
-  x.textAlign='right';x.font=`36px ${LAT}`;x.fillStyle='#cfc6ea';x.fillText(FLIGHT,CW-64,104);
-  x.textAlign='center';x.font=`26px ${SER}`;x.fillStyle='rgba(233,228,247,.55)';x.fillText('下 辈 子',CW/2,TOP-150);
-  x.font=`64px ${SER}`;x.fillStyle='#f4ead8';x.fillText(DEST,CW/2,TOP-72);
-  // paper half
-  g=x.createLinearGradient(0,TOP,0,CH);g.addColorStop(0,'#f7f4fd');g.addColorStop(1,'#ebe6f8');x.fillStyle=g;x.fillRect(0,TOP,CW,CH-TOP);
-  x.strokeStyle='rgba(91,75,176,.28)';x.lineWidth=3;x.setLineDash([10,12]);x.beginPath();x.moveTo(NOTCH+16,TOP);x.lineTo(CW-NOTCH-16,TOP);x.stroke();x.setLineDash([]);
-  const lab=(t,xx,yy,al='left')=>{x.textAlign=al;x.font=`20px ${SER}`;x.fillStyle='#8c80b8';x.fillText(t.split('').join(' '),xx,yy);};
-  const val=(t,xx,yy,al='left',sz=40,col='#2a2350')=>{x.textAlign=al;x.font=`${sz}px ${SER}`;x.fillStyle=col;x.fillText(t,xx,yy);};
-  lab('出发',72,TOP+90);val('这辈子',72,TOP+148);lab('到达',CW-72,TOP+90,'right');val(DEST,CW-72,TOP+148,'right',44,'#3b2f86');
-  x.textAlign='center';x.font=`italic 44px ${LAT}`;x.fillStyle='#a99ad9';x.fillText('→',CW/2,TOP+140);
-  const now=new Date(),tm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  [['登机口','奈何桥'],['座位',SEAT],['免洗行李',hidden>=0?'4 + 1 件':'5 件'],['灵魂总重','21 克']].forEach((r,i)=>{const xx=72+i*(CW-144)/4;lab(r[0],xx,TOP+232);val(r[1],xx,TOP+282,'left',32);});
-  // portrait
-  const por=result.portrait||'';x.textAlign='center';x.font=`36px ${SER}`;x.fillStyle='#3b2f86';
-  const lines=[];let cur='';for(const ch of por){if(x.measureText(cur+ch).width>CW-200){lines.push(cur);cur=ch;}else cur+=ch;}if(cur)lines.push(cur);
-  lines.slice(0,2).forEach((l,i)=>x.fillText(l,CW/2,TOP+400+i*54));
-  if(hidden>=0){x.font=`24px ${SER}`;x.fillStyle='#a99ad9';x.fillText('袖子里，还藏着一件 · 保密',CW/2,TOP+400+Math.min(2,lines.length)*54+16);}
-  x.strokeStyle='rgba(91,75,176,.15)';x.lineWidth=2;x.beginPath();x.moveTo(140,CH-150);x.lineTo(CW-140,CH-150);x.stroke();
-  x.font=`28px ${SER}`;x.fillStyle='#5b4bb0';x.fillText('如果是你，会带哪五件？',CW/2,CH-92);
+  x.textBaseline='alphabetic';x.textAlign='left';x.fillStyle=INKC;x.font=`32px ${SER}`;x.fillText('孟婆汤',72,104);x.font=`italic 30px ${LAT}`;x.fillStyle=DIM;x.fillText('Déjà vu',178,104);
+  x.textAlign='right';x.font=`22px ${SER}`;x.fillStyle=DIM;x.fillText('转世航空 · 登机牌',CW-72,92);x.font=`26px ${LAT}`;x.fillStyle=INKC;x.fillText(FLIGHT,CW-72,124);
+  x.strokeStyle='rgba(36,31,61,.12)';x.lineWidth=2;x.beginPath();x.moveTo(72,150);x.lineTo(CW-72,150);x.stroke();
+  // next-life figure in ink + constellation of the five
+  const k=560,cx0=CW/2,cy0=470,T=destG.tgt,N=destG.n;
+  for(let i=0;i<N;i++){const px=cx0+T[i*3]*k,py=cy0-T[i*3+1]*k;x.fillStyle=`rgba(36,31,61,${rnd(.18,.55)})`;x.beginPath();x.arc(px,py,rnd(.8,1.9),0,6.283);x.fill();}
+  const P=items.map(it=>{const a=it.g.tp;return[cx0+a.x*k,cy0-a.y*k];});
+  x.strokeStyle='rgba(169,130,47,.6)';x.lineWidth=1.6;x.setLineDash([2,7]);x.beginPath();P.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke();x.setLineDash([]);
+  P.forEach(p=>{const rg=x.createRadialGradient(p[0],p[1],0,p[0],p[1],34);rg.addColorStop(0,'rgba(212,170,80,.55)');rg.addColorStop(1,'rgba(212,170,80,0)');x.fillStyle=rg;x.beginPath();x.arc(p[0],p[1],34,0,6.283);x.fill();
+    x.fillStyle=GOLD;x.beginPath();x.arc(p[0],p[1],5.5,0,6.283);x.fill();});
+  x.font=`26px ${SER}`;x.textBaseline='middle';
+  P.forEach((p,i)=>{const t=i===hidden?'':items[i].text;if(!t)return;const w=x.measureText(t).width;let lx=p[0]+18,al='left';if(lx+w>CW-60){lx=p[0]-18;al='right';}x.textAlign=al;x.fillStyle=INKC;x.fillText(t,lx,p[1]);});
+  // headline (first person) + one line of poem
+  x.textBaseline='alphabetic';x.textAlign='center';x.fillStyle=DIM;x.font=`28px ${SER}`;x.fillText('下 辈 子 ， 我 是',CW/2,880);
+  x.fillStyle=INKC;x.font=`80px ${SER}`;x.fillText(DEST,CW/2,980);
+  const hv=(scanData||[]).reduce((m,q,i)=>(i!==hidden&&(m<0||q.grams>scanData[m].grams))?i:m,-1);
+  const poem=result.lines[hv>=0?hv:4]||result.portrait||'';
+  x.font=`34px ${SER}`;x.fillStyle='#4a4268';const pl=[];let cur2='';for(const ch of '「'+poem+'」'){if(x.measureText(cur2+ch).width>CW-220){pl.push(cur2);cur2=ch;}else cur2+=ch;}if(cur2)pl.push(cur2);
+  pl.slice(0,2).forEach((l,i)=>x.fillText(l,CW/2,1070+i*50));
+  if(hidden>=0){x.font=`22px ${SER}`;x.fillStyle=DIM;x.fillText('袖子里，还藏着一件 · 保密',CW/2,1070+Math.min(2,pl.length)*50+18);}
   // stamp
-  x.save();x.translate(CW-170,TOP+392);x.rotate(-.21);x.strokeStyle='rgba(194,150,70,.75)';x.lineWidth=4;x.strokeRect(-70,-34,140,68);x.font=`600 34px ${SER}`;x.fillStyle='rgba(194,150,70,.85)';x.textAlign='center';x.textBaseline='middle';x.fillText('免 洗',0,2);x.restore();
+  x.save();x.translate(CW-190,930);x.rotate(-.2);x.strokeStyle='rgba(169,130,47,.7)';x.lineWidth=3;x.strokeRect(-62,-30,124,60);x.font=`600 30px ${SER}`;x.fillStyle='rgba(169,130,47,.8)';x.textAlign='center';x.textBaseline='middle';x.fillText('免 洗',0,2);x.restore();
+  // perforation
+  x.strokeStyle='rgba(36,31,61,.25)';x.lineWidth=3;x.setLineDash([10,12]);x.beginPath();x.moveTo(NOTCH+16,CUT);x.lineTo(CW-NOTCH-16,CUT);x.stroke();x.setLineDash([]);
+  // stub
+  const lab=(t,xx,yy)=>{x.textAlign='left';x.textBaseline='alphabetic';x.font=`19px ${SER}`;x.fillStyle=DIM;x.fillText(t.split('').join(' '),xx,yy);};
+  const val=(t,xx,yy,sz=34)=>{x.textAlign='left';x.font=`${sz}px ${SER}`;x.fillStyle=INKC;x.fillText(t,xx,yy);};
+  lab('出发',72,CUT+80);val('这辈子',72,CUT+128);lab('到达',300,CUT+80);val(DEST,300,CUT+128);
+  lab('登机口',72,CUT+200);val('奈何桥',72,CUT+246,30);lab('座位',300,CUT+200);val(SEAT,300,CUT+246,30);lab('灵魂',460,CUT+200);val('21 克',460,CUT+246,30);
+  x.font=`26px ${SER}`;x.fillStyle=INKC;x.fillText('如果是你，会带哪五件？',72,CUT+330);x.font=`20px ${SER}`;x.fillStyle=DIM;x.fillText('扫码，去奈何桥值机',72,CUT+368);
+  // QR
+  if(window.qrcode){try{const q=qrcode(0,'M');q.addData(SHARE_URL);q.make();const n=q.getModuleCount(),size=250,cell=size/n,qx=CW-72-size,qy=CUT+(CH-CUT-size)/2;
+    x.fillStyle='#fbfaff';x.fillRect(qx-10,qy-10,size+20,size+20);x.fillStyle=INKC;for(let r2=0;r2<n;r2++)for(let c2=0;c2<n;c2++)if(q.isDark(r2,c2))x.fillRect(qx+c2*cell,qy+r2*cell,cell+.5,cell+.5);}catch(e){}}
   x.restore();
   return c;
 }
 async function passScene(){mood('pass');
-  destG.top=.15;items.forEach(it=>it.g.top=.2);
+  destG.top=.12;items.forEach(it=>it.g.top=.15);
   show(`<div class="hint">正在出票……</div>`);
   const c=await makeCard(),url=c.toDataURL('image/png');ding();
-  const el=show(`<img class="card" src="${url}" alt="下辈子登机牌：${esc(DEST)}">
-    <div class="hint" id="after">长按图片可保存</div>
+  const el=show(`<img class="card" src="${url}" alt="下辈子的登机牌：${esc(DEST)}">
+    <div class="hint" id="after">长按图片，保存或发给朋友</div>
     <div class="row"><button class="btn" id="save" hidden>保存图片</button><button class="btn ghost" id="again">再投一次胎</button></div>`);
   el.querySelector('#again').onclick=()=>location.reload();
   const dl=await (window.claude?.use?window.claude.use('downloads'):Promise.resolve(null)).catch(()=>null);
   if(dl){const b=el.querySelector('#save');b.hidden=false;el.querySelector('#after').textContent='';
-    b.onclick=()=>c.toBlob(async blob=>{try{await dl.save({filename:`deja-vu-${FLIGHT}.png`,data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;el.querySelector('#after').textContent='长按图片可保存';}},'image/png');}
+    b.onclick=()=>c.toBlob(async blob=>{try{await dl.save({filename:`mengpo-${FLIGHT}.png`,data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;el.querySelector('#after').textContent='长按图片，保存或发给朋友';}},'image/png');}
 }
 
 snd.textContent=MUTE?'声音 · 关':'声音 · 开';snd.onclick=()=>{if(MUTE)unlockAudio();ac();setMute(!MUTE);if(MUTE&&SILENT)SILENT.pause();};
