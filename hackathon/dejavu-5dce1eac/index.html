@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>似曾相识 Déjà vu</title>
+<title>孟婆汤 Déjà vu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap">
 <style>
@@ -17,7 +17,7 @@
   --latin:"Cormorant Garamond","Noto Serif SC",serif;
   color-scheme:dark;
 }
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none;touch-action:none}
 body{background:#100d24;color:var(--ink);font-family:var(--serif);overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
 #sky{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;padding-inline:20px;padding-block:22px;pointer-events:none}
@@ -87,7 +87,7 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 .pass .portrait{padding:10px 22px 16px;font-size:14px;line-height:1.8;color:#3b2f86}
 .pass .stampmark{position:absolute;right:18px;top:56px;transform:rotate(-12deg);border:2px solid rgba(214,150,60,.75);color:rgba(194,128,40,.9);border-radius:6px;padding:2px 8px;font-size:13px;letter-spacing:.2em}
 .pass .stub .tear{font-size:12px;letter-spacing:.2em;color:#8c80b8}
-.card{display:block;width:auto;max-width:min(400px,100%);max-height:calc(100vh - 150px);height:auto;filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));animation:rise 1.2s cubic-bezier(.2,.8,.2,1);-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
+.card{touch-action:auto;display:block;width:auto;max-width:min(400px,100%);max-height:calc(100vh - 150px);height:auto;filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));animation:rise 1.2s cubic-bezier(.2,.8,.2,1);-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
 @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
 .snd{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;z-index:5;font-family:var(--serif);font-size:12px;letter-spacing:.2em;color:var(--ink-faint);background:rgba(16,13,36,.35);border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 14px;cursor:pointer;backdrop-filter:blur(6px)}
 .snd:hover{color:var(--ink)}
@@ -99,6 +99,8 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 .hold svg{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);transform:rotate(-90deg)}
 .hold circle{fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round}
 .choose{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.ripple{position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;border:1px solid var(--ink);animation:rip 1.2s ease-out forwards;pointer-events:none}
+@keyframes rip{from{transform:scale(1);opacity:.9}to{transform:scale(9);opacity:0}}
 .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 @media (prefers-reduced-motion:reduce){.scene{transition:none}.ring,.ring::after{animation:none}}
 </style>
@@ -312,7 +314,7 @@ async function ascend(){
   arch.shape(archPts(7.5,9.5,2600),()=>[rnd(-10,10),rnd(-12,-2),rnd(-6,6)]);arch.top=1;
   await sleep(1800);clouds.top=0;[posts,desk,sign,sign2,attendant].forEach(g=>g.top=1);
   await sleep(1200);
-  const el=show(`<div class="hall">转世值机大厅</div><h1>似曾相识<span class="lat">Déjà vu</span></h1>
+  const el=show(`<div class="hall">转世值机大厅</div><h1>孟婆汤<span class="lat">Déjà vu</span></h1>
    <div class="board"><div><b>DV-2207</b><span>一头座头鲸</span><i>登机中</i></div><div><b>DV-0413</b><span>一朵云</span><i>准时</i></div><div><b>DV-1988</b><span>楼下的一只猫</span><i>已起飞</i></div><div><b>${FLIGHT}</b><span>？？？</span><i class="you">请值机</i></div></div>
    <button class="btn" id="go">去值机</button>`,'top');
   el.querySelector('#go').onclick=queue;
@@ -383,42 +385,63 @@ function security(){
   camTo(...POSE.sec,.8);mood('scan');belt.top=.3;gate.top=0;
   const el=show(`<div class="eyebrow">安检 · 透视</div><div class="hint" id="h">点一件行李，放进安检机</div><button class="btn ghost" id="auto">自动扫描</button>`,'top');
   const hint=el.querySelector('#h'),autoB=el.querySelector('#auto');
-  // scanner frame in camera space
-  const D=4.2,hh=Math.tan(FOV*Math.PI/360)*D,hw=hh*W/H,FW=Math.min(2.6,hw*1.72),FH=FW*1.05,FY=.18;
+  const D=4.2,hh=Math.tan(FOV*Math.PI/360)*D,hw=hh*W/H,FW=Math.min(2.6,hw*1.5),FH=FW*1.05,FY=.18,PX=H/(2*hh);
   const frame=new PG(1400,camera);{const o=[],c=[.86,.92,1];const L=(a,b,n)=>o.push(...linePts(a,b,n,c,.022,.004));
     L([-FW/2,FY-FH/2,0],[FW/2,FY-FH/2,0],220);L([-FW/2,FY+FH/2,0],[FW/2,FY+FH/2,0],220);L([-FW/2,FY-FH/2,0],[-FW/2,FY+FH/2,0],220);L([FW/2,FY-FH/2,0],[FW/2,FY+FH/2,0],220);
     for(let k=0;k<500;k++)o.push([rnd(-FW/2,FW/2),rnd(FY-FH/2,FY+FH/2),0,.55,.62,.8,.012]);frame.shape(o);}
   frame.at(0,0,-D);frame.top=0;frame.u.uFog.value=0;frame.u.uWob.value=.001;
-  const scan=new PG(160,camera);{const o=[];for(let k=0;k<160;k++)o.push([rnd(-.006,.006),FY+rnd(-FH/2,FH/2),0,.9,.96,1,.03]);scan.shape(o);}
-  scan.at(-FW/2,0,-D+.01);scan.top=0;scan.u.uFog.value=0;scan.u.uWob.value=.001;
-  let cur=null,busy=false,done=0,scanX=-FW/2,dragging=false,data=null,bubbleOff=null;
+  const vline=new PG(160,camera);{const o=[];for(let k=0;k<160;k++)o.push([rnd(-FW/2,FW/2),rnd(-.006,.006),0,.9,.96,1,.03]);vline.shape(o);}
+  vline.at(0,FY+FH/2,-D+.01);vline.top=0;vline.u.uFog.value=0;vline.u.uWob.value=.001;
+  const hline=new PG(160,camera);{const o=[];for(let k=0;k<160;k++)o.push([rnd(-FW/2,FW/2),rnd(-.006,.006),0,1,.95,.85,.03]);hline.shape(o);}
+  hline.at(0,FY-FH/2,-D+.01);hline.top=0;hline.u.uFog.value=0;hline.u.uWob.value=.001;
+  const GEST=[['wipe','用手指擦开上面的雾'],['ripple','轻点三下，敲出波纹'],['xray','按住，从上往下扫过去'],['hold','按住不放，让时间慢下来'],['lift','从下往上，把它托起来']];
+  let cur=null,busy=false,done=0,data=null,finishing=false,down=false,rv=null,cnt=0,S=1,G='',scanX=0,level=0,lastY=0,holdR=0,taps=0,ringOff=null,raf=0;
   const next=()=>{const it=items.find(it=>!it.passed);cueOn(it&&!busy?it.g:null);};setTimeout(next,1400);
-  const begin=async it=>{busy=true;cur=it;cueOn(null);const g=it.g;it.home=null;g.tp=new V3(0,FY,-D+.05);g.ts=FW*.62;g.pk=3;frame.top=1;tone(523,0,.6,.04);
+  const toCam=p=>({x:((p.x/W)*2-1)*hw,y:(1-(p.y/H)*2)*hh-FY});
+  const reveal=pred=>{if(!cur||finishing)return;const g=cur.g,A=cur.A,B=cur.B;let ch=false;
+    for(let k=0;k<g.n;k++){if(rv[k])continue;const ax=A[k*3]*S,ay=A[k*3+1]*S;if(pred(ax,ay)){rv[k]=1;cnt++;ch=true;g.tgt[k*3]=B[k*3];g.tgt[k*3+1]=B[k*3+1];g.tgt[k*3+2]=B[k*3+2];}}
+    if(ch){g.moving=true;if(Math.random()<.35)tone(Hz(PENT[Math.random()*5|0]*2),0,1.2,.012);}
+    if(cnt>=g.n*.9&&!cur.full){cur.full=true;reveal(()=>true);finishScan();}};
+  const ringAt=(obj,dy=0)=>{if(ringOff)ringOff();const r=document.createElement('div');r.className='ring';ringOff=follow(r,obj,dy);};
+  const ripple=p=>{const d=document.createElement('div');d.className='ripple';d.style.left=p.x+'px';d.style.top=p.y+'px';fx.appendChild(d);setTimeout(()=>d.remove(),1300);};
+  const begin=async it=>{busy=true;cur=it;cueOn(null);const g=it.g;it.home=null;g.tp=new V3(0,FY,-D+.05);g.ts=FW*.62;S=g.ts;g.pk=3;frame.top=1;tone(Hz(5/4),0,.8,.04);
     if(!data)data=await scanP;
     const inner=glyph(data[it.i].inner,true,g.n,.05)||ball(g.n,.45,.06);
     it.A=g.tgt.slice(0,g.n*3);it.B=new Float32Array(g.n*3);for(let k=0;k<g.n;k++){const q=inner[k%inner.length];it.B[k*3]=q[0];it.B[k*3+1]=q[1];it.B[k*3+2]=q[2];}
-    await sleep(700);scanX=-FW/2;scan.obj.position.x=scanX;scan.top=1;g.u.uGold.value=0;
-    hint.textContent='按住，从左往右划过去';const r=document.createElement('div');r.className='ring';const off=follow(r,scan.obj);it.ringOff=off;MODE=null;
-    MOVE=null;};
-  const apply=()=>{if(!cur)return;const g=cur.g,S=g.obj.scale.x;for(let k=0;k<g.n;k++){const src=(cur.A[k*3]*S<scanX)?cur.B:cur.A;g.tgt[k*3]=src[k*3];g.tgt[k*3+1]=src[k*3+1];g.tgt[k*3+2]=src[k*3+2];}g.moving=true;
-    scan.obj.position.x=scanX;if(scanX>=FW/2-.02)finishScan();};
-  const toCam=px=>((px/W)*2-1)*hw;
-  let finishing=false;
-  const finishScan=async()=>{if(finishing)return;finishing=true;dragging=false;MOVE=UP=null;const it=cur,g=it.g;if(it.ringOff)it.ringOff();scan.top=0;
+    rv=new Uint8Array(g.n);cnt=0;G=GEST[it.i][0];hint.textContent=GEST[it.i][1];
+    await sleep(700);g.u.uGold.value=0;
+    if(G==='xray'){scanX=FH/2+.04;vline.obj.position.y=FY+scanX;vline.top=1;ringAt(vline.obj);}
+    else if(G==='lift'){level=-FH/2-.04;hline.obj.position.y=FY+level;hline.top=1;ringAt(hline.obj);}
+    else{ringAt(frame.obj,-FY*PX);}
+    if(G==='wipe'){g.top=.45;}
+    holdR=0;taps=0;it.ready=true;
+    const loop=()=>{if(!cur||finishing)return;if(G==='hold'&&down){holdR+=.016*FW*.32;const r2=holdR*holdR;reveal((x,y)=>x*x+y*y<r2);}raf=requestAnimationFrame(loop);};loop();
+    MODE=p=>{if(!cur||finishing)return;down=true;const c=toCam(p);if(ringOff&&G!=='xray'&&G!=='lift'){ringOff();ringOff=null;}
+      if(G==='wipe'){reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<(FW*.17)**2);}
+      else if(G==='ripple'){taps++;ripple(p);tone(Hz(PENT[taps%5]),0,2.4,.04);const R=taps>=3?FW*1.4:FW*.42,st=performance.now();
+        const grow=now=>{const u=Math.min(1,(now-st)/900),r=R*u;reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<r*r);if(u<1&&cur&&!finishing)requestAnimationFrame(grow);};requestAnimationFrame(grow);}
+      else if(G==='xray'){lastY=p.y;}
+      else if(G==='hold'){mood('hide');}
+      else if(G==='lift'){lastY=p.y;}};
+    MOVE=p=>{if(!down||!cur||finishing)return;const c=toCam(p);
+      if(G==='wipe'){if(cur.g.top<1)cur.g.top=Math.min(1,cur.g.top+.01);reveal((x,y)=>(x-c.x)**2+(y-c.y)**2<(FW*.17)**2);}
+      else if(G==='xray'){const dy=(p.y-lastY)/PX;lastY=p.y;if(dy>0){scanX=Math.max(-FH/2-.05,scanX-dy);vline.obj.position.y=FY+scanX;reveal((x,y)=>y>scanX);}}
+      else if(G==='lift'){const dy=(lastY-p.y)/PX;lastY=p.y;if(dy>0){level=Math.min(FH/2+.05,level+dy);hline.obj.position.y=FY+level;reveal((x,y)=>y<level);}}};
+    UP=()=>{down=false;if(G==='hold')mood('scan');};};
+  const finishScan=async()=>{if(finishing)return;finishing=true;down=false;MODE=MOVE=UP=null;cancelAnimationFrame(raf);const it=cur,g=it.g;g.top=1;if(ringOff){ringOff();ringOff=null;}vline.top=0;hline.top=0;mood('scan');
     const d=data[it.i];totalG+=d.grams;ding();
-    const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克</div>`;b.style.transform='translate(-50%,0)';bubbleOff=follow(b,frame.obj,-(FY-FH/2)*H/(2*hh)+14);
-    await sleep(2400);bubbleOff();
+    const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克</div>`;b.style.transform='translate(-50%,0)';const bOff=follow(b,frame.obj,-(FY-FH/2)*PX+14);
+    await sleep(2600);bOff();
     for(let k=0;k<g.n*3;k++)g.tgt[k]=it.A[k];g.moving=true;g.tgold=1;if(it.tag)it.tag.classList.add('gold');stampAt(frame.obj,'放行');
     await sleep(700);it.home='tray';g.ts=slotSize();it.passed=true;cur=null;busy=false;finishing=false;done++;frame.top=0;hint.textContent='点一件行李，放进安检机';
     if(done===5)return end();MODE=pickH;next();};
-  const pickH=p=>{if(busy)return;const g=pick(items.filter(i=>!i.passed).map(i=>i.g),p,50);const it=items.find(i=>i.g===g);if(!it)return;MODE=null;
-    begin(it).then(()=>{MODE=q=>{if(!cur||finishing)return;dragging=true;scanX=Math.max(scanX,Math.min(FW/2,toCam(q.x)));apply();};
-      MOVE=q=>{if(!dragging||finishing)return;scanX=Math.max(scanX,Math.min(FW/2,toCam(q.x)));apply();};UP=()=>{dragging=false;};});};
+  const pickH=p=>{if(busy)return;const g=pick(items.filter(i=>!i.passed).map(i=>i.g),p,50);const it=items.find(i=>i.g===g);if(!it)return;MODE=null;begin(it);};
   MODE=pickH;
   const end=async()=>{MODE=MOVE=UP=null;cueOn(null);await sleep(800);belt.top=0;gate.top=0;frame.top=0;
     show(`<div class="eyebrow">灵魂总重</div><div class="big">${Math.round(totalG*10)/10} 克</div>`,'top');await sleep(2600);hideScene();};
-  autoB.onclick=async()=>{autoB.disabled=true;for(const it of items){if(it.passed)continue;while(busy&&!cur)await sleep(100);if(!cur){pickH(scr(it.g.obj));while(!cur||!scan.top)await sleep(80);}
-      await sleep(300);while(cur&&!finishing){scanX=Math.min(FW/2,scanX+.06);apply();await sleep(30);}while(busy)await sleep(100);}};
+  autoB.onclick=async()=>{autoB.disabled=true;for(const it of items){if(it.passed)continue;while(busy&&!cur)await sleep(100);
+      if(!cur){pickH(scr(it.g.obj));while(!cur||!cur.ready)await sleep(80);}
+      let t=-FW;while(cur&&!finishing){t+=FW*.05;const tt=t;reveal((x,y)=>x+y<tt);await sleep(30);}while(busy)await sleep(100);}};
 }
 function hideScene(){
   camTo(...POSE.desk,.8);mood('hide');attendant.tp=new V3(-1.8,1.42,-30.6);attendant.top=.2;
@@ -520,7 +543,7 @@ async function makeCard(){
     x.textAlign=al;x.fillStyle='rgba(16,13,36,.55)';x.fillText(t,lx+1,p[1]+1);x.fillStyle='#ecd9a6';x.fillText(t,lx,p[1]);});
   // header
   x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#e9e4f7';x.font=`italic 54px ${LAT}`;x.fillText('Déjà vu',64,104);
-  x.font=`24px ${SER}`;x.fillStyle='rgba(233,228,247,.6)';x.fillText('似曾相识 · 转世航空',66,146);
+  x.font=`24px ${SER}`;x.fillStyle='rgba(233,228,247,.6)';x.fillText('孟婆汤 · 转世航空',66,146);
   x.textAlign='right';x.font=`36px ${LAT}`;x.fillStyle='#cfc6ea';x.fillText(FLIGHT,CW-64,104);
   x.textAlign='center';x.font=`26px ${SER}`;x.fillStyle='rgba(233,228,247,.55)';x.fillText('下 辈 子',CW/2,TOP-150);
   x.font=`64px ${SER}`;x.fillStyle='#f4ead8';x.fillText(DEST,CW/2,TOP-72);
