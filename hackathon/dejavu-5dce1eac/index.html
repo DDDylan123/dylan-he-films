@@ -110,7 +110,7 @@ body.paper .snd{background:rgba(255,255,255,.6)}
 .scale{width:min(260px,70vw);height:auto;overflow:visible}
 .scale line,.scale path{stroke:var(--ink-dim);stroke-width:1.4;fill:none;stroke-linecap:round}
 .scale .g{fill:var(--gold)}
-.scale .wt{fill:none;stroke:var(--gold);stroke-width:1.2}
+.scale .wt{fill:var(--gold);stroke:none;opacity:.9}
 .scale text{fill:var(--gold);font-family:var(--serif);font-size:11px;text-anchor:middle;letter-spacing:.05em}
 .scale .drop{fill:var(--gold);animation:drop .5s cubic-bezier(.3,1.4,.6,1)}
 @keyframes drop{from{transform:translateY(-46px);opacity:0}to{transform:none;opacity:1}}
@@ -490,7 +490,7 @@ function security(){
         <line x1="150" y1="44" x2="150" y2="216"/><path d="M112 216 H188"/><circle cx="150" cy="30" r="5" class="g"/>
         <g id="beam"><line x1="40" y1="44" x2="260" y2="44"/><circle cx="150" cy="44" r="3.5" class="g"/></g>
         <g id="pl">${PAN('<g id="dots"></g>')}</g>
-        <g id="pr">${PAN('<rect x="-17" y="44" width="34" height="18" rx="3" class="wt"/><text x="0" y="57">21 克</text>')}</g>
+        <g id="pr">${PAN('<path d="M-12 62 L-9 48 L9 48 L12 62 Z" class="wt"/><circle cx="0" cy="45" r="3" class="wt"/>')}</g>
       </svg>
       <div class="sum" id="sum"></div>
       <div class="big" id="tot" style="opacity:0;transition:opacity 1.2s">= 21 克</div>
