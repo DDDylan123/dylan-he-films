@@ -234,10 +234,40 @@ let AC=null;function ac(){try{AC=AC||new (window.AudioContext||window.webkitAudi
 let MUTE=false;try{MUTE=localStorage.getItem('dv-mute')==='1';}catch(e){}
 let MASTER=null;function out(){const a=ac();if(!a)return null;if(!MASTER){MASTER=a.createGain();MASTER.gain.value=MUTE?0:1;MASTER.connect(a.destination);}return MASTER;}
 function setMute(m){MUTE=m;try{localStorage.setItem('dv-mute',m?'1':'0');}catch(e){}const o=out();if(o)o.gain.setTargetAtTime(m?0:1,AC.currentTime,.2);snd.textContent=m?'声音 · 关':'声音 · 开';snd.setAttribute('aria-pressed',String(!m));}
-function tone(f,d=0,dur=2.2,v=.1,type='sine'){const a=ac();if(!a)return;const t=a.currentTime+d,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(out());o.start(t);o.stop(t+dur+.1);}
+function tone(f,d=0,dur=2.2,v=.1,type='sine'){const a=ac();if(!a)return;const t=a.currentTime+d,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(out());const rv=rev();if(rv){const sg=a.createGain();sg.gain.value=.45;g.connect(sg).connect(rv);}o.start(t);o.stop(t+dur+.1);}
 function pad(){const a=ac();if(!a)return;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;const g=a.createGain();g.gain.value=0;g.gain.linearRampToValueAtTime(.045,a.currentTime+4);lp.connect(g).connect(out());
   [196,246.9,293.7,392].forEach(f=>{const o=a.createOscillator();o.type='triangle';o.frequency.value=f;o.detune.value=rnd(-6,6);o.connect(lp);o.start();});}
-const ding=()=>{tone(1318.5,0,1.4,.08);tone(1975.5,.08,1.2,.04);};
+const ding=()=>{tone(1296,0,1.4,.07);tone(1944,.08,1.2,.035);};
+/* ---------- 432 Hz generative ambient ---------- */
+let RV=null;function rev(){const a=ac();if(!a)return null;if(RV)return RV;const len=Math.floor(a.sampleRate*5),buf=a.createBuffer(2,len,a.sampleRate);
+  for(let c=0;c<2;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6);}
+  const cv2=a.createConvolver();cv2.buffer=buf;const wet=a.createGain();wet.gain.value=.6;cv2.connect(wet).connect(out());RV=cv2;return cv2;}
+const A4=432,Hz=r=>A4*r;
+const PENT=[1,9/8,5/4,3/2,5/3];                       // A B C# E F#, tuned to A = 432
+const CHORDS=[[1/2,5/8,3/4],[5/12,1/2,5/8],[1/3,5/12,1/2],[3/8,15/32,9/16]]; // A · F#m · D · E
+const MUS={bus:null,lp:null,dens:.8,ci:0,on:false};
+function voice(f,at,dur,peak,type='triangle',dest){const a=ac();const t=a.currentTime+at;
+  [-5,5].forEach(dt=>{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;o.detune.value=dt;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+dur*.35);g.gain.setValueAtTime(peak,t+dur*.6);g.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(g).connect(dest);o.start(t);o.stop(t+dur+.1);});}
+function startMusic(){const a=ac();if(!a||MUS.on)return;MUS.on=true;
+  const bus=a.createGain();bus.gain.value=0;bus.gain.linearRampToValueAtTime(.9,a.currentTime+6);
+  const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1400;lp.Q.value=.4;bus.connect(lp);lp.connect(out());
+  const send=a.createGain();send.gain.value=.75;lp.connect(send).connect(rev());MUS.bus=bus;MUS.lp=lp;
+  // breathing drone: A2 · E3 · A3
+  const breath=a.createGain();breath.gain.value=.6;const lfo=a.createOscillator(),lg=a.createGain();lfo.frequency.value=.06;lg.gain.value=.35;lfo.connect(lg).connect(breath.gain);lfo.start();breath.connect(bus);
+  [[Hz(1/4),.05],[Hz(3/8),.03],[Hz(1/2),.022]].forEach(([f,v])=>{[-4,4].forEach(dt=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;o.detune.value=dt;g.gain.value=v;o.connect(g).connect(breath);o.start();});});
+  // slow chord bed
+  const chord=()=>{if(!MUS.on)return;const c=CHORDS[MUS.ci%CHORDS.length];MUS.ci++;c.forEach((r2,k)=>voice(Hz(r2),k*.4,11,.018,'triangle',bus));setTimeout(chord,9000);};chord();
+  // sparse bells on the pentatonic, spread in stereo
+  const bell=()=>{if(!MUS.on)return;if(MUS.dens>0&&Math.random()<.85){const f=Hz(PENT[Math.random()*5|0]*(Math.random()<.5?1:2)),t=a.currentTime,pan=a.createStereoPanner?a.createStereoPanner():null;
+      const g=a.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+5);
+      [[1,1],[2,.25],[3.01,.08]].forEach(([m,v])=>{const o=a.createOscillator(),og=a.createGain();o.type='sine';o.frequency.value=f*m;og.gain.value=v;o.connect(og).connect(g);o.start(t);o.stop(t+5.2);});
+      if(pan){pan.pan.value=rnd(-.7,.7);g.connect(pan).connect(bus);}else g.connect(bus);}
+    setTimeout(bell,MUS.dens>0?rnd(1600,4200)/MUS.dens:1500);};setTimeout(bell,2500);}
+const MOODS={intro:[2200,1.3],calm:[1100,.8],desk:[1000,.6],scan:[1600,1],hide:[380,.15],drink:[3000,0],reveal:[2000,1.7],pass:[1300,1]};
+function mood(m){const v=MOODS[m];if(!v)return;MUS.dens=v[1];if(MUS.lp&&AC)MUS.lp.frequency.setTargetAtTime(v[0],AC.currentTime,2.5);}
+
 
 /* ---------- game data ---------- */
 const CATS=[{name:'一种味道',ph:'雨后泥土的味道'},{name:'一个声音',ph:'楼下收废品的吆喝'},{name:'一只动物，或一件东西',ph:'我家的猫，或一只恐龙'},{name:'一个瞬间',ph:'毕业那天的晚风'},{name:'一个人',ph:'外婆'}];
@@ -265,7 +295,7 @@ function boot(){
   el.querySelector('#on').onclick=()=>start(false);el.querySelector('#off').onclick=()=>start(true);
 }
 async function ascend(){
-  tone(880,0,2.6,.09);tone(1318.5,.2,2.6,.07);tone(1760,.4,2.8,.05);pad();
+  tone(864,0,3,.07);tone(1296,.25,3,.05);tone(1728,.5,3.2,.035);startMusic();mood('intro');
   camTo(new V3(0,1.7,10),new V3(0,3.2,-14),.42);skyT=1;
   await sleep(2400);floor.top=1;dust.top=1;
   arch.shape(archPts(7.5,9.5,2600),()=>[rnd(-10,10),rnd(-12,-2),rnd(-6,6)]);arch.top=1;
@@ -277,7 +307,7 @@ async function ascend(){
   el.querySelector('#go').onclick=queue;
 }
 async function queue(){
-  camTo(...POSE.queue,.55);
+  camTo(...POSE.queue,.55);mood('calm');
   const el=show(`<div class="eyebrow">排队中</div><button class="btn" id="go" disabled>轮到我了</button>`,'top');
   const Q=[['🐕','“不过，能申报五件「免洗」行李。”','“汤洗不掉它们。我第一件，带我家的狗。”'],['🍵','“过了安检，要喝一碗孟婆汤。”','“喝完，这辈子就全忘了。”'],['🧳','“前面是投胎的值机柜台。”','“你也是这一班？”']];
   const souls=[];
@@ -297,7 +327,7 @@ async function queue(){
   btn.onclick=()=>{done=true;clearTimeout(autoT);clearInterval(iv);MODE=null;cueOn(null);if(off)off();souls.forEach(s=>{s.top=0;s.tp=s.tp.clone().add(new V3(s.tp.x>0?2:-2,0,0));});deskScene();};
 }
 async function deskScene(){
-  camTo(...POSE.desk,.7);arch.top=0;posts.top=.25;
+  camTo(...POSE.desk,.7);mood('desk');arch.top=0;posts.top=.25;
   show(``);await sleep(2200);
   const say=async(a,b2,ms)=>{const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${a}</div>${b2?`<div class="desk">${b2}</div>`:''}`;const off=follow(b,attendant.obj);tone(740,0,.8,.05);await sleep(ms);off();};
   const el=show(`<button class="btn ghost" id="skip">跳过</button>`,'bottom');let skip=false;el.querySelector('#skip').onclick=()=>{skip=true;};
@@ -339,7 +369,7 @@ ${list}
     a.slice(0,5).forEach((q,i)=>{const e=String(q?.inner||'').trim();if(e&&e.length<=8&&/\p{Extended_Pictographic}/u.test(e))out[i].inner=e;const g=Number(q?.grams);if(g>0&&g<=5000)out[i].grams=Math.round(g*10)/10;if(q?.say)out[i].say=String(q.say).slice(0,14);});
     return out;}catch(e){return fb();}}
 function security(){
-  camTo(...POSE.sec,.8);belt.top=.3;gate.top=0;
+  camTo(...POSE.sec,.8);mood('scan');belt.top=.3;gate.top=0;
   const el=show(`<div class="eyebrow">安检 · 透视</div><div class="hint" id="h">点一件行李，放进安检机</div><button class="btn ghost" id="auto">自动扫描</button>`,'top');
   const hint=el.querySelector('#h'),autoB=el.querySelector('#auto');
   // scanner frame in camera space
@@ -380,14 +410,14 @@ function security(){
       await sleep(300);while(cur&&!finishing){scanX=Math.min(FW/2,scanX+.06);apply();await sleep(30);}while(busy)await sleep(100);}};
 }
 function hideScene(){
-  camTo(...POSE.desk,.8);attendant.tp=new V3(-1.8,1.42,-30.6);attendant.top=.2;
+  camTo(...POSE.desk,.8);mood('hide');attendant.tp=new V3(-1.8,1.42,-30.6);attendant.top=.2;
   const prev=ENV.map(g=>g.top);ENV.forEach(g=>{if(g!==attendant)g.top=g.top*.3;});skyT=.5;tone(196,0,4,.05,'triangle');tone(293.7,.4,4,.04,'triangle');
   const el=show(`<div class="eyebrow">小孟转过身去了</div>
     <p class="whisper">最想留住的那一件，<br>可以悄悄藏进袖子。</p>
     <div class="hint">它会跟你去下辈子，<br>但不会出现在分享出去的登机牌上。</div>
     <button class="btn ghost" id="no">不藏了</button>`,'top');
   let sel=null,over=false,bot=null;
-  const restore=()=>{ENV.forEach((g,k)=>g.top=prev[k]);skyT=1;attendant.tp=new V3(0,1.42,-29);attendant.top=1;};
+  const restore=()=>{mood('desk');ENV.forEach((g,k)=>g.top=prev[k]);skyT=1;attendant.tp=new V3(0,1.42,-29);attendant.top=1;};
   const go=async()=>{if(over)return;over=true;MODE=null;cueOn(null);items.forEach(it=>{it.g.top=it.home==='pocket'?.5:1;});restore();await sleep(1400);drink();};
   el.querySelector('#no').onclick=()=>{if(sel){sel.home='tray';sel.g.ts=slotSize();if(sel.tag)sel.tag.style.opacity=1;sel=null;}if(bot)bot.remove();go();};
   setTimeout(()=>{if(!over&&!sel)cueOn(items[2].g);},1600);
@@ -412,7 +442,7 @@ function drink(){
   const bowl=new PG(1300);bowl.at(0,1.62,-27.6,.95);bowl.ts=.95;bowl.top=1;bowl.shape(glyph('🥣',true,1300,.05)||ball(800,.4),()=>[rnd(-3,3),rnd(2,4),rnd(-2,2)]);
   show(`<div class="eyebrow">孟婆汤</div><div class="hint">点碗，喝下</div>`,'top');setTimeout(()=>cueOn(bowl),1600);
   MODE=async p=>{if(!pick([bowl],p,90))return;MODE=null;cueOn(null);show(``);
-    bowl.tp=camera.localToWorld(new V3(0,-.15,-.9));bowl.pk=1.6;bowl.ts=.9;tone(330,0,3,.06,'triangle');
+    mood('drink');bowl.tp=camera.localToWorld(new V3(0,-.15,-.9));bowl.pk=1.6;bowl.ts=.9;tone(330,0,3,.06,'triangle');
     await sleep(1200);skyT=2.4;bowl.top=0;ENV.forEach(g=>g.top=0);dust.top=.25;slots.forEach(s=>s.top=0);items.forEach(it=>{if(it.tag)it.tag.style.opacity=0;});
     await sleep(900);skyT=.35;await sleep(1600);reveal();};
 }
@@ -435,8 +465,8 @@ async function reveal(){
   if(!result){show(`<div class="hint">……</div>`,'bottom');result=await resultP;}
   const c=camera.position.clone(),fw=new V3();camera.getWorldDirection(fw);
   destG=new PG(5200);const pos=c.clone().add(fw.multiplyScalar(9)).add(new V3(0,.5,0));destG.at(pos.x,pos.y,pos.z,Math.min(5.4,5.4*W/H*1.2));destG.ts=destG.obj.scale.x;destG.top=1;destG.k=1.2;destG.u.uWob.value=.004;destG.u.uFog.value=.008;
-  destG.shape(glyph(DEST_E,true,5200,.035)||ball(3000,.5,.04),()=>[rnd(-2,2),rnd(-2,2),rnd(-2,2)]);destG.spin=true;skyT=.8;
-  tone(392,0,4,.06);tone(587,.3,4,.05);tone(784,.6,4,.04);
+  destG.shape(glyph(DEST_E,true,5200,.035)||ball(3000,.5,.04),()=>[rnd(-2,2),rnd(-2,2),rnd(-2,2)]);destG.spin=true;skyT=.8;mood('reveal');
+  tone(Hz(1/2),0,5,.05);tone(Hz(3/4),.3,5,.04);tone(Hz(1),.6,5,.03);
   show(`<div class="eyebrow">下辈子，你是</div><div class="big">${esc(DEST)}</div>`,'top');
   await sleep(2600);
   const T=destG.tgt,N=destG.n,anc=[[T[0],T[1],T[2]]];
@@ -504,7 +534,7 @@ async function makeCard(){
   x.restore();
   return c;
 }
-async function passScene(){
+async function passScene(){mood('pass');
   destG.top=.15;items.forEach(it=>it.g.top=.2);
   show(`<div class="hint">正在出票……</div>`);
   const c=await makeCard(),url=c.toDataURL('image/png');ding();
