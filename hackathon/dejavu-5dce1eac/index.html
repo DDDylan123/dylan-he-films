@@ -45,6 +45,9 @@ form.f{background:rgba(16,13,36,.55);backdrop-filter:blur(10px);-webkit-backdrop
 input.t{width:100%;max-width:320px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);font-family:var(--serif);font-size:22px;text-align:center;padding:8px 4px;user-select:text;-webkit-user-select:text}
 input.t::placeholder{color:var(--ink-faint);font-size:15px}
 .caption{min-height:2.2em;font-size:19px;line-height:1.7;letter-spacing:.06em;color:var(--ink);max-width:20em;transition:opacity .5s;text-wrap:balance;text-shadow:0 0 18px rgba(16,13,36,.9)}
+.flight{display:flex;align-items:baseline;gap:14px;font-size:14px;letter-spacing:.12em;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.flight b{font-family:var(--latin);font-weight:500;color:var(--lilac);letter-spacing:.1em}
+.flight i{font-style:normal;color:var(--gold);font-size:13px;animation:blink 1.4s infinite}
 .board{width:100%;max-width:320px;display:flex;flex-direction:column;font-variant-numeric:tabular-nums;border:1px solid var(--line);border-radius:10px;padding:6px 12px;background:rgba(16,13,36,.35);backdrop-filter:blur(6px)}
 .board div{display:grid;grid-template-columns:5em 1fr auto;gap:10px;font-size:13px;line-height:2;text-align:left}
 .board b{font-family:var(--latin);font-weight:500;letter-spacing:.08em;color:var(--lilac)}
@@ -337,7 +340,7 @@ async function ascend(){
   await sleep(1800);clouds.top=0;[posts,desk,sign,sign2,attendant].forEach(g=>g.top=1);
   await sleep(1200);
   const el=show(`<div class="hall">转世值机大厅</div><h1>孟婆汤<span class="lat">Déjà vu</span></h1>
-   <div class="board"><div><b>DV-2207</b><span>一头座头鲸</span><i>登机中</i></div><div><b>DV-0413</b><span>一朵云</span><i>准时</i></div><div><b>DV-1988</b><span>楼下的一只猫</span><i>已起飞</i></div><div><b>${FLIGHT}</b><span>？？？</span><i class="you">请值机</i></div></div>
+   <div class="flight"><b>${FLIGHT}</b><span>前往 · 下辈子</span><i class="you">请值机</i></div>
    <button class="btn" id="go">去值机</button>`,'top');
   el.querySelector('#go').onclick=queue;
 }
