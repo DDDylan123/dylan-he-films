@@ -353,7 +353,7 @@ async function deskScene(){
 function declare(i){
   const c=CATS[i];
   sign.top=0;sign2.top=0;
-  const el=show(`<form class="f" autocomplete="off"><div class="panelhead"><div class="slotno">免洗行李 ${i+1} / 5</div><div class="cat">${c.name}</div></div><input class="t" id="in${i}" maxlength="14" placeholder="${c.ph}" aria-label="${c.name}"><button class="btn" type="submit">申报</button></form>`,'top');
+  const el=show(`<form class="f" autocomplete="off"><div class="panelhead"><div class="slotno">免洗行李 ${i+1} / 5</div><div class="cat">${c.name}</div><div class="hint" style="font-size:12px;min-height:0">或者，任何你想带的</div></div><input class="t" id="in${i}" maxlength="14" placeholder="${c.ph}" aria-label="${c.name}"><button class="btn" type="submit">申报</button></form>`,'top');
   const inp=el.querySelector('input'),f=el.querySelector('form');setTimeout(()=>inp.focus(),500);
   f.addEventListener('submit',async e=>{e.preventDefault();const v=inp.value.trim();if(!v){inp.focus();return;}
     f.querySelector('button').disabled=true;inp.disabled=true;inp.style.transition='opacity .4s';inp.style.opacity='0';tone(587,0,.9,.05);
