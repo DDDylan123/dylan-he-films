@@ -60,6 +60,7 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
 .tag{position:absolute;transform:translate(-50%,0);font-size:12px;color:var(--ink-dim);white-space:nowrap;max-width:20vw;overflow:hidden;text-overflow:ellipsis;transition:color .4s,opacity .6s;text-shadow:0 0 8px #100d24}
 .tag.gold{color:var(--gold)}
+.tag .w{font-size:11px;opacity:.85;font-variant-numeric:tabular-nums}
 .stampfx{position:absolute;transform:translate(-50%,-50%) rotate(-12deg);border:2px solid var(--gold);color:var(--gold);border-radius:6px;padding:2px 10px;font-size:15px;letter-spacing:.25em;animation:stamp .8s ease forwards;text-shadow:0 0 10px rgba(255,224,138,.8)}
 @keyframes stamp{0%{opacity:0;transform:translate(-50%,-50%) rotate(-12deg) scale(1.8)}30%{opacity:1;transform:translate(-50%,-50%) rotate(-12deg) scale(1)}100%{opacity:0;transform:translate(-50%,-90%) rotate(-12deg) scale(1)}}
 /* boarding pass */
@@ -105,8 +106,11 @@ input.t::placeholder{color:var(--ink-faint);font-size:15px}
 body.paper{background:#f9f7fc;--ink:#241f3d;--ink-dim:#4a4468;--ink-faint:#8a83a6;--gold:#a9822f;--line:rgba(36,31,61,.2);--glass:rgba(36,31,61,.05);--mint:#6b5fa0;--peach:#3b2f5e}
 body.paper .big,body.paper h1,body.paper .caption,body.paper .whisper{text-shadow:none}
 body.paper .snd{background:rgba(255,255,255,.6)}
-.sum{font-size:clamp(17px,4.6vw,21px);letter-spacing:.08em;color:var(--ink-dim);font-variant-numeric:tabular-nums;min-height:1.6em}
-.sum b{font-weight:400;color:var(--gold)}
+.sum{display:flex;flex-direction:column;gap:2px;width:min(240px,70vw);font-size:15px;letter-spacing:.06em;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.wrow{display:flex;justify-content:space-between;gap:16px;animation:pop .5s ease}
+.wrow span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sum b{font-weight:400;color:var(--gold);white-space:nowrap}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .scale{width:min(260px,70vw);height:auto;overflow:visible}
 .scale line,.scale path{stroke:var(--ink-dim);stroke-width:1.4;fill:none;stroke-linecap:round}
 .scale .g{fill:var(--gold)}
@@ -477,7 +481,7 @@ function security(){
     const d=data[it.i];totalG+=d.grams;ding();
     const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克</div>`;b.style.transform='translate(-50%,0)';const bOff=follow(b,frame.obj,-(FY-FH/2)*PX+14);
     await sleep(2600);bOff();
-    for(let k=0;k<g.n*3;k++)g.tgt[k]=it.A[k];g.moving=true;g.tgold=1;if(it.tag)it.tag.classList.add('gold');stampAt(frame.obj,'放行');
+    for(let k=0;k<g.n*3;k++)g.tgt[k]=it.A[k];g.moving=true;g.tgold=1;if(it.tag){it.tag.classList.add('gold');it.tag.innerHTML=`${esc(it.text)}<br><span class="w">${d.grams} 克</span>`;}stampAt(frame.obj,'放行');
     await sleep(700);it.home='tray';g.ts=slotSize();it.passed=true;cur=null;busy=false;finishing=false;done++;frame.top=0;hint.textContent='点一件行李，放进安检机';
     if(done===5)return end();MODE=pickH;next();};
   const pickH=p=>{if(busy)return;const g=pick(items.filter(i=>!i.passed).map(i=>i.g),p,50);const it=items.find(i=>i.g===g);if(!it)return;MODE=null;begin(it);};
@@ -503,7 +507,7 @@ function security(){
     await sleep(1000);let sum=0;
     for(let q=0;q<5;q++){const w=data[q].grams;sum+=w;
       const dt=document.createElementNS('http://www.w3.org/2000/svg','circle');dt.setAttribute('cx',String(-22+q*11));dt.setAttribute('cy','58');dt.setAttribute('r',String(3+Math.min(4,w/4)));dt.setAttribute('class','drop');dots.appendChild(dt);
-      sm.innerHTML+=(q?' + ':'')+`<b>${data[q].grams}</b>`;tone(Hz(PENT[q]),0,1.4,.04);tone(140-q*6,0,.5,.03);
+      sm.insertAdjacentHTML('beforeend',`<div class="wrow"><span>${esc(items[q].text)}</span><b>${data[q].grams} 克</b></div>`);tone(Hz(PENT[q]),0,1.4,.04);tone(140-q*6,0,.5,.03);
       tgt=14*(1-sum/21);vel-=1.2;await sleep(1100);}
     tgt=0;await sleep(1400);el2.querySelector('#tot').style.opacity=1;tone(Hz(1/2),0,4,.06);tone(Hz(3/4),.15,4,.05);tone(Hz(1),.3,4,.04);
     await sleep(1500);el2.querySelector('#hv').style.opacity=1;await sleep(3800);alive=false;hideScene();};
@@ -606,7 +610,7 @@ async function makeCard(){
   P.forEach(p=>{const rg=x.createRadialGradient(p[0],p[1],0,p[0],p[1],34);rg.addColorStop(0,'rgba(212,170,80,.55)');rg.addColorStop(1,'rgba(212,170,80,0)');x.fillStyle=rg;x.beginPath();x.arc(p[0],p[1],34,0,6.283);x.fill();
     x.fillStyle=GOLD;x.beginPath();x.arc(p[0],p[1],5.5,0,6.283);x.fill();});
   x.font=`26px ${SER}`;x.textBaseline='middle';
-  P.forEach((p,i)=>{const t=i===hidden?'':items[i].text;if(!t)return;const w=x.measureText(t).width;let lx=p[0]+18,al='left';if(lx+w>CW-60){lx=p[0]-18;al='right';}x.textAlign=al;x.fillStyle=INKC;x.fillText(t,lx,p[1]);});
+  P.forEach((p,i)=>{const t=i===hidden?'':items[i].text+(scanData?` · ${scanData[i].grams} 克`:'');if(!t)return;const w=x.measureText(t).width;let lx=p[0]+18,al='left';if(lx+w>CW-60){lx=p[0]-18;al='right';}x.textAlign=al;x.fillStyle=INKC;x.fillText(t,lx,p[1]);});
   // headline (first person) + one line of poem
   x.textBaseline='alphabetic';x.textAlign='center';x.fillStyle=DIM;x.font=`28px ${SER}`;x.fillText('下 辈 子 ， 我 是',CW/2,880);
   x.fillStyle=INKC;x.font=`80px ${SER}`;x.fillText(DEST,CW/2,980);
