@@ -231,6 +231,17 @@ function pick(list,p,r=46){let best=null,bd=r*r;for(const g of list){const s=scr
 
 /* ---------- audio ---------- */
 let AC=null;function ac(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();}catch(e){}return AC;}
+
+/* iPhone: play as media so the ring/silent switch doesn't mute it */
+let SILENT=null;function unlockAudio(){
+  try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}
+  try{if(!SILENT){const sr=8000,n=sr,b=new Uint8Array(44+n*2),v=new DataView(b.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)b[o+i]=t.charCodeAt(i);};
+      w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+      let bin='';for(let i=0;i<b.length;i++)bin+=String.fromCharCode(b[i]);
+      SILENT=new Audio('data:audio/wav;base64,'+btoa(bin));SILENT.loop=true;SILENT.setAttribute('playsinline','');SILENT.setAttribute('webkit-playsinline','');}
+    const pr=SILENT.play();if(pr)pr.catch(()=>{});}catch(e){}
+  const a=ac();if(a&&a.state!=='running'){try{a.resume();}catch(e){}}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&AC&&!MUTE){try{AC.resume();}catch(e){}if(SILENT)SILENT.play().catch(()=>{});}});
 let MUTE=false;try{MUTE=localStorage.getItem('dv-mute')==='1';}catch(e){}
 let MASTER=null;function out(){const a=ac();if(!a)return null;if(!MASTER){MASTER=a.createGain();MASTER.gain.value=MUTE?0:1;MASTER.connect(a.destination);}return MASTER;}
 function setMute(m){MUTE=m;try{localStorage.setItem('dv-mute',m?'1':'0');}catch(e){}const o=out();if(o)o.gain.setTargetAtTime(m?0:1,AC.currentTime,.2);snd.textContent=m?'声音 · 关':'声音 · 开';snd.setAttribute('aria-pressed',String(!m));}
@@ -291,7 +302,7 @@ function boot(){
   snd.style.opacity='0';snd.style.pointerEvents='none';
   const el=show(`<div class="hint" style="font-size:15px;letter-spacing:.4em;padding-left:.4em">睁开眼之前</div>
    <div class="choose"><button class="btn" id="on">有声进入</button><button class="btn" id="off">静音进入</button></div>`);
-  let go=false;const start=m=>{if(go)return;go=true;ac();setMute(m);el.classList.remove('on');snd.style.transition='opacity 1s';snd.style.opacity='';snd.style.pointerEvents='';ascend();};
+  let go=false;const start=m=>{if(go)return;go=true;if(!m)unlockAudio();ac();setMute(m);el.classList.remove('on');snd.style.transition='opacity 1s';snd.style.opacity='';snd.style.pointerEvents='';ascend();};
   el.querySelector('#on').onclick=()=>start(false);el.querySelector('#off').onclick=()=>start(true);
 }
 async function ascend(){
@@ -547,7 +558,7 @@ async function passScene(){mood('pass');
     b.onclick=()=>c.toBlob(async blob=>{try{await dl.save({filename:`deja-vu-${FLIGHT}.png`,data:blob});}catch(e){if(e&&e.code==='unavailable')b.hidden=true;el.querySelector('#after').textContent='长按图片可保存';}},'image/png');}
 }
 
-snd.textContent=MUTE?'声音 · 关':'声音 · 开';snd.onclick=()=>{ac();setMute(!MUTE);};
+snd.textContent=MUTE?'声音 · 关':'声音 · 开';snd.onclick=()=>{if(MUTE)unlockAudio();ac();setMute(!MUTE);if(MUTE&&SILENT)SILENT.pause();};
 /* ---------- loop ---------- */
 let last=performance.now();
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;TIME+=dt;
