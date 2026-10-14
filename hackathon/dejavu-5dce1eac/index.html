@@ -368,19 +368,20 @@ function declare(i){
   });
 }
 const INNER_FB=['🪟','🌙','🌊','🕯️','☀️'],SAY_FB=['放行。','很轻，可以带。','有点重，但不超重。','放行，拿好。','没问题。'];
+function norm21(arr){const sum=arr.reduce((a,q)=>a+Math.max(.1,q.grams),0)||1;let acc=0;arr.forEach((q,i)=>{if(i<arr.length-1){q.grams=Math.max(.1,Math.round(Math.max(.1,q.grams)/sum*210)/10);acc+=q.grams;}});arr[arr.length-1].grams=Math.max(.1,Math.round((21-acc)*10)/10);return arr;}
 async function fetchScan(){const fb=()=>items.map((it,i)=>({inner:INNER_FB[i],grams:Math.round(rnd(3,900)),say:SAY_FB[i]}));
-  const s=await sampleP;if(!s)return fb();
+  const s=await sampleP;if(!s)return norm21(fb());
   const list=items.map((it,i)=>`${i+1}.（${it.cat}）${it.text}`).join('\n');
   try{const r=await s.json(`天堂机场的安检机能看见行李“里面”藏着的那段时光。下面是一位旅客的五件行李：
 ${list}
 每件给出：
 - inner：一个 emoji，画出这件东西里面藏着的那个画面或那段时光（不要和这件东西本身的样子相同，要有一点意外和诗意）
-- grams：这件东西在一个人心里的分量，单位克，0.1 到 2000，可有一位小数；玩笑的东西很轻，重要的人或时光很重
+- grams：这件东西在这个人心里占的分量（相对值，1 到 100）；玩笑的东西很轻，重要的人或时光很重
 - say：安检员看完说的一句话，不超过 10 个字，平静、温柔，偶尔一点幽默
 只回复 JSON：{"items":[{"inner":"🪟","grams":21,"say":"放行。"}]}`,{modelTier:'quick'});
     const a=r&&Array.isArray(r.items)?r.items:[];const out=fb();
     a.slice(0,5).forEach((q,i)=>{const e=String(q?.inner||'').trim();if(e&&e.length<=8&&/\p{Extended_Pictographic}/u.test(e))out[i].inner=e;const g=Number(q?.grams);if(g>0&&g<=5000)out[i].grams=Math.round(g*10)/10;if(q?.say)out[i].say=String(q.say).slice(0,14);});
-    return out;}catch(e){return fb();}}
+    return norm21(out);}catch(e){return norm21(fb());}}
 function security(){
   camTo(...POSE.sec,.8);mood('scan');belt.top=.3;gate.top=0;
   const el=show(`<div class="eyebrow">安检 · 透视</div><div class="hint" id="h">点一件行李，放进安检机</div><button class="btn ghost" id="auto">自动扫描</button>`,'top');
@@ -430,7 +431,7 @@ function security(){
     UP=()=>{down=false;if(G==='hold')mood('scan');};};
   const finishScan=async()=>{if(finishing)return;finishing=true;down=false;MODE=MOVE=UP=null;cancelAnimationFrame(raf);const it=cur,g=it.g;g.top=1;if(ringOff){ringOff();ringOff=null;}vline.top=0;hline.top=0;mood('scan');
     const d=data[it.i];totalG+=d.grams;ding();
-    const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克</div>`;b.style.transform='translate(-50%,0)';const bOff=follow(b,frame.obj,-(FY-FH/2)*PX+14);
+    const b=document.createElement('div');b.className='bubble';b.innerHTML=`<div>${esc(d.say)}</div><div class="desk">${esc(it.text)} · ${d.grams} 克 / 21 克</div>`;b.style.transform='translate(-50%,0)';const bOff=follow(b,frame.obj,-(FY-FH/2)*PX+14);
     await sleep(2600);bOff();
     for(let k=0;k<g.n*3;k++)g.tgt[k]=it.A[k];g.moving=true;g.tgold=1;if(it.tag)it.tag.classList.add('gold');stampAt(frame.obj,'放行');
     await sleep(700);it.home='tray';g.ts=slotSize();it.passed=true;cur=null;busy=false;finishing=false;done++;frame.top=0;hint.textContent='点一件行李，放进安检机';
@@ -438,7 +439,7 @@ function security(){
   const pickH=p=>{if(busy)return;const g=pick(items.filter(i=>!i.passed).map(i=>i.g),p,50);const it=items.find(i=>i.g===g);if(!it)return;MODE=null;begin(it);};
   MODE=pickH;
   const end=async()=>{MODE=MOVE=UP=null;cueOn(null);await sleep(800);belt.top=0;gate.top=0;frame.top=0;
-    show(`<div class="eyebrow">灵魂总重</div><div class="big">${Math.round(totalG*10)/10} 克</div>`,'top');await sleep(2600);hideScene();};
+    const hv=data.reduce((m,q,i)=>q.grams>data[m].grams?i:m,0);show(`<div class="eyebrow">灵魂总重</div><div class="big">21 克</div><div class="hint">其中最重的，是「${esc(items[hv].text)}」</div>`,'top');await sleep(2600);hideScene();};
   autoB.onclick=async()=>{autoB.disabled=true;for(const it of items){if(it.passed)continue;while(busy&&!cur)await sleep(100);
       if(!cur){pickH(scr(it.g.obj));while(!cur||!cur.ready)await sleep(80);}
       let t=-FW;while(cur&&!finishing){t+=FW*.05;const tt=t;reveal((x,y)=>x+y<tt);await sleep(30);}while(busy)await sleep(100);}};
@@ -555,7 +556,7 @@ async function makeCard(){
   lab('出发',72,TOP+90);val('这辈子',72,TOP+148);lab('到达',CW-72,TOP+90,'right');val(DEST,CW-72,TOP+148,'right',44,'#3b2f86');
   x.textAlign='center';x.font=`italic 44px ${LAT}`;x.fillStyle='#a99ad9';x.fillText('→',CW/2,TOP+140);
   const now=new Date(),tm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  [['登机口','奈何桥'],['座位',SEAT],['免洗行李',hidden>=0?'4 + 1 件':'5 件'],['灵魂总重',(Math.round(totalG*10)/10)+' 克']].forEach((r,i)=>{const xx=72+i*(CW-144)/4;lab(r[0],xx,TOP+232);val(r[1],xx,TOP+282,'left',32);});
+  [['登机口','奈何桥'],['座位',SEAT],['免洗行李',hidden>=0?'4 + 1 件':'5 件'],['灵魂总重','21 克']].forEach((r,i)=>{const xx=72+i*(CW-144)/4;lab(r[0],xx,TOP+232);val(r[1],xx,TOP+282,'left',32);});
   // portrait
   const por=result.portrait||'';x.textAlign='center';x.font=`36px ${SER}`;x.fillStyle='#3b2f86';
   const lines=[];let cur='';for(const ch of por){if(x.measureText(cur+ch).width>CW-200){lines.push(cur);cur=ch;}else cur+=ch;}if(cur)lines.push(cur);
