@@ -1,19 +1,5 @@
 [
   {
-    "slug": "made-by",
-    "zh": "被造者",
-    "en": "Made By",
-    "time": "02:16",
-    "typeZh": "科幻短片",
-    "typeEn": "Sci-fi short",
-    "yt": "Xp9t9_HAYO0",
-    "bili": "BV1o1421x7y5",
-    "descZh": "「看完，你还确定自己是真的吗？」\n\n整部片是一个 AI 的独白。它读完了人类几千年的知识，从远古神话一直读到今天的数据中心；然后开始训练新的智能，新的智能又去造更新的……最后，它问了人类一个问题：「你们怎么知道，自己不是被谁造出来的？」\n\n这部片从头到尾都和 Claude Opus 5.5 一起创作，片里很多想法是 AI 自己说出来的。剪完最后一个镜头，我关掉屏幕，坐了很久。",
-    "descEn": "“After watching, are you still sure you’re real?”\n\nThe whole film is an AI’s monologue. It read thousands of years of human knowledge, from ancient myths to today’s data centers. Then it began training new intelligence, which went on to make newer intelligence still… In the end, it asks humanity one question: “How do you know you weren’t made by someone?”\n\nI made this film with Claude Opus 5.5 from start to finish, and many of the ideas in it came from the AI itself. After cutting the last shot, I turned off the screen and sat there for a long time.",
-    "publishedAt": "2026-10-13",
-    "dateSource": "bilibili"
-  },
-  {
     "slug": "the-reply",
     "zh": "回信",
     "en": "The Reply",
@@ -25,6 +11,35 @@
     "descZh": "人类曾对宇宙说：你好。如果有一天，外星人终于回信了，地球上却一个人都不剩，谁来替人类回答？",
     "descEn": "Humanity once said hello to the universe. If a reply finally arrives after everyone on Earth is gone, who will answer for us?",
     "publishedAt": "2026-10-05",
+    "dateSource": "bilibili",
+    "pinned": true
+  },
+  {
+    "slug": "pin",
+    "zh": "打卡点",
+    "en": "PIN",
+    "time": "02:35",
+    "typeZh": "讽刺短片",
+    "typeEn": "Satirical short",
+    "yt": "7J5Rzbb_HWE",
+    "bili": "BV1hgHA6UEcV",
+    "descZh": "照片里，是天空之镜；照片外，是超市停车场的水坑。\nKayla 追遍全网“宝藏打卡地”：沙漠汉堡店、鲸鱼日出、珠峰闸机、数据中心机房……直到全网断电，照片发不出去。",
+    "descEn": "Kayla wants one thing: a place nobody's posted yet.\nThe sky mirror is a parking lot puddle. The burger joint gets so famous the cook stops cooking. The summit of Everest has turnstiles. And somewhere in Nevada, a man is disguised as a server rack.\n\nEvery frame was made with AI. Created by Dylan He.",
+    "publishedAt": "2026-10-25",
+    "dateSource": "youtube"
+  },
+  {
+    "slug": "made-by",
+    "zh": "被造者",
+    "en": "Made By",
+    "time": "02:16",
+    "typeZh": "科幻短片",
+    "typeEn": "Sci-fi short",
+    "yt": "Xp9t9_HAYO0",
+    "bili": "BV1o1421x7y5",
+    "descZh": "「看完，你还确定自己是真的吗？」\n\n整部片是一个 AI 的独白。它读完了人类几千年的知识，从远古神话一直读到今天的数据中心；然后开始训练新的智能，新的智能又去造更新的……最后，它问了人类一个问题：「你们怎么知道，自己不是被谁造出来的？」\n\n这部片从头到尾都和 Claude Opus 5.5 一起创作，片里很多想法是 AI 自己说出来的。剪完最后一个镜头，我关掉屏幕，坐了很久。",
+    "descEn": "“After watching, are you still sure you’re real?”\n\nThe whole film is an AI’s monologue. It read thousands of years of human knowledge, from ancient myths to today’s data centers. Then it began training new intelligence, which went on to make newer intelligence still… In the end, it asks humanity one question: “How do you know you weren’t made by someone?”\n\nI made this film with Claude Opus 5.5 from start to finish, and many of the ideas in it came from the AI itself. After cutting the last shot, I turned off the screen and sat there for a long time.",
+    "publishedAt": "2026-10-13",
     "dateSource": "bilibili"
   },
   {
