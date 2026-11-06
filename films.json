@@ -15,6 +15,20 @@
     "pinned": true
   },
   {
+    "slug": "neurovolt",
+    "en": "NEUROVOLT",
+    "zh": "NEUROVOLT",
+    "time": "03:31",
+    "typeZh": "科幻讽刺短片",
+    "typeEn": "Sci-fi satire",
+    "yt": "Kiu1ZMrn1CQ",
+    "bili": null,
+    "descZh": "我用 AI 拍了一场【假的科技发布会】。\n\n产品、公司都是虚构的，但里面某些东西，好像已经发生了。\n\n从哪句开始，你觉得这不是科幻了？\n如果是你，会领走这个免费的设备吗？",
+    "descEn": "I used AI to make a FAKE tech keynote.\n\nThe product and the company are fictional. But some of it feels like it is already happening.\n\nAt what point did this stop feeling like science fiction to you?\nWould you take this free device home?",
+    "publishedAt": "2026-11-06",
+    "dateSource": "youtube"
+  },
+  {
     "slug": "pin",
     "zh": "打卡点",
     "en": "PIN",
